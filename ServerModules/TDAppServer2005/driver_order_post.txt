@@ -1,0 +1,1 @@
+XML=<?xml version="1.0" encoding="UTF-8"?><SMS><operations><operation>SEND</operation></operations><authentification><username>psdevelop@yandex.ru</username><password>kfDS450korc</password></authentification><message><sender>00079883138837</sender><text>Заказ:***___br***___msg_text</text></message><numbers><number>+***___dest_number</number></numbers></SMS>

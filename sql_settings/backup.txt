@@ -1,0 +1,12 @@
+;
+BACKUP DATABASE [TD5R1] TO DISK = N'C:\Users\ADMIN\Documents\other\TDTwoRelease0408.bak' WITH INIT,  NAME = N'TDTwoRelease0408-Полная База данных Резервное копирование'
+;
+инструкция_усечения_журнала=DBCC SHRINKFILE(TDTwoRelease_Log,2)
+;-- WITH TRUNCATE_ONLY;--not simple backup mode
+BACKUP LOG TD5R1
+
+BACKUP DATABASE [TDTwoRelease0408] TO DISK = N'C:\Users\ALFA_SRV\Documents\other\TDTwoRelease0408.bak' WITH INIT,  NAME = N'TDTwoRelease0408-Полная База данных Резервное копирование'
+
+отправь ? на номер 5340
+производитьк_конрольное_сохранение_базы=NO
+не_показывать_неактивированные_предварительные_заявки

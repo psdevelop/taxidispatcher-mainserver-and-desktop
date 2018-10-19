@@ -1,0 +1,1 @@
+XML=<SMS><operations><operation>SEND</operation></operations><authentification><username>psdevelop@yandex.ru</username><password>kfDS450korc</password></authentification><message><sender>00079883138837</sender><text>¬аш расчЄт***___br***___msg_text руб.</text></message><numbers><number>+***___dest_number</number></numbers></SMS>

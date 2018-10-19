@@ -1,0 +1,202 @@
+To COM2: ATZ0
+To COM2: ATQ0
+To COM2: ATS40.2=1
+To COM2: AT&W0
+COM2: OK
+Receive progr buff=+++OK
+COM2: ATQ0OKATS40.2=1ERRORAT&W0ERROR
+Receive progr buff=++OK+ATQ0OKATS40.2=1ERRORAT&W0ERROR
+COM2: AT*T
+Receive progr buff=+OK+ATQ0OKATS40.2=1ERRORAT&W0ERROR+AT*T
+COM2: ERROR
+Receive progr buff=OK+ATQ0OKATS40.2=1ERRORAT&W0ERROR+AT*T+ERROR
+COM2: 
+Receive progr buff=ATQ0OKATS40.2=1ERRORAT&W0ERROR+AT*T+ERROR+
+COM2: AT&V0
+Receive progr buff=AT*T+ERROR++AT&V0
+COM2: 
+Receive progr buff=ERROR++AT&V0+
+COM2: &C: 2;
+Receive progr buff=+AT&V0++&C: 2;
+COM2:  &D: 2; 
+Receive progr buff=AT&V0++&C: 2;+ &D: 2; 
+COM2: &F: 0; E
+Receive progr buff=+&C: 2;+ &D: 2; +&F: 0; E
+COM2: : 1; L: 
+Receive progr buff=&C: 2;+ &D: 2; +&F: 0; E+: 1; L: 
+COM2: 0; M: 0;
+Receive progr buff= &D: 2; +&F: 0; E+: 1; L: +0; M: 0;
+COM2:  Q: 0; V
+Receive progr buff=&F: 0; E+: 1; L: +0; M: 0;+ Q: 0; V
+COM2: : 1; X: 
+Receive progr buff=: 1; L: +0; M: 0;+ Q: 0; V+: 1; X: 
+COM2: 4; Z: 0; S0: 0
+Receive progr buff=0; M: 0;+ Q: 0; V+: 1; X: +4; Z: 0; S0: 0
+COM2: S10: 14;
+Receive progr buff= Q: 0; V+: 1; X: +4; Z: 0; S0: 0+S10: 14;
+COM2:  S11: 95
+Receive progr buff=: 1; X: +4; Z: 0; S0: 0+S10: 14;+ S11: 95
+COM2: ; S3: 13
+Receive progr buff=4; Z: 0; S0: 0+S10: 14;+ S11: 95+; S3: 13
+COM2: ; S4: 10
+Receive progr buff=S10: 14;+ S11: 95+; S3: 13+; S4: 10
+COM2: ; S5: 8;
+Receive progr buff= S11: 95+; S3: 13+; S4: 10+; S5: 8;
+COM2:  S6: 2; 
+Receive progr buff=; S3: 13+; S4: 10+; S5: 8;+ S6: 2; 
+COM2: S7: 50; 
+Receive progr buff=; S4: 10+; S5: 8;+ S6: 2; +S7: 50; 
+COM2: S8: 2; S9: 6+F
+Receive progr buff=; S5: 8;+ S6: 2; +S7: 50; +S8: 2; S9: 6+F
+COM2: CLASS: 0; +CFG: 
+Receive progr buff= S6: 2; +S7: 50; +S8: 2; S9: 6+F+CLASS: 0; +CFG: 
+COM2: ""; +FCC
+Receive progr buff=S7: 50; +S8: 2; S9: 6+F+CLASS: 0; +CFG: +""; +FCC
+COM2: : 0,1,0,
+Receive progr buff=S8: 2; S9: 6+F+CLASS: 0; +CFG: +""; +FCC+: 0,1,0,
+COM2: 0,0,0,0,
+Receive progr buff=CLASS: 0; +CFG: +""; +FCC+: 0,1,0,+0,0,0,0,
+COM2: 0; +FIS:
+Receive progr buff=""; +FCC+: 0,1,0,+0,0,0,0,+0; +FIS:
+COM2:  0,1,0,0
+Receive progr buff=: 0,1,0,+0,0,0,0,+0; +FIS:+ 0,1,0,0
+COM2: ,0,0,0,0
+Receive progr buff=0,0,0,0,+0; +FIS:+ 0,1,0,0+,0,0,0,0
+COM2: +CDR: 
+Receive progr buff=0; +FIS:+ 0,1,0,0+,0,0,0,0++CDR: 
+COM2: 0; +CDS: 0,1,204
+Receive progr buff= 0,1,0,0+,0,0,0,0++CDR: +0; +CDS: 0,1,204
+COM2: 8,6; +CF
+Receive progr buff=,0,0,0,0++CDR: +0; +CDS: 0,1,204+8,6; +CF
+COM2: C: 0; +C
+Receive progr buff=+CDR: +0; +CDS: 0,1,204+8,6; +CF+C: 0; +C
+COM2: QD: 10; 
+Receive progr buff=0; +CDS: 0,1,204+8,6; +CF+C: 0; +C+QD: 10; 
+COM2: +CRC: 0;
+Receive progr buff=8,6; +CF+C: 0; +C+QD: 10; ++CRC: 0;
+COM2:  +CRM: 0
+Receive progr buff=C: 0; +C+QD: 10; ++CRC: 0;+ +CRM: 0
+COM2: ; +CTA: 
+Receive progr buff=QD: 10; ++CRC: 0;+ +CRM: 0+; +CTA: 
+COM2: 0+CXT:
+Receive progr buff=+CRC: 0;+ +CRM: 0+; +CTA: +0+CXT:
+COM2:  0; +DR: 0; +DS:
+Receive progr buff= +CRM: 0+; +CTA: +0+CXT:+ 0; +DR: 0; +DS:
+COM2:  3,0,204
+Receive progr buff=; +CTA: +0+CXT:+ 0; +DR: 0; +DS:+ 3,0,204
+COM2: 8,6; +EB
+Receive progr buff=0+CXT:+ 0; +DR: 0; +DS:+ 3,0,204+8,6; +EB
+COM2: : 1,0,30
+Receive progr buff= 0; +DR: 0; +DS:+ 3,0,204+8,6; +EB+: 1,0,30
+COM2: ; +EFCS:
+Receive progr buff= 3,0,204+8,6; +EB+: 1,0,30+; +EFCS:
+COM2:  1; +ER:
+Receive progr buff=8,6; +EB+: 1,0,30+; +EFCS:+ 1; +ER:
+COM2:  0+ES:
+Receive progr buff=: 1,0,30+; +EFCS:+ 1; +ER:+ 0+ES:
+COM2:  3,0,2; 
+Receive progr buff=; +EFCS:+ 1; +ER:+ 0+ES:+ 3,0,2; 
+COM2: +ESR: 1;
+Receive progr buff= 1; +ER:+ 0+ES:+ 3,0,2; ++ESR: 1;
+COM2:  +ETBM: 
+Receive progr buff= 0+ES:+ 3,0,2; ++ESR: 1;+ +ETBM: 
+COM2: 1,1,20; 
+Receive progr buff= 3,0,2; ++ESR: 1;+ +ETBM: +1,1,20; 
+COM2: +FAA: 0; +FAP: 0
+Receive progr buff=+ESR: 1;+ +ETBM: +1,1,20; ++FAA: 0; +FAP: 0
+COM2: ,0,0; +F
+Receive progr buff= +ETBM: +1,1,20; ++FAA: 0; +FAP: 0+,0,0; +F
+COM2: BO: 0+
+Receive progr buff=1,1,20; ++FAA: 0; +FAP: 0+,0,0; +F+BO: 0+
+COM2: FBU: 0; 
+Receive progr buff=+FAA: 0; +FAP: 0+,0,0; +F+BO: 0++FBU: 0; 
+COM2: +FCQ: 1,
+Receive progr buff=,0,0; +F+BO: 0++FBU: 0; ++FCQ: 1,
+COM2: 0; +FCR:
+Receive progr buff=BO: 0++FBU: 0; ++FCQ: 1,+0; +FCR:
+COM2:  0; +FCT
+Receive progr buff=FBU: 0; ++FCQ: 1,+0; +FCR:+ 0; +FCT
+COM2: : 1E; +F
+Receive progr buff=+FCQ: 1,+0; +FCR:+ 0; +FCT+: 1E; +F
+COM2: EA: 0; +
+Receive progr buff=0; +FCR:+ 0; +FCT+: 1E; +F+EA: 0; +
+COM2: FFC: 0,0
+Receive progr buff= 0; +FCT+: 1E; +F+EA: 0; ++FFC: 0,0
+COM2: ,0,0; +F
+Receive progr buff=: 1E; +F+EA: 0; ++FFC: 0,0+,0,0; +F
+COM2: HS: 0+
+Receive progr buff=EA: 0; ++FFC: 0,0+,0,0; +F+HS: 0+
+COM2: FIE: 0; 
+Receive progr buff=FFC: 0,0+,0,0; +F+HS: 0++FIE: 0; 
+COM2: +FIP: 0;
+Receive progr buff=,0,0; +F+HS: 0++FIE: 0; ++FIP: 0;
+COM2:  +FLI: "
+Receive progr buff=HS: 0++FIE: 0; ++FIP: 0;+ +FLI: "
+COM2: "; +FLO:
+Receive progr buff=FIE: 0; ++FIP: 0;+ +FLI: "+"; +FLO:
+COM2:  1; +FLP: 0; +FM
+Receive progr buff=+FIP: 0;+ +FLI: "+"; +FLO:+ 1; +FLP: 0; +FM
+COM2: S: 0; +F
+Receive progr buff= +FLI: "+"; +FLO:+ 1; +FLP: 0; +FM+S: 0; +F
+COM2: NR: 0,0,
+Receive progr buff="; +FLO:+ 1; +FLP: 0; +FM+S: 0; +F+NR: 0,0,
+COM2: 0,0+FN
+Receive progr buff= 1; +FLP: 0; +FM+S: 0; +F+NR: 0,0,+0,0+FN
+COM2: S: ""; +
+Receive progr buff=S: 0; +F+NR: 0,0,+0,0+FN+S: ""; +
+COM2: FPA: ""; +FPI: ""; +FPP: 0; +FPR
+Receive progr buff=NR: 0,0,+0,0+FN+S: ""; ++FPA: ""; +FPI: ""; +FPP: 0; +FPR
+COM2: : 8; +FP
+Receive progr buff=0,0+FN+S: ""; ++FPA: ""; +FPI: ""; +FPP: 0; +FPR+: 8; +FP
+COM2: S: 1; +F
+Receive progr buff=S: ""; ++FPA: ""; +FPI: ""; +FPP: 0; +FPR+: 8; +FP+S: 1; +F
+COM2: PW: ""
+Receive progr buff=FPA: ""; +FPI: ""; +FPP: 0; +FPR+: 8; +FP+S: 1; +F+PW: ""
+COM2: +FRQ: 0,0; +FRY:
+Receive progr buff=: 8; +FP+S: 1; +F+PW: ""++FRQ: 0,0; +FRY:
+COM2:  0; +FSA
+Receive progr buff=S: 1; +F+PW: ""++FRQ: 0,0; +FRY:+ 0; +FSA
+COM2: : ""; +F
+Receive progr buff=PW: ""++FRQ: 0,0; +FRY:+ 0; +FSA+: ""; +F
+COM2: SP: 0; +
+Receive progr buff=+FRQ: 0,0; +FRY:+ 0; +FSA+: ""; +F+SP: 0; +
+COM2: ICF: 3,3
+Receive progr buff= 0; +FSA+: ""; +F+SP: 0; ++ICF: 3,3
+COM2: ; +IFC: 
+Receive progr buff=: ""; +F+SP: 0; ++ICF: 3,3+; +IFC: 
+COM2: 2,2; +IL
+Receive progr buff=SP: 0; ++ICF: 3,3+; +IFC: +2,2; +IL
+COM2: RR: 0+
+Receive progr buff=ICF: 3,3+; +IFC: +2,2; +IL+RR: 0+
+COM2: IPR: 115
+Receive progr buff=; +IFC: +2,2; +IL+RR: 0++IPR: 115
+COM2: 200; +MA
+Receive progr buff=2,2; +IL+RR: 0++IPR: 115+200; +MA
+COM2: : ; +MR:
+Receive progr buff=RR: 0++IPR: 115+200; +MA+: ; +MR:
+COM2:  0; +MS:
+Receive progr buff=IPR: 115+200; +MA+: ; +MR:+ 0; +MS:
+COM2:  ; +MV18
+Receive progr buff=200; +MA+: ; +MR:+ 0; +MS:+ ; +MV18
+COM2: R: 0; +M
+Receive progr buff=: ; +MR:+ 0; +MS:+ ; +MV18+R: 0; +M
+COM2: V18S: 0,
+Receive progr buff= 0; +MS:+ ; +MV18+R: 0; +M+V18S: 0,
+COM2: 0,0; +CM
+Receive progr buff= ; +MV18+R: 0; +M+V18S: 0,+0,0; +CM
+COM2: UX: C,2
+Receive progr buff=R: 0; +M+V18S: 0,+0,0; +CM+UX: C,2
+COM2: *ESMS: 0; *READ
+Receive progr buff=V18S: 0,+0,0; +CM+UX: C,2+*ESMS: 0; *READ
+COM2: MT: 0; *
+Receive progr buff=0,0; +CM+UX: C,2+*ESMS: 0; *READ+MT: 0; *
+COM2: DELMT: 0
+Receive progr buff=UX: C,2+*ESMS: 0; *READ+MT: 0; *+DELMT: 0
+COM2: ; *MOREQ
+Receive progr buff=*ESMS: 0; *READ+MT: 0; *+DELMT: 0+; *MOREQ
+COM2: : ""; *M
+Receive progr buff=MT: 0; *+DELMT: 0+; *MOREQ+: ""; *M
+COM2: TACK: 0
+Receive progr buff=DELMT: 0+; *MOREQ+: ""; *M+TACK: 0
+COM2: OK
+Receive progr buff=; *MOREQ+: ""; *M+TACK: 0+OK

@@ -1,0 +1,3487 @@
+29.03.2006 - Изменения под требования новых заказчиков
+класс СЕКТОР ВЫПОЛНЕНИЯ ЗАКАЗА
+изменение Date->DateTime
+привязка водителя к сектору, возникновение очерёдности по дате-времени в секторе
+EvolutionScript29032006_1.sql - относительно версии для магнита
+29.03.2006
+добавление после разговоров со вторым программистом
+флаг - "автоматизированный режим заполнения"
+вторая панель для данного режима,
+список секторов и содержимое их очередей
+флаги - определён с обычного и опр с сотового телефона
+30.03.2006
+добавление второй связи для исходного и конечного секторов движения
+ассоциация класса соответствия с классом сектора
+добавление признака-назначать из общего списка
+добавление признака - СООБЩЕНО ВОДИТЕЛЮ
+01042006-добавление 4-х полей размеров и положения
+сектора, а текже поля подсказки на диаграмме
+04042006
+rep_time в классе "Объект выборки отчётности"
+автозап конечн сектора
+запрос конечн сектора
+запрос начальн сектора
+автозап нач сектора
+сообщать о неточностях секторного режима
+класс ЗАКАЗ - поле несовпадение исх сектора ---вычислимое
+05042006
+класс ЗАКАЗ- поле полное имя диспетчера ---вычислимое
+22042006
+перечень атрибутов отвеч за настройку призов в Объекте выборки отчётности,
+классе Заказ, классе Соответствие параметров заказа
+25042006
+атрибуты в классе водитель
+занят другим водителем и номер последнего сектора и дата последней заявки
+26042006
+атрибут Режим диспетчера в классе Объект выборки отчётности
+30042006
+признаки обновления незавершённых заявок в классе Объект выборки отчетности 
+и классе Персонал, каждый оператор может быть настроен только на одного диспетчера
+07052006
+явл дежурным, номер деж группы, количество дежурных групп,
+текущая дежурная группа, время смены деж групп, сутки деж группы,
+пер обнул деж водителя, пер обнул обычн водителя
+14022009 
+поменять у всех у кого версия 4.1.1.1 и более текст функции
+GetCustComment на
+----------------------
+CREATE FUNCTION GetCustComment  ( @cust_num decimal, @nzd datetime, @phone_adr varchar(255), @oo decimal, @od decimal)
+RETURNS varchar(255)
+AS
+BEGIN
+   declare @ccount int, @res varchar(255),  @cres varchar(255)
+
+   SET @res='Заявка от '
+   
+   --select @ccount=COUNT(*) from Zakaz where 
+   --nomer_zakaza=@cust_num
+  SET @ccount=1
+ 
+   if (@ccount>0) begin
+
+      --select @cres=telefon_klienta+adres_vyzova_vvodim from Zakaz c where 
+      --    c.nomer_zakaza=@cust_num   
+      if (@phone_adr='')  begin
+       SET @res='Пустая заявка установите адрес или телефон'
+      end
+      else
+       begin
+
+      -- select ='Заявка от '+CAST(nachalo_zakaza_data as VARCHAR) from Zakaz c where 
+      --     c.nomer_zakaza=@cust_num     
+
+        SET @res=CAST(@nzd as VARCHAR) 
+        SET @cres=', нет оператора '
+        select @ccount=COUNT(*) from Personal p where 
+          (p.BOLD_ID=@oo)
+         if (@ccount>0) begin
+            select @cres=', оператор '+p.login from Personal p where 
+            (p.BOLD_ID=@oo)
+         end 
+
+        SET @res=@res+@cres
+
+        SET @cres=', нет диспетчера '
+        select @ccount=COUNT(*) from Personal p where 
+          (p.BOLD_ID=@od)
+         if (@ccount>0) begin
+            select @cres=', диспетчер '+p.login from Personal p where 
+            (p.BOLD_ID=@od)
+         end  
+
+         SET @res=@res+@cres       
+
+        end    
+
+   end
+   else begin
+     set @res='Заявка не найдена в базе'
+   end
+
+   RETURN(@res)
+END
+----------------------
+поменять фаил отчетов!!!!
+15022009
+версия 4.1.1.2
+добавлена возможность высвечивания автоопределенного номера
+после поднятия трубки с установкой необходимого количества
+интервалов ожидания после сигнала из линии
+флаги 
+высвечивать_автоопределенный_номер_после_поднятия_трубки=NO
+ожидание_для_определения_после_звонка=2
+----------------------
+версия 4.1.1.3
+добавлены флаги
+[com_settings]
+скорость_основного_модема=19200 - обычная скорость
+скорость_дополнительного_модема=115200 - требуется например для AFIS 
+модема CDMA
+также добпвлен флаг 
+[BUSINESS_DATA]
+не_перемещаться_на_автоопределенные_заявки=YES - отсутствует
+перемещение фокуса по таблице при обновлении после определения номера
+-----------------------
+версия 4.1.1.4
+[modems]
+основной_модем_AFIS_CDMA=NO
+дополнительный_модем_AFIS_CDMA=NO
+добавлено слежение за подключенностью линий
+(BoldHandlesDM.blhDriversUnion.CurrentElement as 
+TObjekt_vyborki_otchyotnosti).Regim_dispetchera-переменная
+базы определена как устанавливающая слежение (Настройки->Прочие)
+возможность глобального запрета на изменение один раз введенного
+номера, принята следующая неиспользуемая переменная (Настройки->Прочие)
+(BoldHandlesDM.blhDriversUnion.CurrentElement as 
+TObjekt_vyborki_otchyotnosti).ne_uchit_zanyat_drug_disp
+-----------------------
+версия 4.1.1.5
+[BUSINESS_DATA]
+;лучше выключать для ускорения быстродействия
+искать_плохие_номера_дополнительно_по_адресу=NO 
+укорены операции установки номера и адреса
+добавить новую функцию к базе
+------------------
+CREATE FUNCTION GetOrderINumComment  ( @inum varchar(255))
+RETURNS varchar(255)
+AS
+BEGIN
+   declare @res varchar(255)
+   
+   select @res=('Абонент: '+Familiya+' '+Imya+' '+Otchestvo+', выз.-'+CAST(dom as VARCHAR)+'.')  
+   from Persona where 
+     CAST(korpus as varchar(255))=@inum
+  
+   if @res=NULL begin
+       SET @res='Нет данных по абонентскому номеру '
+   end  
+
+   RETURN(@res)
+END
+----------------------
+создана новая папка sql_settings
+которую надо будет копировать вместе с программой !!! ОБЯЗАТЕЛЬНО
+через нее можно будет управлять содержанием
+SQL-инструкций без правки программы
+----------------------
+4.1.1.6
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ИЗМЕНИТЬ ФУНКЦИЮ
+CREATE FUNCTION GetOrderINumComment  ( @inum varchar(255))
+RETURNS varchar(255)
+AS
+BEGIN
+   declare @res varchar(255), @pres1 int, @pres2 int, @pres3 int
+   
+   select @pres1=Prizovoe_kolichestvo_1 from Objekt_vyborki_otchyotnosti where
+    Tip_objekta='for_drivers' 
+  
+  if @pres1>0 begin
+  select @res=('Абонент: '+Familiya+' '+Imya+' '+Otchestvo+', приз. накопл. -'+CAST((dom%@pres1) as VARCHAR)+'.')  
+   from Persona where 
+     CAST(korpus as varchar(255))=@inum  
+  end
+ else
+  begin
+    select @res=('Абонент: '+Familiya+' '+Imya+' '+Otchestvo+', выз. всего-'+CAST(dom as VARCHAR)+'.')  
+   from Persona where 
+     CAST(korpus as varchar(255))=@inum
+  end
+
+   if @res=NULL begin
+       SET @res='Нет данных по абонентскому номеру '
+   end  
+
+   RETURN(@res)
+END
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+;пока пусть NO
+не_выводить_информацию_по_абонентскому_номеру=NO
+schit_okon_posl_kon_sekt(используем неиспользуемый флаг) 
+- (Настройки->Прочие)-Удалять
+справочные если их номер совпадает с одним из неоконченных
+-------------
+запрещен доступ к панели (Настройки->Прочие) без прав Администратора
+если открыто окно "Подробный список водителей" обновление
+задерживается
+-------------------
+4.1.1.7
+Версия, развивающая возможности работы с сотовыми телефонами
+[gsm_modems_logic_settings]
+;важен первый пареметр количество_правил, по нему 
+;производится поиск следующих за ним параметров
+количество_правил=3
+удалять_префикс1=YES
+префикс1=+7
+не_выводить_номер1=59595
+удалять_префикс2=YES
+префикс2=8
+не_выводить_номер2=
+удалять_префикс3=YES
+префикс3=86133
+не_выводить_номер3=
+--------------------
+Также выключается программа, если телефон не отвечает
+и стоит флаг (Настройки->Прочие)->Не работать без активной линии,
+то есть выдернут шнур из модемного входа телефона
+Теперь при полном выключении/включении сигналов от модемов
+выбрасывается окно диалога подтверждения настройки
+-------------------
+4.1.1.8
+Избавление от невывода автоопределенных повторных вызовов
+[modems]
+время_между_посылами_RING=8
+время_между_посылами_RING2=8
+время_между_посылами_RING3=8
+-------------------
+4.1.1.9
+отмена подтверждения для диспетчера АОН заявок, принятых на компьютере оператора
+[BUSINESS_DATA]
+не_считать_АОН_заявку_как_принятую_оператором=YES
+изменен exe-файл, убраны некоторые лишние операции, привязка заявки к оператору осуществляется
+к текущему пользователю на машине, где происходит добавление заявки любого вида или уст. адреса
+привязка заявки к диспетчеру - к текущему пользователю на машине, где устанавливается позывной
+ПОЛНОСТЬЮ ЗАМЕНИТЬ ПАПКУ sql_settings
+а также возможность  скрытия панели
+[BUSINESS_DATA]
+отображать_дополнительные_характеристики_заявки=YES
+-------------------
+4.1.1.10
+убран баг с перезаписью непустого адреса
+предусмотрено добавление аб номеров без лишних заявок
+[BUSINESS_DATA]
+добавление_новых_аб_данных_к_неоконченной_заявке=YES
+-------------------
+бля для проставки пропущенных призовых по абонентским
+номерам использовать
+select Nomer_zakaza, Adres_okonchaniya_zayavki,
+ Nachalo_zakaza_data, Nomer_skidki from Zakaz where 
+(Nachalo_zakaza_data>='12.03.2009') 
+order by Adres_okonchaniya_zayavki, Nachalo_zakaza_data ASC
+--------------------
+4.1.1.11
+(BoldHandlesDM.blhDriversUnion.CurrentElement as 
+TObjekt_vyborki_otchyotnosti).Vybratj_poslednie_nesk_dnei 
+теперь отвечает за устанавливаемый администратором параметр
+на панели Натсройки->Прочие "Производить запись разговоров"
+усовершенствована система записи разговоров
+!!!!!!!!!!!!!!параметр call_rec_time_quant_count уже есть
+[BUSINESS_DATA]
+;параметр управляет длительностью записи разговора call_rec_time_quant_count*5 сек
+call_rec_time_quant_count=5
+-------------------
+новые параметры [BUSINESS_DATA]
+папка_файлов_видеозаписей=C:\TMRelease4\TaxiManager\VideoRecords
+маска_списка_файлов_видеозаписей=*.3gp
+папка_файлов_звукозаписей=C:\TMRelease4\TaxiManager\CallRecords
+маска_списка_файлов_звукозаписей=*.wav
+эти папки надо создать, можно в папке программы
+следующие два флага пока не трогать, просто записать какие есть
+[BUSINESS_DATA]
+;не_показывать_неактивированные_предварительные_заявки пока пусть NO
+не_показывать_неактивированные_предварительные_заявки=NO
+положение_списков_водителей=СЛЕВА
+;если в следующем параметре указано не число или число менее 1
+;то записи будут удалятся при каждой загрузке программы
+удалять_записи_за_последние_n_часов=24
+;запись в одном из следующих 2 флагах автоматически отрубает старт звукозаписи
+;по RING последовательности от основного модема, флаги друг друга не исключают
+запись_по_факту_определения_номера=YES
+запись_по_факту_добавления_заявки=NO
+-----------------------
+4.1.1.12
+добавить удаленную процедуру к базе и поменять exe-файл
+--------------------
+CREATE PROCEDURE AddNewOrderNum 
+	-- Add the parameters for the stored procedure here
+	(@bold_id int, @ord_num int OUTPUT)
+AS
+BEGIN 
+    DECLARE @new_ord_num int;
+    DECLARE @RETURN_VALUE int;   
+
+	SELECT @new_ord_num=(Ispoljz_priz_3+1) 
+      FROM Objekt_vyborki_otchyotnosti 
+    
+    UPDATE Objekt_vyborki_otchyotnosti SET Ispoljz_priz_3=
+      (Ispoljz_priz_3+1);
+     
+    SET @ord_num=@new_ord_num;
+    return
+END
+GO
+-------------------
+4.1.1.13
+Исправляем баг с подсветкой водителей (предположительно
+при смене водителец с одного на другого)
+Запись до покл. трубки
+Детектировать отсутствие линии (см. также верхний пункт)
+Процедура 2 заявки подряд с руки
+;пока пусть одинаковые
+classic_detect_combine=CALLER NUMBER: 
+caller_id_detect_comb=CALLER NUMBER: 
+длина_определяемого_номера_обычн_модем=10
+добавить_пробелы_к_комбинациям=YES
+-------------------
+4.1.1.14
+усовершенствована система обновлений
+[BUSINESS_DATA]
+запрет_обновления_при_манипуляциях_с_деревом=YES
+показывать_безусловное_окно_вызова_по_RING=NO
+подтверждать_заверяемую_сумму_отчета=YES
+заверяемая_сумма_отчета=200
+выводить_посл_заявки_абонента=YES
+------------
+добавить Вид LastWeekOrdersView к базе данных 
+(список заявок последней недели,
+нужен для ускорения заросов
+списка заявок по аб. номеру или телефону
+из всей таблицы Zakaz)
+====================
+SELECT     BOLD_ID, BOLD_TYPE, Yavl_pochasovym, Kolichestvo_chasov, Nachalo_zakaza_data, Konec_zakaza_data, Telefon_klienta, Data_podachi, 
+                      Zavershyon, Arhivnyi, Uslovn_stoim, Adres_vyzova_vvodim, Predvariteljnyi, Data_predvariteljnaya, Zadeistv_predvarit, Data_po_umolchaniyu, 
+                      Soobsheno_voditelyu, vypolnyaetsya_voditelem, otpuskaetsya_dostepcherom, ocenivaetsya_cherez, adres_sektora, konechnyi_sektor_raboty, 
+                      sektor_voditelya, Nomer_zakaza, Adres_okonchaniya_zayavki, Pozyvnoi_ustan, Data_pribytie, Nomer_skidki, Ustan_pribytie, Primechanie, 
+                      Slugebnyi, otpravlyaetsya, Opr_s_obsh_linii, Data_na_tochke
+FROM         dbo.Zakaz
+WHERE     (Nachalo_zakaza_data >= GETDATE() - 7)
+УСОВЕРШЕНСТВОВАНА СИСТЕМА ОТПРАВКИ КОНТРОЛЬНОЙ ИНФОРМАЦИИ НА ЭЛЕКТРОННЫЙ ЯЩИК
+====================
+4.1.1.15
+Добавить функцию
+-------------------
+USE [TDTwoRelease150209]
+GO
+
+SET ANSI_NULLS OFF
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+CREATE FUNCTION [dbo].[GetEndSectorNameByID]  ( @s_id int)
+RETURNS varchar(255)
+AS
+BEGIN
+   declare @res varchar(255)
+   
+  select @res=Naimenovanie   
+   from Spravochnik where 
+     BOLD_ID=@s_id  
+
+   if @res=NULL begin
+       SET @res='Не установлен сектор'
+   end  
+
+   RETURN(@res)
+END
+-----------------------
+[BUSINESS_DATA]
+показывать_конечный_сектор=YES
+;в случае установе следующего флага jump_on_region_after_phone=NO 
+срыть_поле_региона_или_аб_номера=YES
+перемещать_фокус_на_позывной_после_установки_номера_абонента=NO
+---------
+УЧТИТЕ ПОЯСНЕНИЯ К СЛЕДУЮЩЕМУ, РАНЕЕ ДОБАВЛЕННОМУ ФЛАГУ!!!!!!!!
+;данный параметр определяет поле постановки фокуса после ввода телефонного номера 
+;его следует поставить NO если поле region(аб. номер) скрыто
+;jump_on_region_after_phone=YES
+---------------------
+;данный флаг актуален только при наличии опции, открывающей работу 
+;с конечным сектором в таблице показывать_конечный_сектор=YES 
+перемещать_на_поле_кон_сектора_после_позывного=YES
+==============================
+4.1.1.16
+Усовершенствована защита предварительных заявок
+Добавить функцию
+-------------------
+USE [TDTwoRelease150209]
+GO
+
+SET ANSI_NULLS OFF
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+CREATE FUNCTION [dbo].[GetDrIDByNum]  ( @dr_num int)
+RETURNS int
+AS
+BEGIN
+   declare @res int
+   
+   SET @res=-1
+   
+  select @res=BOLD_ID   
+   from Voditelj where 
+     Pozyvnoi=@dr_num 
+
+   if @res=NULL begin
+       SET @res=-1
+   end  
+
+   RETURN(@res)
+END
+---------------------
+теперь в пункте главного меню "Настройки" 
+доступна функция восстановления заявок
+после ошибочного стирания водителей, естественно 
+с условием, что водитель с таким же позывным 
+предварительно (перед восстановлением) вновь !!!!!!добавлен
+===========================
+4.1.1.17
+Усовершенствован режим работы с аб. номерами
+теперь если при вводе тел.номера не находится
+соответствующей ему записи с аб. номером, 
+то производится поиск в таблице простого соответствия,
+которая также ведется при формировании таблицы заявок
+также включена поддержка определения номеров с сотовых
+телефонов через AT+CLIP=1
+[modems]
+CLIP_AT_INSTR1=AT+CLIP=1
+CLIP_AT_INSTR2=
+CLIP_AT_INSTR3=
+сделана подсветка заявок, определенных с сотового
+===========================
+4.1.1.18
+подсветка заявок которые долго выполняются
+[BUSINESS_DATA]
+подсвечивать_долгие_заявки=YES
+количество_минут_для определения_долгой_заявки=10
+===========================
+4.1.1.19
+доработана подсистема управления GSM-устройствами
+[BUSINESS_DATA]
+выключать_программу_при_отсутствии_модема=NO
+производить_попытки_восстановления_связи_с_модемами=YES
+===========================
+4.1.1.20
+доработана подсистема управления GSM-устройствами
+[BUSINESS_DATA]
+номер_перезагружаемого_USB_концентратора=1
+отключать_только_конечный_USB_модем=YES
+имя_рестартуемого_устройства=Philips DF2000 GSM Handset Modem
+системное_имя_USB_концентратора=Корневой USB концентратор
+перезагружать_все_USB_устройства_при_неудачном_восстановлении_связи=NO
+перезагружать_USB_модемы_при_неудачном_восстановлении_связи=YES
+;следующий параметр пусть пока всегда будет NO
+перезагружать_все_USB_устройства_после_модемов=NO
+попытки_восстановления_связи_делать_периодически_GSM=NO
+попытки_восстановления_связи_делать_периодически_2GSM=NO
+попытки_восстановления_связи_делать_периодически_3GSM=NO
+имя_рестартуемого_устройства2=
+имя_рестартуемого_устройства3=
+автосканирование_устройств_после_реконнекта=YES
+===========================
+4.1.1.21
+усовершенствована подсистема распознавания 
+номеров входящих звонков
+у каждой группы элементов раздела [BUSINESS_DATA]
+появились новые параметры управляющие обрезкой суффикса, в том
+числе остатка от предыдущего номера
+удалять_суффикс3=YES
+суффикс3=
+считать_суффикс_по_длине3=YES
+длина_суффикса3=4
+суффикс_совпадает_с_концом_предыдущего_номера3=NO
+удалять_суффикс_при_наличии_префикса3=YES
+является_прерывающим_по_префиксу3=NO
+является_прерывающим_по_суффиксу3=NO
+то же самое в разделе[gsm_modems_logic_settings]
+также добавлено управление количеством правил для обычных модемов (находятся !!!! в разделе [BUSINESS_DATA], 
+а не в [gsm_modems_logic_settings], этот раздел для сотовых)
+(!!!!!!!установить параметр для них обязательно логичней перед самими правилами
+и в соответствии с количеством правил)
+[BUSINESS_DATA]
+количество_правил_для_обрезки=3
+добавлен важный параметр, при установке которого в YES
+высвечиваться будут номера в потоке от модема,
+которые не только по длине равны установленной но и больше ее,
+это необходимо если модем определяет номерные последовательности нечеткой длины (например от русского 
+и европейского АОНа, то есть в смешанном режиме, то есть от 7 символов)
+[BUSINESS_DATA]
+определять_номера_с_длиной_больше_установленной=NO
+Для корректной работы механизма обрезки остатков от последнего номера
+(пока только для одного стационарного модема) необходимо установить
+количество запоминаемых последних номеров для сравнения (пока не более одного)
+[BUSINESS_DATA]
+количество_последних_запоминаемых_номеров=1
+СМ. ТАКЖЕ ПРИМЕР НАСТРОЙКИ ПРАВИЛ В ФАЙЛЕ НАСТРОЕК С ОБНОВЛЕННОЙ ВЕРСИЕЙ ПО
+======================
+4.1.1.22
+добавлена возможность отмена диалога при возникновении призовой заявки
+[BUSINESS_DATA]
+установливать_признак_призовой_без_диалога=YES
+======================
+4.1.1.23
+отдельная возможность для добавления общего префикса
+[BUSINESS_DATA]
+добавлять_префикс_к_номерам_длиной_10=YES
+общий_префикс=7
+======================
+4.1.1.24
+[BUSINESS_DATA]
+запретить_менять_установленный_аб_номер=YES
+считать_призовой_по_телефону_если_аб_не_определен=YES
+декрементировать_показатели_при_попытке_смены_телефона_и_аб_номера=YES
+======================
+4.1.1.25
+добавлена возможность манипулирования списком водителей
+для главного отчета
+======================
+4.1.1.26
+добавлена возможность указания типа водителя,
+фильтрации в главном отчете, введен новый параметр доступа 
+пользователя к основным панелям, фильтрация служебных 
+заявок в оконченных заявках, пункт меню настройки закрыт
+при отсутствии разрешения на работу с настройками
+======================
+4.1.1.27
+добавлена панель повторяющихся номеров вызова
+[BUSINESS_DATA]
+выводить_повторяющиеся_заявки=YES
+подкорректированна система определения номеров
+======================
+4.1.1.28
+добавлен новый вид основного отчета
+и введена возможность учета вычетов с водителей
+за работу диспетчера (стоимость за каждую заявку-
+в настройках программы)
+======================
+4.1.1.29
+Исправлен баг с подсчетом дробных в основном отчете с
+наработкой диспетчера по кол-ву заявок, также в нем
+добавлена возможность невывода заработавших 0 рублей
+исправлен баг при добавлении нового аб. номера
+поменять папку отчетов
+введена возможность отсечения повторяющихся заявок
+до конца не доработана
+[BUSINESS_DATA]
+выводить_повторяющиеся_заявки=YES
+======================
+4.2.1.0
+для работы уведомления по Java
+
+эволюционруем БД
+/*
+   2 июля 2011 г.14:19:50
+   Пользователь: 
+   Сервер: MICROSOF-AC7BDC\SQLEXPRESS
+   База данных: TDTwoRelease0408
+   Приложение: 
+*/
+
+/* Чтобы избежать возможных неполадок, связанных с потерей данных, необходимо подробно изучить этот сценарий перед его выполнением вне контекста конструктора баз данных.*/
+BEGIN TRANSACTION
+SET QUOTED_IDENTIFIER ON
+SET ARITHABORT ON
+SET NUMERIC_ROUNDABORT OFF
+SET CONCAT_NULL_YIELDS_NULL ON
+SET ANSI_NULLS ON
+SET ANSI_PADDING ON
+SET ANSI_WARNINGS ON
+COMMIT
+BEGIN TRANSACTION
+GO
+ALTER TABLE dbo.Zakaz ADD
+	REMOTE_SET int NOT NULL CONSTRAINT DF_Zakaz_REMOTE_SET DEFAULT 0,
+	REMOTE_INCOURSE int NOT NULL CONSTRAINT DF_Zakaz_REMOTE_IN_COURSE DEFAULT 0,
+	REMOTE_ACCEPTED int NOT NULL CONSTRAINT DF_Zakaz_REMOTE_ACCEPTED DEFAULT 0,
+	REMOTE_DRNUM int NOT NULL CONSTRAINT DF_Zakaz_REMOTE_DRNUM DEFAULT 0
+GO
+COMMIT
+
+добавляем функцию
+USE [TDTwoRelease0408]
+GO
+/****** Объект:  UserDefinedFunction [dbo].[GetCustComment]    Дата сценария: 07/02/2011 14:29:41 ******/
+SET ANSI_NULLS OFF
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+CREATE FUNCTION [dbo].[GetRemoteCustComment]  ( @REMOTE_SET int, 
+@REMOTE_INCOURSE int, @REMOTE_ACCEPTED int, @REMOTE_DRNUM int)
+RETURNS varchar(255)
+AS
+BEGIN
+   declare @res varchar(255)
+
+   SET @res='НЕТ ДАННЫХ'
+   
+ 
+   if (@REMOTE_SET<>0) begin
+  
+      if (@REMOTE_INCOURSE<>0)  begin
+        SET @res='Передана, уведомлен '+CAST( @REMOTE_DRNUM AS CHAR(10))
+      end
+      else
+       begin
+        SET @res='Передана, не уведомлен '+CAST( @REMOTE_DRNUM AS CHAR(10))
+       end
+
+       if (@REMOTE_ACCEPTED=-1)  begin
+        SET @res='ОТКАЗ '+CAST( @REMOTE_DRNUM AS CHAR(10))
+       end 
+
+       if (@REMOTE_ACCEPTED=1)  begin
+        SET @res='Принял '+CAST( @REMOTE_DRNUM AS CHAR(10))
+       end 
+
+       if (@REMOTE_SET=-1)  begin
+        SET @res='Отмена диспетчером для '+CAST( @REMOTE_DRNUM AS CHAR(10))
+       end 
+
+       if (@REMOTE_SET=-2)  begin
+        SET @res='Отмена водителем '+CAST( @REMOTE_DRNUM AS CHAR(10))
+       end 
+
+       if (@REMOTE_SET=-3)  begin
+        SET @res='Отмена принята водителем '+CAST( @REMOTE_DRNUM AS CHAR(10))
+       end
+
+   end
+   else begin
+     set @res='Не передана'
+     if (@REMOTE_ACCEPTED<>0)  begin
+        SET @res='Не передана, ОТКАЗ '+CAST( @REMOTE_DRNUM AS CHAR(10))
+       end
+   end
+
+   RETURN(@res)
+END
+
+Добавляем вид
+USE [TDTwoRelease0408]
+GO
+/****** Объект:  View [dbo].[LastWeekOrdersView]    Дата сценария: 07/03/2011 03:13:05 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW [dbo].[RemoteOrders]
+AS
+SELECT     BOLD_ID, Telefon_klienta, Adres_vyzova_vvodim, 
+Pozyvnoi_ustan, REMOTE_SET, REMOTE_INCOURSE, REMOTE_ACCEPTED, 
+REMOTE_DRNUM 
+FROM         dbo.Zakaz
+WHERE  (REMOTE_SET>=-1) AND (REMOTE_SET<=1)
+
+Добавляем удаленную процедуру
+USE [TDTwoRelease0408]
+GO
+/****** Объект:  StoredProcedure [dbo].[AddNewOrderNum]    Дата сценария: 07/03/2011 16:30:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SetOrderParam] 
+	-- Add the parameters for the stored procedure here
+	(@bold_id int, @param_name varchar(20), @int_value int, @str_value varchar(255), @float_value float, @res int OUTPUT)
+AS
+BEGIN 
+
+	SET @res = 0;
+ 
+    if (@param_name='REMOTE_SET')
+		begin
+			UPDATE Zakaz SET REMOTE_SET=@int_value WHERE BOLD_ID=@bold_id
+			SET @res = @@ROWCOUNT;
+		end
+
+    if (@param_name='REMOTE_INCOURSE')
+		begin
+			UPDATE Zakaz SET REMOTE_INCOURSE=@int_value WHERE BOLD_ID=@bold_id
+			SET @res = @@ROWCOUNT;
+		end
+
+    if (@param_name='REMOTE_ACCEPTED')
+		begin
+			UPDATE Zakaz SET REMOTE_ACCEPTED=@int_value WHERE BOLD_ID=@bold_id
+            SET @res = @@ROWCOUNT;
+		end
+
+    /*if (@param_name='ORDER_SUMM')
+		begin
+			UPDATE Zakaz SET Uslovn_stoim=@float_value WHERE BOLD_ID=@bold_id
+            SET @res = @@ROWCOUNT;
+		end
+	*/
+     
+    return
+END
+
+Создаем имя входа
+app_server
+пароль app_server
+и пользователя для нашей базы с этим же именем
+и поными правами
+прописываем доступ к базе в файле соединения с сохранением пароля
+TaxiDispatcherServer.udl, проверяем соединение
+
+новые разделы
+[удаленный_контроль]
+вести_удаленный_контроль=YES
+показывать_REMOTE_COMMENT=YES
+автоматически_отправлять_при_введении_позывного=YES
+[CallCenter]
+-------------------------
+Новые папки модулей
+Modules
+=============================
+4.2.2.1
+система отсылки СМС клиентам и водителям
+создаем 2 поля контроля в БД
+/*
+   22 июля 2011 г.3:59:39
+   Пользователь: 
+   Сервер: BEST-3567AA0DF3\SQLEXPRESS
+   База данных: TDTwoRelease0408
+   Приложение: 
+*/
+
+/* Чтобы избежать возможных неполадок, связанных с потерей данных, необходимо подробно изучить этот сценарий перед его выполнением вне контекста конструктора баз данных.*/
+BEGIN TRANSACTION
+SET QUOTED_IDENTIFIER ON
+SET ARITHABORT ON
+SET NUMERIC_ROUNDABORT OFF
+SET CONCAT_NULL_YIELDS_NULL ON
+SET ANSI_NULLS ON
+SET ANSI_PADDING ON
+SET ANSI_WARNINGS ON
+COMMIT
+BEGIN TRANSACTION
+GO
+ALTER TABLE dbo.Zakaz ADD
+	DRIVER_SMS_SEND_STATE int NOT NULL CONSTRAINT DF_Zakaz_DRIVER_SMS_SEND_STATE DEFAULT 0,
+	CLIENT_SMS_SEND_STATE int NOT NULL CONSTRAINT DF_Zakaz_CLIENT_SMS_SEND_STATE DEFAULT 0
+GO
+COMMIT
+
+/*
+   22 июля 2011 г.5:00:40
+   Пользователь: 
+   Сервер: BEST-3567AA0DF3\SQLEXPRESS
+   База данных: TDTwoRelease0408
+   Приложение: 
+*/
+
+/* Чтобы избежать возможных неполадок, связанных с потерей данных, необходимо подробно изучить этот сценарий перед его выполнением вне контекста конструктора баз данных.*/
+BEGIN TRANSACTION
+SET QUOTED_IDENTIFIER ON
+SET ARITHABORT ON
+SET NUMERIC_ROUNDABORT OFF
+SET CONCAT_NULL_YIELDS_NULL ON
+SET ANSI_NULLS ON
+SET ANSI_PADDING ON
+SET ANSI_WARNINGS ON
+COMMIT
+BEGIN TRANSACTION
+GO
+ALTER TABLE dbo.Zakaz ADD
+	SMS_SEND_DRNUM varchar(50) NOT NULL CONSTRAINT DF_Zakaz_SMS_SEND_DRNUM DEFAULT 'пусто',
+	SMS_SEND_CLPHONE varchar(50) NOT NULL CONSTRAINT DF_Zakaz_SMS_SEND_CLPHONE DEFAULT 'пусто'
+GO
+COMMIT
+
+Добавить функцию
+USE [TDTwoRelease0408]
+GO
+/****** Объект:  UserDefinedFunction [dbo].[GetRemoteCustComment]    Дата сценария: 07/22/2011 04:51:09 ******/
+SET ANSI_NULLS OFF
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+CREATE FUNCTION [dbo].[GetSendSMSCustComment]  ( @DRIVER_SMS_SEND_STATE int, 
+@CLIENT_SMS_SEND_STATE int, @SMS_SEND_DRNUM varchar(50), 
+@SMS_SEND_CLPHONE varchar(50))
+RETURNS varchar(255)
+AS
+BEGIN
+	declare @dr_res varchar(255), @cl_res varchar(255)
+
+	SET @dr_res=''
+	SET @cl_res=''
+   
+ 
+	if (@DRIVER_SMS_SEND_STATE=0) begin
+		SET @dr_res='-'
+	end
+
+	if (@DRIVER_SMS_SEND_STATE=1) begin
+		SET @dr_res='ЗАПРОС SMS ВОД. '+ @SMS_SEND_DRNUM
+	end
+
+	if (@DRIVER_SMS_SEND_STATE=2) begin
+		SET @dr_res='ОТПРАВЛЕНО SMS ВОД. '+ @SMS_SEND_DRNUM
+	end
+
+	if (@DRIVER_SMS_SEND_STATE=-1) begin
+		SET @dr_res='ОШИБКА SMS ВОД. '+ @SMS_SEND_DRNUM
+	end
+
+	if (@CLIENT_SMS_SEND_STATE=0) begin
+		SET @cl_res='-'
+	end
+
+	if (@CLIENT_SMS_SEND_STATE=1) begin
+		SET @cl_res='ЗАПРОС SMS КЛ. '+ @SMS_SEND_CLPHONE
+	end
+
+	if (@CLIENT_SMS_SEND_STATE=2) begin
+		SET @cl_res='ОТПРАВЛЕНО SMS КЛ. '+ @SMS_SEND_CLPHONE
+	end
+
+	if (@CLIENT_SMS_SEND_STATE=-1) begin
+		SET @cl_res='ОШИБКА SMS КЛ. '+ @SMS_SEND_CLPHONE
+	end
+
+	RETURN(@dr_res+' '+@cl_res)
+END
+
+Опять меняем папку sql_settings со всеми запросами
+============================
+Client 4.2.2.1 AppServer 1.3.0.1
+Добавляем вид к базе
+USE [TDTwoRelease0408]
+GO
+/****** Объект:  View [dbo].[RemoteOrders]    Дата сценария: 07/28/2011 23:25:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW [dbo].[SMSSendOrders]
+AS
+SELECT     BOLD_ID, Nomer_zakaza, Telefon_klienta, Adres_vyzova_vvodim, 
+Pozyvnoi_ustan, DRIVER_SMS_SEND_STATE, CLIENT_SMS_SEND_STATE, 
+SMS_SEND_DRNUM, SMS_SEND_CLPHONE 
+FROM         dbo.Zakaz
+WHERE  ((DRIVER_SMS_SEND_STATE=1) OR 
+ (CLIENT_SMS_SEND_STATE=1))  AND (ZAVERSHYON=0)
+Еще раз напоминаю 
+
+Создаем имя входа
+app_server
+пароль app_server
+также обязательно пользователя в базе для данного логина
+НОВЫЙ ФАЙЛ НАСТРОЕК ДЛЯ СЕРВЕРА ПРИЛОЖЕНИЙ
+[BUSINESS_DATA]
+вести_контроль_отсылки_SMS=YES
+вести_контроль_удаленного_управления=NO
+запускать_CALL_CENTER=NO
+автоконнект_с_основной_базой=NO
+пытаться_восстанавливать_неактивное_соединение=YES
+всегда_запрашивать_пароль=NO
+сворачивать_в_трей_при_старте=YES
+[SMS_SENDING]
+use_COM_port_GSM1=YES
+COM_port_GSM1_num=19
+use_COM_port_GSM1=NO
+COM_port_GSM1_num=11
+
+для клиетского приложения новые настройки
+[удаленный_контроль]
+запретить_отсылку_SMS_водителям=YES
+запретить_отсылку_SMS_клиентам=YES
+
+[BUSINESS_DATA]
+спрашивать_о_бэкапе_базы=YES
+бэкап_путь=[TDTwoRelease0408] TO  DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL.1\MSSQL\Backup\TDTwoRelease0408.bak' WITH NOFORMAT, NOINIT,  NAME = N'TDTwoRelease0408-Полная База данных Резервное копирование', SKIP, NOREWIND, NOUNLOAD,  STATS = 10
+количество_моментов_бэкапа=1
+время_бэкапа1=
+время_бэкапа2=
+
+создать папку для бэкапов на диске С:\TDBackUp\
+=============================
+13.11.2011
+[BUSINESS_DATA]
+производитьк_конрольное_сохранение_базы=YES ;тестовый флаг сохранения 
+перед обновлением с сервера
+18.12.2011
+клиент версия 5.0.1.1
+меняется функция на сервере (отображение параметров вызываемой машины)\
+соответвенно !!!!!!!!!!!меняется на клиенте полностью папка sql_settings
+USE [TDTwoRelease0408]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[GetCustComment]    Script Date: 12/18/2011 19:51:17 ******/
+SET ANSI_NULLS OFF
+GO
+
+SET QUOTED_IDENTIFIER OFF
+GO
+
+CREATE FUNCTION [dbo].[GetCustComment]  ( @cust_num decimal, @nzd datetime, @phone_adr varchar(255), @oo decimal, @od decimal, @dr_num int)
+RETURNS varchar(255)
+AS
+BEGIN
+   declare @ccount int, @res varchar(255),  @cres varchar(255)
+
+   SET @res='Заявка от '
+   
+   --select @ccount=COUNT(*) from Zakaz where 
+   --nomer_zakaza=@cust_num
+  SET @ccount=1
+ 
+   if (@ccount>0) begin
+
+      --select @cres=telefon_klienta+adres_vyzova_vvodim from Zakaz c where 
+      --    c.nomer_zakaza=@cust_num   
+      if (@phone_adr='')  begin
+       SET @res='Пустая заявка установите адрес или телефон'
+      end
+      else
+       begin
+
+      -- select ='Заявка от '+CAST(nachalo_zakaza_data as VARCHAR) from Zakaz c where 
+      --     c.nomer_zakaza=@cust_num     
+
+        SET @res=CAST(@nzd as VARCHAR) 
+        SET @cres=', нет оператора '
+        select @ccount=COUNT(*) from Personal p where 
+          (p.BOLD_ID=@oo)
+         if (@ccount>0) begin
+            select @cres=', оператор '+p.login from Personal p where 
+            (p.BOLD_ID=@oo)
+         end 
+
+        SET @res=@res+@cres
+
+        SET @cres=', нет диспетчера '
+        select @ccount=COUNT(*) from Personal p where 
+          (p.BOLD_ID=@od)
+         if (@ccount>0) begin
+            select @cres=', диспетчер '+p.login from Personal p where 
+            (p.BOLD_ID=@od)
+         end  
+
+         SET @res=@res+@cres 
+         
+         SET @cres=' не опр. водитель '
+         if (@dr_num>0) begin
+			select @ccount=COUNT(*) from Voditelj v where 
+				(v.Pozyvnoi=@dr_num)
+			if (@ccount>0) begin
+				select @cres=', машина '+CAST(v.Pozyvnoi AS VARCHAR)+' '+
+					ISNULL(v.Marka_avtomobilya,'нет марки и цвета')+' '+
+					ISNULL(v.Gos_nomernoi_znak,'нет гос. номера') from Voditelj v where 
+					(v.Pozyvnoi=@dr_num)
+			end  
+         end
+
+         SET @res=@res+@cres      
+
+        end    
+
+   end
+   else begin
+     set @res='Заявка не найдена в базе'
+   end
+
+   RETURN(@res)
+END
+GO
+также полностью реализован режим скрытия предварительных несработавших заявок
+для этого устанавливается в YES флаг 
+;не_показывать_неактивированные_предварительные_заявки пока пусть NO
+;теперь можно включать
+не_показывать_неактивированные_предварительные_заявки=YES
+-------------------
+подсчитывать_за_сутки=YES - показывать счетчик не только за смену но и за сутки
+==================================
+05/05/2012
+добавляем отправку смс клиенту через сервис
+новая функция
+USE [TDTwoRelease0408]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[GetCustComment]    Script Date: 05/05/2012 09:31:33 ******/
+SET ANSI_NULLS OFF
+GO
+
+SET QUOTED_IDENTIFIER OFF
+GO
+
+CREATE FUNCTION [dbo].[GetCustClientInfo]  ( @cust_num decimal, @dr_num int)
+RETURNS varchar(255)
+AS
+BEGIN
+   declare @ccount int, @res varchar(255),  @cres varchar(255),
+		@poz varchar(255), @model varchar(255), @gos_num  varchar(255)
+
+  SET @res=''
+   
+   --select @ccount=COUNT(*) from Zakaz where 
+   --nomer_zakaza=@cust_num
+  SET @ccount=1
+ 
+   if (@ccount>0) begin
+      --select @cres=telefon_klienta+adres_vyzova_vvodim from Zakaz c where 
+      --    c.nomer_zakaza=@cust_num   
+      --if (@phone_adr='')  begin
+      -- SET @res=''
+      --end
+      --else
+      -- begin
+      -- select ='Заявка от '+CAST(nachalo_zakaza_data as VARCHAR) from Zakaz c where 
+      --     c.nomer_zakaza=@cust_num     
+      --SET @res=CAST(@nzd as VARCHAR)   
+         SET @cres=''
+         SET @poz=''
+		 SET @model=''
+         SET @gos_num=''
+         if (@dr_num>0) begin
+			select @ccount=COUNT(*) from Voditelj v where 
+				(v.Pozyvnoi=@dr_num)
+			if (@ccount>0) begin
+				select @poz=ISNULL(CAST(v.Pozyvnoi AS VARCHAR),''),
+					@model=ISNULL(v.Marka_avtomobilya,''),
+					@gos_num=ISNULL(v.Gos_nomernoi_znak,'') from Voditelj v where 
+					(v.Pozyvnoi=@dr_num)
+			end  
+         end
+		 
+		 if	(@poz<>'') begin
+			SET @poz='позывной '+@poz
+		 end
+		 if ((@model<>'') AND (@gos_num<>'')) begin
+			SET @res=@model+' '+@gos_num+' '+@poz    
+         end
+        --end    
+   end
+   else begin
+     set @res=''
+   end
+
+   RETURN(@res)
+END
+GO
+--------------
+Обновляем вид
+USE [TDTwoRelease0408]
+GO
+
+/****** Object:  View [dbo].[SMSSendOrders]    Script Date: 05/05/2012 10:07:30 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[SMSSendOrders]
+AS
+SELECT     BOLD_ID, Nomer_zakaza, Telefon_klienta, Adres_vyzova_vvodim, Pozyvnoi_ustan, DRIVER_SMS_SEND_STATE, CLIENT_SMS_SEND_STATE, SMS_SEND_DRNUM, 
+                      SMS_SEND_CLPHONE, dbo.GetCustClientInfo(BOLD_ID, Pozyvnoi_ustan) AS CLIENT_ORDER_INFO
+FROM         dbo.Zakaz
+WHERE     ((DRIVER_SMS_SEND_STATE = 1) OR
+                      (CLIENT_SMS_SEND_STATE = 1)) AND (ZAVERSHYON=0)
+
+GO
+
+
+-------------
+изменение в файлах настройки приложения-сервера
+[BUSINESS_DATA]
+вести_контроль_отсылки_SMS=YES
+;следующий параметр относится к соединению с удаленной базой
+вести_контроль_удаленного_управления=NO
+запускать_CALL_CENTER=NO
+автоконнект_с_основной_базой=YES
+пытаться_восстанавливать_неактивное_локальное_соединение=YES
+;следующий параметр относится к соединению с удаленной базой
+пытаться_восстанавливать_неактивное_соединение=NO
+всегда_запрашивать_пароль=NO
+сворачивать_в_трей_при_старте=YES
+отправлять_СМС_через_порт=NO
+дублировать_СМС_на_Java_приложение=NO
+отправлять_СМС_на_Java_приложение=NO
+отправлять_СМС_через_HTTP=NO
+отправлять_СМС_на_Интернет_сервис=YES
+;на дубровке API 02H3E1IOJRE670TB0K6DZ45O4K3J57KB1726GN07212V89J7M3LX1MM7343G85HT
+шаблон_отправки_на_Интернет_сервис=http://www.smspilot.ru/api.php?send=Вам направлено такси ***___msg_text, Спасибо, что Вы с нами&to=***___dest_number&from=Na-Dubrovku&apikey=02H3E1IOJRE670TB0K6DZ45O4K3J57KB1726GN07212V89J7M3LX1MM7343G85HT&charset=windows-1251
+базовый_адрес_HTTP_приложения=http://anapataxi.ru/TDHTTPExchange/
+HTTP_password=l4s4dfr839hr3twky
+[SMS_SENDING]
+use_COM_port_GSM1=YES
+COM_port_GSM1_num=19
+use_COM_port_GSM1=NO
+COM_port_GSM1_num=11
+============================
+в процессе внедрения исправляем
+USE [TDTwoRelease0408]
+GO
+/****** Объект:  View [dbo].[SMSSendOrders]    Дата сценария: 05/05/2012 14:16:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER VIEW [dbo].[SMSSendOrders]
+AS
+SELECT     BOLD_ID, Nomer_zakaza, Telefon_klienta, Adres_vyzova_vvodim, Pozyvnoi_ustan, DRIVER_SMS_SEND_STATE, CLIENT_SMS_SEND_STATE, SMS_SEND_DRNUM, 
+                      SMS_SEND_CLPHONE, dbo.GetCustClientInfo(BOLD_ID, Pozyvnoi_ustan) AS CLIENT_ORDER_INFO
+FROM         dbo.Zakaz
+WHERE     ((DRIVER_SMS_SEND_STATE = 1) OR
+                      (CLIENT_SMS_SEND_STATE = 1)) AND (ZAVERSHYON=0)
+--------------
+шаблон_отправки_на_Интернет_сервис=http://www.smspilot.ru/api.php?send=Вам направлено такси ***___msg_text Спасибо, что с нами!&to=***___dest_number&from=Na-Dubrovku&apikey=02H3E1IOJRE670TB0K6DZ45O4K3J57KB1726GN07212V89J7M3LX1MM7343G85HT&charset=windows-1251
+--------------
+сокращаем СМС
+USE [TDTwoRelease0408]
+GO
+/****** Object:  UserDefinedFunction [dbo].[GetCustClientInfo]    Script Date: 05/08/2012 08:32:27 ******/
+SET ANSI_NULLS OFF
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+
+ALTER FUNCTION [dbo].[GetCustClientInfo]  ( @cust_num decimal, @dr_num int)
+RETURNS varchar(255)
+AS
+BEGIN
+   declare @ccount int, @res varchar(255),  @cres varchar(255),
+		@poz varchar(255), @model varchar(255), @gos_num  varchar(255)
+
+  SET @res=''
+   
+   --select @ccount=COUNT(*) from Zakaz where 
+   --nomer_zakaza=@cust_num
+  SET @ccount=1
+ 
+   if (@ccount>0) begin
+      --select @cres=telefon_klienta+adres_vyzova_vvodim from Zakaz c where 
+      --    c.nomer_zakaza=@cust_num   
+      --if (@phone_adr='')  begin
+      -- SET @res=''
+      --end
+      --else
+      -- begin
+      -- select ='Заявка от '+CAST(nachalo_zakaza_data as VARCHAR) from Zakaz c where 
+      --     c.nomer_zakaza=@cust_num     
+      --SET @res=CAST(@nzd as VARCHAR)   
+         SET @cres=''
+         SET @poz=''
+		 SET @model=''
+         SET @gos_num=''
+         if (@dr_num>0) begin
+			select @ccount=COUNT(*) from Voditelj v where 
+				(v.Pozyvnoi=@dr_num)
+			if (@ccount>0) begin
+				select @poz=ISNULL(CAST(v.Pozyvnoi AS VARCHAR),''),
+					@model=ISNULL(v.Marka_avtomobilya,''),
+					@gos_num=ISNULL(v.Gos_nomernoi_znak,'') from Voditelj v where 
+					(v.Pozyvnoi=@dr_num)
+			end  
+         end
+		 
+		 --if	(@poz<>'') begin
+		 --	SET @poz='позывной '+@poz
+		 --end
+		 if ((@model<>'') AND (@gos_num<>'')) begin
+			SET @res=@model+' '+@gos_num    
+         end
+        --end    
+   end
+   else begin
+     set @res=''
+   end
+
+   RETURN(@res)
+END
+===================================================
+5_1 28.05.2012 
+для отчета по СМС добавляем функцию CREATE FUNCTION [dbo].[GetIntervalDriverSuccessSMSCount]  (@dr_num int, @start_dt datetime, @end_dt datetime)
+RETURNS int
+AS
+BEGIN
+  declare @res int
+
+  SET @res=0;
+ 
+   if (@dr_num>0) AND (@start_dt<@end_dt) begin
+  
+		select @res=COUNT(*) from Zakaz ord  
+			where ord.Nachalo_zakaza_data>=@start_dt AND 
+			ord.Konec_zakaza_data<=@end_dt AND 
+			ord.DRIVER_SMS_SEND_STATE=2 AND 
+			ord.Pozyvnoi_ustan=@dr_num;
+   end
+
+   RETURN(@res)
+END
+===================================================
+05062012
+CREATE FUNCTION [dbo].[GetIntervalDrClientSuccessSMSCount]  (@dr_num int, @start_dt datetime, @end_dt datetime)
+RETURNS int
+AS
+BEGIN
+  declare @res int
+
+  SET @res=0;
+ 
+   if (@dr_num>0) AND (@start_dt<@end_dt) begin
+  
+		select @res=COUNT(*) from Zakaz ord  
+			where ord.Nachalo_zakaza_data>=@start_dt AND 
+			ord.Konec_zakaza_data<=@end_dt AND 
+			ord.CLIENT_SMS_SEND_STATE=2 AND 
+			ord.Pozyvnoi_ustan=@dr_num;
+   end
+
+   RETURN(@res)
+END
+===========================================
+новый флаг для сервера
+[BUSINESS_DATA]
+показывать_номер_клиента_при_отсылке_сообщения_водителю=NO
+===========================================
+01-10-2012 5.2.5.1
+ПОДДЕРЖКА НЕСКОЛЬКИХ ВИДОВ ПРИЗОВЫХ ОДНОВРЕМЕННО ПО ТЕЛЕФОННОМУ НОМЕРУ
+ЭТО НЕ СКРИПТ ДОБАВЛЯТЬ ПОЛЯ НАДО ВРУЧНУЮ ПО СМЫСЛУ ОТРЫВКОВ СКРИПТА
+USE [TDTwoRelease0408]
+
+
+--CREATE TABLE [dbo].[Objekt_vyborki_otchyotnosti](
+........................................
+	[use_bonus3] [int] NULL,
+	[use_bonus4] [int] NULL,
+	[Prizovoe_kolichestvo_4] [int] NULL,
+ CONSTRAINT [IX_Objekt_vyborBXE] PRIMARY KEY CLUSTERED 
+(
+	[BOLD_ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+
+---ALTER TABLE [dbo].[Objekt_vyborki_otchyotnosti] ADD  CONSTRAINT [DF_Objekt_vyborki_otchyotnosti_use_bonus3]  DEFAULT ((0)) FOR [use_bonus3]
+GO
+
+---ALTER TABLE [dbo].[Objekt_vyborki_otchyotnosti] ADD  CONSTRAINT [DF_Objekt_vyborki_otchyotnosti_use_bonus4]  DEFAULT ((0)) FOR [use_bonus4]
+GO
+
+--ALTER TABLE [dbo].[Objekt_vyborki_otchyotnosti] ADD  CONSTRAINT [DF_Objekt_vyborki_otchyotnosti_Prizovoe_kolichestvo_4]  DEFAULT ((0)) FOR [Prizovoe_kolichestvo_4]
+GO
+=============================
+02-10-2012 ДОБАВЛЕН ОТЧЕТ ПО ВЫРАБОТКЕ ВОДИТЕЛЕЙ
+добавляем функцию
+CREATE FUNCTION [dbo].[GetNearestBeginEndDate]  ( @dr_num integer, @start_date datetime)
+RETURNS datetime
+AS
+BEGIN
+   declare @ccount int, @end_date datetime, @ord_type varchar(255)
+
+   SET @ord_type=NULL;
+   SET @end_date=NULL;
+   
+   select TOP 1 @ord_type=ord.Adres_vyzova_vvodim, 
+   @end_date=ord.Nachalo_zakaza_data 
+   from Zakaz ord where 
+   ord.Nachalo_zakaza_data>@start_date and 
+   ord.Pozyvnoi_ustan=@dr_num and
+   ord.Telefon_klienta='Фиктивная' and 
+   ((ord.Adres_vyzova_vvodim='Снятие с линии') or 
+   (ord.Adres_vyzova_vvodim='Постановка на линию'))
+   order by ord.Nachalo_zakaza_data asc
+ 
+   if ((@ord_type=NULL) or (@ord_type<>'Снятие с линии')) begin
+		SET @end_date=@start_date;
+   end
+   --else begin
+   --   SET @res='Заявка не найдена в базе'
+   --end
+
+   RETURN(@end_date)
+END
+меняем программу и добавляем вид к БД
+CREATE VIEW [dbo].[DriversActivityIntervals]
+AS
+SELECT     TOP (100) PERCENT Pozyvnoi_ustan, Nachalo_zakaza_data AS StartDate, dbo.GetNearestBeginEndDate(Pozyvnoi_ustan, Nachalo_zakaza_data) AS NearEndDate, 
+                      DATEDIFF(minute, Nachalo_zakaza_data, dbo.GetNearestBeginEndDate(Pozyvnoi_ustan, Nachalo_zakaza_data)) AS MinuteDelta
+FROM         dbo.Zakaz AS ord
+WHERE     (Telefon_klienta = 'Фиктивная') AND (Adres_vyzova_vvodim = 'Постановка на линию')
+ORDER BY StartDate
+======================================
+13042013
+[удаленный_контроль]
+отсылать_данные_клиент_отчет=YES
+на кубиках
+отсылать_данные_клиент_отчет=YES
+шаблон_отправки_клиенту_об_отчете=Ваш расчёт***___brсоставил ***___msg_text руб***___brСпасибо, что с нами!***___brwww.na-dubrovku.ru
+в базе
+в виде зпроса состояния смс ордерс
+появилось поле стоимости
+=======================================
+27072013
+[BUSINESS_DATA]
+вести_контроль_оплаты_водителем=YES
+дата_начала_контроля_оплат_водителей=27.07.2013
+
+Меняем таблицу
+USE [TDTwoRelease0408]
+GO
+
+/****** Object:  Table [dbo].[Vyruchka_ot_voditelya]    Script Date: 07/27/2013 21:25:46 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Vyruchka_ot_voditelya](
+	[BOLD_ID] [int] NOT NULL,
+	[BOLD_TYPE] [smallint] NOT NULL,
+	[Summa] [decimal](28, 10) NOT NULL,
+	[kem_prinositsya] [int] NULL,
+	[Data_postupleniya] [datetime] NULL,
+	[Pozyvnoi] [int] NOT NULL,
+ CONSTRAINT [IX_Vyruchka_ot_7UB] PRIMARY KEY CLUSTERED 
+(
+	[BOLD_ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[Vyruchka_ot_voditelya] ADD  DEFAULT (0) FOR [Summa]
+GO
+
+ALTER TABLE [dbo].[Vyruchka_ot_voditelya] ADD  DEFAULT ((-1)) FOR [kem_prinositsya]
+GO
+
+ALTER TABLE [dbo].[Vyruchka_ot_voditelya] ADD  CONSTRAINT [DF_Vyruchka_ot_voditelya_Pozyvnoi]  DEFAULT ((0)) FOR [Pozyvnoi]
+GO
+
+Добавляем функцию
+USE [TDTwoRelease0408]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[GetDrTakePercent]    Script Date: 07/27/2013 21:26:46 ******/
+SET ANSI_NULLS OFF
+GO
+
+SET QUOTED_IDENTIFIER OFF
+GO
+
+
+CREATE FUNCTION [dbo].[GetDrTakePercent]  (@Drnum int)
+RETURNS decimal(28, 10)
+AS
+BEGIN
+   DECLARE @percent decimal(28, 10),
+           @all_percent decimal(28, 10),
+           @dr_count int,
+           @res decimal(28, 10)
+   
+   SET @percent=0
+   SET @all_percent=0
+   SET @dr_count=0
+   
+   select @dr_count=COUNT(*) from Voditelj
+   where Pozyvnoi=@Drnum 
+   
+   IF @dr_count=0 BEGIN
+     SET @res=0
+   END
+    ELSE
+   BEGIN
+     select @percent=dr.Individ_procent from Voditelj dr
+     where Pozyvnoi=@Drnum
+     
+     if @percent>0 begin
+		SET @res=@percent
+	 end
+	 else
+	 begin
+		select @res=ovo.Procent_otchisleniya from Objekt_vyborki_otchyotnosti ovo
+		where ovo.Tip_objekta='for_drivers'
+	 end
+     
+   END  
+
+   RETURN(@res)
+END
+
+
+GO
+===================================
+07082013
+Изменения в настройках сервера приложений
+[BUSINESS_DATA]
+работать_с_сокет_клиентами=YES
+автоматически_запускать_сокет_сервер=YES
+отсылать_данные_по_смс_если_сокет_недоступен=YES
+рассылка_по_сокетам_сектора=YES
+рассылка_по_всем=NO 
+рассылать_остальным_после_рассылки_по_сектору=YES
+стартовый_приоритет_рассылки_по_остальным=10
+граничный_приоритет=15
+приоритет_индивидуального_заказа=5
+ожидание_при_запросе_на_выполнение=YES
+ожидание_при_запросе_с_руки=YES
+ожидание_при_отчете=YES
+отсылать_индивидуально_установленному=YES
+использовать_индивидуальный_приоритет=YES
+использовать_неблокирующие_сокеты=NO
+порт_сокет_сервера=6030
+использовать_UDP=NO
+автоматич_назначать_из_претенд_на_заявку=YES
+;следующий параметр-счетчик измеряется в секундах
+время_ожидания_до_автоназнач_из_претенд=15
+автоматически_закрывать_заявку=YES
+время_ожидания_до_автозакр_заявки=15
+;еще два флага разрешения отсылок на сервере приложений
+;в дополнение к отсылать_данные_клиент_отчет
+отсылать_SMS_клиент_вызов=NO
+отсылать_SMS_водитель_заказ=NO
+;для статуса 17
+автоназн_след_претенд_при_отсутств_ответа=YES
+время_автоназн_претенд_при_отсутств_ответа=15
+автоматич_рассыл_заново_при_отработке_претенд=NO
+время_ожидания_повторн_рассылки=30
+;для статуса ORDER_DISP_CANCEL = 11; ORDER_DISP_CANCEL_ASK_WAIT = 19;
+автосброс_отмены_при_отсутствии_потдверждения=NO
+время_автосброса_отмены=60
+;следующая настройка ставит на перерыв без возм разр диспетчера
+автоматическая_постановка_на_перерыв=YES
+автоматическое_снятие_с_перерыва=YES
+;следующ настройка ставит на перерыв ч-з некоторое время, к-рое для диспетчера
+автопост_на_перерыв_при_бездейств_дисп=NO
+время_автоперерыва_при_бездейств_дисп=15
+автоснятие_с_линии_при_запросе=YES
+автоснятие_с_линии_при_потере_соед=NO
+время_автоснятия_при_потере_соед=120
+;параметры сортировки при рассыле и логике отдачи
+включить_режим_приоритетной_автораздачи=YES
+не_управлять_зявками_принудит_режим=YES
+сорт_претендентов_по_времени_реакции=YES
+первые_по_реакции_впереди=NO
+опрос_перед_отдачей_индивидуально=YES
+опрос_перед_отдачами_для_сектора=NO
+опрос_перед_отдачами_для_всех=YES
+включать_занятых_в_рассыл_для_сектора=YES
+включать_занятых_в_рассыл_для_всех=YES
+;для статуса ORDER_OCCUPED_ALLOW = 7
+автоназн_след_претенд_при_отсутств_сокета=YES
+;след параметр пока не используем, след претендент сразу при отс сокета
+время_автоназн_претенд_при_отсутств_сокета=15
+;для ORDER_ONHAND_ATTEPMT = 23 и ORDER_ONHAND_ALLOW_USER_WAIT = 25
+автоотправка_неразреш_с_руки=YES
+;сколько дается времени для запрета с руки когда -> ORDER_ONHAND_DENY = 24
+время_отправки_неразреш_с_руки=15
+;для ORDER_ONHAND_ALLOW_ASK_WAIT = 18 использование под вопросом
+;что еще понимать под снятием - удал в архив или завершение
+снимать_по_истеч_отдан_с_руки=YES
+время_ожидания_отданного_с_руки=120
+;для ORDER_ONHAND_ALLOW = 9 использование под вопросом
+;что еще понимать под снятием - удал в архив или завершение
+снимать_отдан_с_руки_при_отсутств_сокета=YES
+время_снятия_отдан_с_руки_при_отсутств_сокета=120
+показывать_телефон_в_JAVA_приложении=YES
+пересылать_недоставленный_статус_вод=YES
+время_пересылк_недост_статуса_вод=20
+длина_буферов_сокета=8192
+количество_итераций_повтора_отправки=2
+
+В БД в таблицу водителей добавляем
+[Priority] [int] NOT NULL
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT [DF_Voditelj_Priority]  DEFAULT ((0)) FOR [Priority]
+
+[REMOTE_LOGIN] [varchar](50) NULL,
+[REMOTE_PASSWORD] [varchar](50) NULL,
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT [DF_Voditelj_REMOTE_LOGIN]  DEFAULT ('') FOR [REMOTE_LOGIN]
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT [DF_Voditelj_REMOTE_PASSWORD]  DEFAULT ('') FOR [REMOTE_PASSWORD]
+
+[REMOTE_STATUS] [int] NOT NULL,
+[ACCEPT_RSTATUS] [int] NOT NULL,
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT [DF_Voditelj_REMOTE_STATUS]  DEFAULT ((0)) FOR [REMOTE_STATUS]
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT [DF_Voditelj_ACCEPT_RSTATUS]  DEFAULT ((0)) FOR [ACCEPT_RSTATUS]
+
+[STAT_ORDER_ID] [int] NOT NULL
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT [DF_Voditelj_STAT_ORDER_ID]  DEFAULT ((-1)) FOR [STAT_ORDER_ID]
+
+[REMOTE_SYNC] [int] NOT NULL
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT [DF_Voditelj_REMOTE_SYNC]  
+DEFAULT ((0)) FOR [REMOTE_SYNC]
+
+[LAST_STATUS_TIME] [datetime] NOT NULL,
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT 
+[DF_Voditelj_LAST_STATUS_TIME]  DEFAULT (getdate()) FOR [LAST_STATUS_TIME]
+
+[ITS_REMOTE_CLIENT] [int] NOT NULL,
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT [DF_Voditelj_ITS_REMOTE_CLIENT]  
+DEFAULT ((0)) FOR [ITS_REMOTE_CLIENT]
+GO
+
+[SYNC_STATUS] [int] NOT NULL
+ALTER TABLE [dbo].[Voditelj] ADD  CONSTRAINT 
+[DF_Voditelj_SYNC_STATUS]  DEFAULT ((0)) FOR [SYNC_STATUS]
+GO
+
+В таблицу заказов
+[Priority_counter] [int] NOT NULL,
+[Individ_order] [int] NOT NULL,
+[Individ_sending] [int] NOT NULL,
+[SECTOR_ID] [int] NOT NULL,
+
+ALTER TABLE [dbo].[Zakaz] ADD  CONSTRAINT [DF_Zakaz_Priority_counter]  DEFAULT ((0)) FOR [Priority_counter]
+ALTER TABLE [dbo].[Zakaz] ADD  CONSTRAINT [DF_Zakaz_Individ_order]  DEFAULT ((0)) FOR [Individ_order]
+ALTER TABLE [dbo].[Zakaz] ADD  CONSTRAINT [DF_Zakaz_Individ_sending]  DEFAULT ((0)) FOR [Individ_sending]
+ALTER TABLE [dbo].[Zakaz] ADD  CONSTRAINT [DF_Zakaz_SECTOR_ID]  DEFAULT ((-1)) FOR [SECTOR_ID]
+
+[REMOTE_SUMM] [decimal](28, 10) NOT NULL
+ALTER TABLE [dbo].[Zakaz] ADD  CONSTRAINT [DF_Zakaz_REMOTE_SUMM]  DEFAULT ((0)) FOR [REMOTE_SUMM]
+
+[REMOTE_SYNC] [int] NOT NULL
+ALTER TABLE [dbo].[Zakaz] ADD  CONSTRAINT [DF_Zakaz_REMOTE_SYNC]  
+DEFAULT ((0)) FOR [REMOTE_SYNC]
+
+[LAST_STATUS_TIME] [datetime] NOT NULL,
+ALTER TABLE [dbo].[Zakaz] ADD  CONSTRAINT [DF_Zakaz_LAST_STATUS_TIME]  
+DEFAULT (getdate()) FOR [LAST_STATUS_TIME]
+GO
+
+У приложения клиента
+[удаленный_контроль]
+вести_удаленный_контроль_сокет_клиентов=YES
+заказ_как_индивидуальный_при_введ_позывного=YES
+автозапрос_состояний_сокет_клиентов=NO
+спрашивать_при_удаленной_пост_на_заказ=YES
+спрашивать_при_запросе_на_перерыв=YES
+спрашивать_при_запросе_отмены_водителем=YES
+спрашивать_при_снятии_с_линии_водителем=YES
+спрашивать_при_постановке_с_руки_водителем=YES
+использовать_индивидуальный_приоритет=YES
+гибридный_режим_назначения_удал_водителя=YES
+гибридный_режим_отчета_удал_заявки=YES
+спрашивать_при_ручном_отч_удал_заявки=NO
+
+[BUSINESS_DATA]
+сообщать_о_пустом_телефоне=NO
+загружать_данные_о_сеансах_пользователей=NO
+загружать_логи_событий=NO
+
+08082013
+!!!!!!!!!МЕНЯЕМ ОБЕ ПРОГРАММЫ
+и ДЕЛАЕМ НОРМАЛЬНЫЙ ПОСЫЛ ОТЧЕТА КЛИЕНТУ, МЕНЯЕМ ВИД
+CREATE VIEW [dbo].[SMSSendOrders]
+AS
+SELECT     BOLD_ID, Nomer_zakaza, Telefon_klienta, Adres_vyzova_vvodim, Pozyvnoi_ustan, DRIVER_SMS_SEND_STATE, CLIENT_SMS_SEND_STATE, SMS_SEND_DRNUM, 
+                      SMS_SEND_CLPHONE, dbo.GetCustClientInfo(BOLD_ID, Pozyvnoi_ustan) AS CLIENT_ORDER_INFO, Uslovn_stoim
+FROM         dbo.Zakaz
+WHERE     (DRIVER_SMS_SEND_STATE = 1) AND (Arhivnyi = 0) AND (Zavershyon = 0) OR
+                      (Arhivnyi = 0) AND (CLIENT_SMS_SEND_STATE = 1) AND (Zavershyon = 0) OR
+                      (DRIVER_SMS_SEND_STATE <> 1) AND (Arhivnyi = 0) AND (CLIENT_SMS_SEND_STATE = 3) 
+				AND (ABS(DATEDIFF(minute, Konec_zakaza_data, GETDATE())) < 10)
+
+GO
+Добавляем новые поля
+TABLE [dbo].[Objekt_vyborki_otchyotnosti]
+[DAYLY_SALE] [decimal](28, 10) NOT NULL,
+[MIN_DEBET] [decimal](28, 10) NOT NULL,
+
+ALTER TABLE [dbo].[Objekt_vyborki_otchyotnosti] ADD  
+CONSTRAINT [DF_Objekt_vyborki_otchyotnosti_DAYLY_SALE]  DEFAULT ((0)) FOR [DAYLY_SALE]
+ALTER TABLE [dbo].[Objekt_vyborki_otchyotnosti] ADD  
+CONSTRAINT [DF_Objekt_vyborki_otchyotnosti_MIN_DEBET]  DEFAULT ((0)) FOR [MIN_DEBET]
+
+[view_bonuses] [int] NOT NULL,
+	[view_ab_bonuses] [int] NOT NULL,
+	[use_ab_account] [int] NOT NULL,
+
+ALTER TABLE [dbo].[Objekt_vyborki_otchyotnosti] 
+ADD  CONSTRAINT [DF_Objekt_vyborki_otchyotnosti_view_bonuses]  
+DEFAULT ((0)) FOR [view_bonuses]
+GO
+
+ALTER TABLE [dbo].[Objekt_vyborki_otchyotnosti] 
+ADD  CONSTRAINT [DF_Objekt_vyborki_otchyotnosti_view_ab_bonuses]  
+DEFAULT ((0)) FOR [view_ab_bonuses]
+GO
+
+ALTER TABLE [dbo].[Objekt_vyborki_otchyotnosti] 
+ADD  CONSTRAINT [DF_Objekt_vyborki_otchyotnosti_use_ab_account]  
+DEFAULT ((0)) FOR [use_ab_account]
+GO
+-------------------------------
+Добавляем хранимую процедуру
+CREATE PROCEDURE [dbo].[IncrementOrdersPriority] 
+	-- Add the parameters for the stored procedure here
+	(@max_priority int)
+AS
+BEGIN 
+
+	if(@max_priority<=0)
+		SET @max_priority=20;
+ 
+	UPDATE Zakaz 
+	SET Zakaz.Priority_counter=
+	Zakaz.Priority_counter+1 
+	WHERE ((Zakaz.REMOTE_SET>0) OR 
+	(Zakaz.REMOTE_SET<5)) AND
+	Zakaz.Priority_counter<(@max_priority+1);
+
+END
+------------------------------
+Добавляем процедуру
+CREATE PROCEDURE [dbo].[SetDriverOnLine] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int)
+AS
+BEGIN 
+	UPDATE Voditelj 
+	SET Voditelj.V_rabote=1 
+	WHERE Voditelj.BOLD_ID=@driver_id;
+END
+--------------------------------
+Добавляем процедуру
+CREATE PROCEDURE [dbo].[SetOrderRemoteStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @status int, @count int OUT, 
+	@priority_counter int)
+AS
+BEGIN 
+	SET @count=0;
+
+	if @priority_counter>-10000 begin
+		UPDATE Zakaz 
+		SET Zakaz.REMOTE_SET=@status,
+		Zakaz.Priority_counter=@priority_counter 
+		WHERE Zakaz.BOLD_ID=@order_id;
+		
+		SET @count=@@ROWCOUNT;
+	end
+	else
+	begin
+		UPDATE Zakaz 
+		SET Zakaz.REMOTE_SET=@status 
+		WHERE Zakaz.BOLD_ID=@order_id;
+		
+		SET @count=@@ROWCOUNT;
+	end;
+	
+END
+--------------------------------
+Добавляем процедуру
+CREATE PROCEDURE [dbo].[SetIndOrderSendStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @indiv_priority int)
+AS
+BEGIN 
+	UPDATE Zakaz 
+	SET Zakaz.Individ_sending=1,
+	Zakaz.REMOTE_SET=2,
+	Zakaz.Priority_counter=
+	Zakaz.Priority_counter-@indiv_priority 
+	WHERE Zakaz.BOLD_ID=@order_id;
+END
+---------------------------------
+Добавляем процедуру
+CREATE PROCEDURE [dbo].[IncOrdersPriorityById] 
+	-- Add the parameters for the stored procedure here
+	(@max_priority int, @order_id int)
+AS
+BEGIN 
+
+	if(@max_priority<=0)
+		SET @max_priority=20;
+ 
+	UPDATE Zakaz 
+	SET Zakaz.Priority_counter=
+	Zakaz.Priority_counter+1 
+	WHERE ((Zakaz.REMOTE_SET>0) OR 
+	(Zakaz.REMOTE_SET<5)) AND
+	Zakaz.Priority_counter<(@max_priority+1) AND 
+	Zakaz.BOLD_ID = @order_id;
+
+END
+---------------------------------
+Добавляем функцию
+CREATE FUNCTION [dbo].[GetDriverDaysFixedSumm]  (@Drnum int, @start_date datetime, @free_days_count int)
+RETURNS decimal(28, 10)
+AS
+BEGIN
+   DECLARE @onday_fixed decimal(28, 10),
+           @days_count int,
+           @dr_count int,
+           @res decimal(28, 10)
+   
+   SET @onday_fixed=0
+   SET @days_count=0
+   SET @dr_count=0
+   SET @res=0
+   
+   select @dr_count=COUNT(*) from Voditelj
+   where Pozyvnoi=@Drnum 
+   
+   IF @dr_count=0 BEGIN
+     SET @res=0
+   END
+    ELSE
+   BEGIN
+      
+     SET @days_count=DATEDIFF(day, @start_date, GETDATE()) - 
+		@free_days_count;
+    
+	 select @onday_fixed=ovo.Kol_posl_dnei from Objekt_vyborki_otchyotnosti ovo
+	 where ovo.Tip_objekta='for_drivers';
+
+     SET @res=@onday_fixed*@days_count;
+   END  
+
+   RETURN(@res)
+END
+------------------------------------
+Добавляем функцию
+CREATE FUNCTION [dbo].[GetDrOrderFixedSumm]  (@Drnum int, @start_date datetime)
+RETURNS decimal(28, 10)
+AS
+BEGIN
+   DECLARE @order_fixed decimal(28, 10),
+           @order_count int,
+           @dr_count int,
+           @res decimal(28, 10)
+   
+   SET @order_fixed=0
+   SET @order_count=0
+   SET @dr_count=0
+   SET @res=0
+   
+   select @dr_count=COUNT(*) from Voditelj
+   where Pozyvnoi=@Drnum 
+   
+   IF @dr_count=0 BEGIN
+     SET @res=0
+   END
+    ELSE
+   BEGIN
+     select @order_count=COUNT(*) from Zakaz ord
+     where ord.Pozyvnoi_ustan=@Drnum AND 
+     ord.Nachalo_zakaza_data>=@start_date AND
+     ord.Arhivnyi=0 and ord.Zavershyon=1 AND
+     ord.Soobsheno_voditelyu=0;
+    
+	 select @order_fixed=ovo.Kolich_vyd_benzina from Objekt_vyborki_otchyotnosti ovo
+	 where ovo.Tip_objekta='for_drivers';
+
+     SET @res=@order_fixed*@order_count;
+   END  
+
+   RETURN(@res)
+END
+-----------------------------------------
+Добавляем процедуру
+CREATE PROCEDURE [dbo].[SetOrderOccupAttemptStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @driver_id int, @count int OUT, @status int, @is_manual int)
+AS
+BEGIN 
+	DECLARE @dr_num int, @dr_count int, 
+		@comment varchar(255), @att_count int;
+	
+	SET @count = 0;
+	SET @dr_count = 0; 
+	SET @att_count = 0;
+	
+	SELECT @dr_count=COUNT(*) FROM Voditelj
+	WHERE BOLD_ID=@driver_id;
+	
+	if(@dr_count>0) BEGIN
+
+	SELECT @count=COUNT(*) FROM Zakaz
+	WHERE  
+	(Zakaz.BOLD_ID=@order_id);
+	
+	SELECT @dr_num=Pozyvnoi FROM Voditelj
+	WHERE BOLD_ID=@driver_id;
+	
+	IF (@count>0)
+	begin
+	
+	SELECT @comment=('Заказ № '+
+	CAST(CAST(Nomer_zakaza AS int) AS varchar(50))+
+	', '+Telefon_klienta+', '+Adres_vyzova_vvodim) 
+	FROM Zakaz
+	WHERE  
+	(Zakaz.BOLD_ID=@order_id);
+	
+	SELECT @att_count=COUNT(*) 
+	FROM ORDER_ACCEPTING 
+	WHERE ORDER_ID=@order_id;
+	
+	EXEC dbo.FixOrderAccepting @driver_id, @order_id, @dr_num, @comment, @is_manual;
+	
+	if (@att_count=0) begin
+		UPDATE Zakaz 
+		SET Zakaz.REMOTE_DRNUM=@dr_num 
+		WHERE (Zakaz.REMOTE_SET>0) AND 
+		(Zakaz.REMOTE_SET<=6) AND 
+		(Zakaz.BOLD_ID=@order_id);
+	end
+	
+	UPDATE Zakaz 
+	SET Zakaz.REMOTE_SET=@status
+	WHERE (Zakaz.REMOTE_SET>3) AND 
+	(Zakaz.REMOTE_SET<=5) AND 
+	(Zakaz.BOLD_ID=@order_id);
+	
+	end
+	
+	END
+	
+END
+-------------------------------------------
+Добавляем поля в таблицу Personal
+[HasRemOrdChanges] [int] NOT NULL,
+[HasRemDrChanges] [int] NOT NULL,
+
+ALTER TABLE [dbo].[Personal] ADD  CONSTRAINT [DF_Personal_HasRemOrdChanges]  
+DEFAULT ((0)) FOR [HasRemOrdChanges]
+ALTER TABLE [dbo].[Personal] ADD  CONSTRAINT [DF_Personal_HasRemDrChanges]  
+DEFAULT ((0)) FOR [HasRemDrChanges]
+--------------------------------------------
+Создаем таблицу
+CREATE TABLE [dbo].[ORDER_ACCEPTING](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ORDER_ID] [int] NOT NULL,
+	[DRIVER_ID] [int] NOT NULL,
+	[ACCEPT_DATE] [datetime] NOT NULL,
+	[COMMENT] [varchar](255) NULL,
+	[DRIVER_NUM] [int] NOT NULL
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[ORDER_ACCEPTING] ADD  CONSTRAINT [DF_ORDER_ACCEPTING_ACCEPT_DATE]  DEFAULT (getdate()) FOR [ACCEPT_DATE]
+GO
+
+ALTER TABLE [dbo].[ORDER_ACCEPTING] ADD  CONSTRAINT [DF_ORDER_ACCEPTING_DRIVER_NUM]  DEFAULT ((0)) FOR [DRIVER_NUM]
+GO
+
+добавляем поле
+[IS_MANUAL] [int] NOT NULL
+ALTER TABLE [dbo].[ORDER_ACCEPTING] ADD  
+CONSTRAINT [DF_ORDER_ACCEPTING_IS_MANUAL]  DEFAULT ((0)) FOR [IS_MANUAL]
+GO
+--------------------------------------------
+к таблице заказов триггер
+USE [TDTwoRelease0408]
+GO
+
+/****** Object:  Trigger [dbo].[AFTER_REMOTE_CLOSING]    Script Date: 08/19/2013 00:43:52 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TRIGGER [dbo].[AFTER_REMOTE_CLOSING] 
+   ON  [dbo].[Zakaz] 
+   AFTER UPDATE
+AS 
+BEGIN
+
+	SET NOCOUNT ON;
+
+	DECLARE @nOldValue int, @nNewValue int, 
+		@RSOldValue int, @order_count int,
+		@NewArhValue int, @NewComplValue int,
+		@OldArhValue int, @OldComplValue int,
+		@newDrId int;
+	SELECT @nOldValue=b.BOLD_ID, 
+	@nNewValue=a.REMOTE_SET,
+	@RSOldValue=b.REMOTE_SET,
+	@NewArhValue=a.Arhivnyi,
+	@NewComplValue=a.Zavershyon,
+	@OldArhValue=b.Arhivnyi,
+	@OldComplValue=b.Zavershyon,
+	@newDrId = a.vypolnyaetsya_voditelem -- Get the Old and New values
+	FROM inserted a, deleted b
+
+	IF @nNewValue=100 
+	BEGIN
+		DELETE FROM ORDER_ACCEPTING WHERE 
+		ORDER_ACCEPTING.ORDER_ID=@nOldValue;
+	END;
+	
+	--ORDER_NO_REM_STATUS = 0;ORDER_INDIVID_TAKE = 1;
+	--ORDER_SECTOR_PUBLISHING = 2;ORDER_ALL_PUBLISHING = 3;
+	--ORDER_PUBLUSHED_WAIT = 4;
+	--ORDER_IS_OCCUPED = 5;ORDER_OCCUPED_DENY = 6;
+	--ORDER_OCCUPED_ALLOW = 7;ORDER_BUSY = 8;
+	--ORDER_ONHAND_ALLOW = 9;ORDER_ONHAND_ACTIVE = 10;
+	--ORDER_DISP_CANCEL = 11;ORDER_DISP_CANCEL_DR_INCOURSE = 12;
+	--ORDER_DRV_CANCEL = 13;ORDER_DRV_CANCEL_DISP_ALLOW = 14;
+	--ORDER_DRV_COMPLETE = 15;ORDER_COMLETE_ALLOW = 16;
+	--ORDER_ALLOW_ASK_WAIT = 17;ORDER_ONHAND_ALLOW_ASK_WAIT = 18;
+	--ORDER_DISP_CANCEL_ASK_WAIT = 19;ORDER_CLOSE_ERROR = 20;
+	--ORDER_DRCANCEL_DENY = 21;ORDER_INWORKING_WAIT = 22;
+	--ORDER_ONHAND_ATTEPMT = 23;ORDER_ONHAND_DENY = 24;
+	--ORDER_ONHAND_ALLOW_USER_WAIT = 25;ORDER_COMPLETE_ALLOW_USER_WAIT = 26;
+	--ORDER_CLOSE_ASK_WAIT = 27;
+	--ORDER_ONHAND_ABORT = 28; ORDER_CLOSE = 100;
+	
+	IF ((@nNewValue=100 OR @nNewValue=8 
+		OR @nNewValue=16 OR @nNewValue=0) 
+		AND @RSOldValue<>@nNewValue)
+	BEGIN
+		EXEC CheckDriverBusy @newDrId;
+	END;
+	
+	IF (@nNewValue<100 AND @nNewValue<>0 
+		AND @RSOldValue<>@nNewValue)
+	BEGIN
+		UPDATE Personal SET HasRemOrdChanges=1;
+	END;
+	
+	IF (@RSOldValue<>@nNewValue)
+	BEGIN
+		UPDATE Zakaz 
+		SET LAST_STATUS_TIME=CURRENT_TIMESTAMP
+		FROM Zakaz JOIN inserted i
+		ON Zakaz.BOLD_ID=i.BOLD_ID;
+	END;
+	
+	IF (((@nNewValue=100 OR @nNewValue=0) 
+		AND @RSOldValue<>@nNewValue) OR 
+		(@NewArhValue<>@OldArhValue) OR 
+		(@NewComplValue<>@OldComplValue))
+	BEGIN
+	
+		SELECT @order_count=COUNT(*) 
+		FROM Zakaz WHERE 
+		(REMOTE_SET<>0) AND (REMOTE_SET<99) 
+		AND (Arhivnyi=0) AND (Zavershyon=0) AND 
+		(Soobsheno_voditelyu=0);
+	
+		IF @order_count=0 BEGIN
+			UPDATE Personal 
+			SET HasRemOrdChanges=0;
+		END;
+	END;
+	
+	UPDATE Personal SET EstjVneshnieManip=1;
+	
+END
+
+GO
+====================================
+CREATE TRIGGER [dbo].[AFTER_ORDER_INSERT] 
+   ON  [dbo].[Zakaz] 
+   AFTER INSERT
+AS 
+BEGIN
+
+	SET NOCOUNT ON;
+
+	UPDATE Personal SET EstjVneshnieManip=1;
+
+END
+====================================
+CREATE TRIGGER AFTER_DRIVER_UPDATE 
+   ON  Voditelj 
+   AFTER UPDATE
+AS 
+BEGIN
+
+	SET NOCOUNT ON;
+
+	UPDATE Personal SET EstjVneshnieManip=1, Prover_vodit=1;
+
+END
+=================================
+----------------------------------------------
+еще одну хранимую процедуру
+CREATE PROCEDURE [dbo].[FixOrderAccepting] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @order_id int, @dr_num int, @comment varchar(255), @is_manual int)
+AS
+BEGIN 
+	INSERT INTO ORDER_ACCEPTING (ORDER_ID, DRIVER_ID, DRIVER_NUM, COMMENT, IS_MANUAL)
+	VALUES (@order_id, @driver_id, @dr_num, @comment, @is_manual);
+END
+-----------------------------------------------
+Добавляем кучу процедур смены состояний
+CREATE PROCEDURE [dbo].[SetOrderDriverCancelAttStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @dr_num int, @count int OUT)
+AS
+BEGIN 
+	--DECLARE @count int;
+	SET @count = 0;
+
+	SELECT @count=COUNT(*) FROM Zakaz
+	WHERE (Zakaz.REMOTE_SET>6) AND 
+	(Zakaz.REMOTE_SET<11) AND 
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+	UPDATE Zakaz 
+	SET Zakaz.REMOTE_SET=13 
+	WHERE (Zakaz.REMOTE_SET>6) AND 
+	(Zakaz.REMOTE_SET<11) AND 
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+END
+--------------------------------
+CREATE PROCEDURE [dbo].[SetOrderDriverCancelAllowStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @dr_num int, @count int OUT)
+AS
+BEGIN 
+	--DECLARE @count int;
+	SET @count = 0;
+
+	SELECT @count=COUNT(*) FROM Zakaz
+	WHERE (Zakaz.REMOTE_SET=13) AND  
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+	UPDATE Zakaz 
+	SET Zakaz.REMOTE_SET=14
+	WHERE (Zakaz.REMOTE_SET=13) AND  
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+END
+-----------------------------------
+CREATE PROCEDURE [dbo].[SetOrderDispCancelAllowStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @dr_num int, @count int OUT)
+AS
+BEGIN 
+	--DECLARE @count int;
+	SET @count = 0;
+
+	SELECT @count=COUNT(*) FROM Zakaz
+	WHERE (Zakaz.REMOTE_SET=11) AND  
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+	UPDATE Zakaz 
+	SET Zakaz.REMOTE_SET=12
+	WHERE (Zakaz.REMOTE_SET=11) AND  
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+END
+---------------------------------------
+CREATE PROCEDURE [dbo].[SetOrderDispCancelAttStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @dr_num int, @count int OUT)
+AS
+BEGIN 
+	--DECLARE @count int;
+	SET @count = 0;
+
+	SELECT @count=COUNT(*) FROM Zakaz
+	WHERE (Zakaz.REMOTE_SET>6) AND 
+	(Zakaz.REMOTE_SET<11) AND 
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+	UPDATE Zakaz 
+	SET Zakaz.REMOTE_SET=11 
+	WHERE (Zakaz.REMOTE_SET>6) AND 
+	(Zakaz.REMOTE_SET<11) AND 
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+END
+------------------------------------------
+CREATE PROCEDURE [dbo].[CheckDriverBusy] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int)
+AS
+BEGIN 
+    DECLARE @counter int, 
+		@its_remote_client int, @dr_count int;
+    
+    --ORDER_NO_REM_STATUS = 0;ORDER_INDIVID_TAKE = 1;
+	--ORDER_SECTOR_PUBLISHING = 2;ORDER_ALL_PUBLISHING = 3;
+	--ORDER_PUBLUSHED_WAIT = 4;
+	--ORDER_IS_OCCUPED = 5;ORDER_OCCUPED_DENY = 6;
+	--ORDER_OCCUPED_ALLOW = 7;ORDER_BUSY = 8;
+	--ORDER_ONHAND_ALLOW = 9;ORDER_ONHAND_ACTIVE = 10;
+	--ORDER_DISP_CANCEL = 11;ORDER_DISP_CANCEL_DR_INCOURSE = 12;
+	--ORDER_DRV_CANCEL = 13;ORDER_DRV_CANCEL_DISP_ALLOW = 14;
+	--ORDER_DRV_COMPLETE = 15;ORDER_COMLETE_ALLOW = 16;
+	--ORDER_ALLOW_ASK_WAIT = 17;ORDER_ONHAND_ALLOW_ASK_WAIT = 18;
+	--ORDER_DISP_CANCEL_ASK_WAIT = 19;ORDER_CLOSE_ERROR = 20;
+	--ORDER_DRCANCEL_DENY = 21;ORDER_INWORKING_WAIT = 22;
+	--ORDER_ONHAND_ATTEPMT = 23;ORDER_ONHAND_DENY = 24;
+	--ORDER_ONHAND_ALLOW_USER_WAIT = 25;ORDER_COMPLETE_ALLOW_USER_WAIT = 26;
+	--ORDER_CLOSE_ASK_WAIT = 27;
+	--ORDER_ONHAND_ABORT = 28; ORDER_CLOSE = 100;
+	--ORDER_DRV_CANCEL_USER_WAIT = 29;
+    
+    SELECT @dr_count=COUNT(*)
+    from Voditelj dr
+    WHERE dr.BOLD_ID=@driver_id;
+    
+    IF (@dr_count>0)
+    BEGIN
+    
+    SELECT @its_remote_client=dr.ITS_REMOTE_CLIENT
+    from Voditelj dr
+    WHERE dr.BOLD_ID=@driver_id;
+    
+    IF(@its_remote_client=1)
+    BEGIN
+		SELECT @counter=COUNT(*) FROM Zakaz
+		WHERE vypolnyaetsya_voditelem=@driver_id
+		and Zavershyon=0  and Arhivnyi=0
+		and (REMOTE_SET IN (8,11,13,15,19,20,21,26,29)) 
+		and Soobsheno_voditelyu=0;
+    END
+    ELSE
+    BEGIN
+		SELECT @counter=COUNT(*) FROM Zakaz
+		WHERE vypolnyaetsya_voditelem=@driver_id
+		and Zavershyon=0 and Arhivnyi=0 
+		and Soobsheno_voditelyu=0;
+    END;
+    
+	if(@counter>0)
+	begin
+		UPDATE Voditelj 
+		SET Voditelj.Zanyat_drugim_disp=1 
+		WHERE Voditelj.BOLD_ID=@driver_id;
+	end
+	else
+	begin
+		UPDATE Voditelj 
+		SET Voditelj.Zanyat_drugim_disp=0 
+		WHERE Voditelj.BOLD_ID=@driver_id;
+	end;	
+	
+	END;
+END
+------------------------------------------
+CREATE PROCEDURE [dbo].[SetOrderGoStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @dr_num int, @count int OUT)
+AS
+BEGIN 
+	DECLARE @prev_dr_id int, 
+	@on_launch int, @driver_id int;
+	
+	SET @count = 0;
+
+	SELECT @count=COUNT(*)
+	FROM Zakaz
+	WHERE ((Zakaz.REMOTE_SET=17) OR 
+	(Zakaz.REMOTE_SET=18)) AND  
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+	SELECT TOP 1 @driver_id=dr.BOLD_ID 
+	FROM Voditelj dr 
+	WHERE dr.Pozyvnoi=@dr_num;
+	
+	if (@count>0)
+	begin
+	
+	SELECT  
+	
+	@prev_dr_id=
+	Zakaz.vypolnyaetsya_voditelem 
+	FROM Zakaz
+	WHERE   
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+	UPDATE Zakaz 
+	SET Zakaz.REMOTE_SET=8,
+	Zakaz.vypolnyaetsya_voditelem=@driver_id,
+	Zakaz.Pozyvnoi_ustan=@dr_num,
+	Zakaz.CLIENT_SMS_SEND_STATE=1
+	WHERE ((Zakaz.REMOTE_SET=17) OR 
+	(Zakaz.REMOTE_SET=18)) AND  
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+	UPDATE Voditelj
+	SET Na_pereryve=0,
+	Zanyat_drugim_disp=1
+	WHERE BOLD_ID=@driver_id;
+	
+	EXEC CheckDriverBusy @prev_dr_id;
+	
+	end
+	
+	
+	
+END
+--------------------------------------------
+CREATE PROCEDURE [dbo].[SetOnHandOrderGoStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @dr_num int, @count int OUT)
+AS
+BEGIN 
+	--DECLARE @count int;
+	SET @count = 0;
+
+	SELECT @count=COUNT(*) FROM Zakaz
+	WHERE (Zakaz.REMOTE_SET=9) AND  
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+	UPDATE Zakaz 
+	SET Zakaz.REMOTE_SET=10
+	WHERE (Zakaz.REMOTE_SET=9) AND  
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.REMOTE_DRNUM=@dr_num);
+	
+END
+-----------------------------------------------
+CREATE PROCEDURE [dbo].[SetOrderCompleteAttemptStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int,  @driver_id int, @summ float, @count int OUT, @status int)
+AS
+BEGIN 
+	--DECLARE @dr_num int;
+	SET @count = 0;
+
+	SELECT @count=COUNT(*) FROM Zakaz
+	WHERE ((Zakaz.REMOTE_SET=8) OR 
+	(Zakaz.REMOTE_SET=10)) AND 
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.vypolnyaetsya_voditelem=@driver_id);
+	
+	IF(@count>0)
+	BEGIN
+	
+	UPDATE Zakaz 
+	SET Zakaz.REMOTE_SET=@status,
+	Zakaz.REMOTE_SUMM=@summ,
+	Zakaz.CLIENT_SMS_SEND_STATE=3 
+	WHERE ((Zakaz.REMOTE_SET=8) OR 
+	(Zakaz.REMOTE_SET=10)) AND 
+	(Zakaz.BOLD_ID=@order_id) AND
+	(Zakaz.vypolnyaetsya_voditelem=@driver_id);
+	
+	SET @count=@@ROWCOUNT;
+	
+	--ORDER_DRV_COMPLETE = 15;
+		--ORDER_COMLETE_ALLOW = 16;
+		--ORDER_COMPLETE_ALLOW_USER_WAIT = 26;
+		--ORDER_CLOSE_ASK_WAIT = 27;
+	
+	IF (@count>0)
+	BEGIN
+		UPDATE Zakaz SET Uslovn_stoim=@summ
+		WHERE (Zakaz.BOLD_ID=@order_id) AND
+		(@status in (15,16));
+	END;
+	
+	EXEC CheckDriverBusy @driver_id;
+	
+	END
+	
+END
+--------------------------------------------------
+CREATE PROCEDURE [dbo].[SetDriverRemoteStatus] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @status int, @count int OUT, 
+		@check_busy int, @on_launch int, @on_line int,
+		@sync int)
+AS
+BEGIN 
+
+	--DR_ERROR_CL_SOCKET = -2;
+	--DR_NOT_CONNECTED = -1;
+	--DR_NOT_AUTORIZED = 0;
+	--FREE_DRIVER = 1;
+	--DR_IN_DECISION = 2;
+	--DR_IN_WORKING = 3;
+	--DR_IN_WORKING_ONHAND = 4;
+	--DR_IN_CANCELING = 5;
+	--DR_IN_SELF_CANCELING = 6;
+	--DR_ON_REST = 7;
+	--DR_OUT_FROM_LINE = 8;
+	--DR_IN_WORKING_ONHAND_ATTEMPT = 9;
+	--DR_IN_CANCELING_ATTEMPT = 10;
+	--DR_IN_SELF_CANCELING_ATTEMPT = 11;
+	--DR_ON_REST_ATTEMPT = 12;
+	--DR_OUT_FROM_LINE_ATTEMPT = 13;
+	--DR_IN_WORKING_ONHAND_DENY = 14;
+	--DR_IN_SELF_CANCELING_DENY = 15; 
+	--DR_ON_REST_DENY = 16;
+	--DR_OUT_FROM_LINE_DENY = 17;
+	--DR_FROM_REST_ATTEMPT = 18;
+	--DR_NOACTIVE_STATUS=100;
+
+	SET @count=0;
+	
+	IF(@status=1)	--FREE_DRIVER = 1;
+	BEGIN
+		UPDATE Voditelj 
+		SET Voditelj.REMOTE_STATUS=@status 
+		WHERE Voditelj.BOLD_ID=@driver_id;
+		
+		SET @count=@@ROWCOUNT;
+	END;
+	
+	IF(@status=-2)	--DR_ERROR_CL_SOCKET = -2;
+	BEGIN
+		UPDATE Voditelj 
+		SET Voditelj.REMOTE_STATUS=@status 
+		WHERE Voditelj.BOLD_ID=@driver_id;
+		
+		SET @count=@@ROWCOUNT;
+	END;
+
+	IF(@status=12)	--DR_ON_REST_ATTEMPT = 12;
+	BEGIN
+		UPDATE Voditelj 
+		SET Voditelj.REMOTE_STATUS=@status 
+		WHERE Voditelj.BOLD_ID=@driver_id AND
+		Voditelj.REMOTE_STATUS NOT IN ( -1, -2);
+		
+		SET @count=@@ROWCOUNT;
+	END;
+	
+	IF(@status=7)	--DR_ON_REST = 7;
+	BEGIN
+		UPDATE Voditelj 
+		SET Voditelj.REMOTE_STATUS=@status 
+		WHERE Voditelj.BOLD_ID=@driver_id AND
+		Voditelj.REMOTE_STATUS NOT IN ( -1, -2);
+		
+		SET @count=@@ROWCOUNT;
+	END;
+	
+	IF(@status=18)	----DR_FROM_REST_ATTEMPT = 18;
+	BEGIN
+		UPDATE Voditelj 
+		SET Voditelj.REMOTE_STATUS=@status 
+		WHERE Voditelj.BOLD_ID=@driver_id AND
+		Voditelj.REMOTE_STATUS NOT IN ( -1, -2);
+		
+		SET @count=@@ROWCOUNT;
+	END;
+	
+	IF(@status=100)	----DR_NOACTIVE_STATUS=100;
+	BEGIN
+		UPDATE Voditelj 
+		SET Voditelj.REMOTE_STATUS=@status 
+		WHERE Voditelj.BOLD_ID=@driver_id AND
+		Voditelj.REMOTE_STATUS NOT IN ( -1, -2);
+		
+		SET @count=@@ROWCOUNT;
+	END;
+	
+	if(@count>0 AND @check_busy>0)
+	BEGIN
+		EXEC CheckDriverBusy @driver_id;
+	END;
+	
+	if(@count>0 AND @on_launch>=0)
+	BEGIN
+		if(@on_launch>0)
+		BEGIN
+			UPDATE Voditelj 
+			SET Na_pereryve=1
+			WHERE BOLD_ID=@driver_id;
+		END
+		ELSE
+		BEGIN
+			UPDATE Voditelj 
+			SET Na_pereryve=0
+			WHERE BOLD_ID=@driver_id;
+		END;
+	END;
+	
+	if(@count>0 AND @on_line>=0)
+	BEGIN
+		if(@on_line>0)
+		BEGIN
+			UPDATE Voditelj 
+			SET V_rabote=1
+			WHERE BOLD_ID=@driver_id;
+		END
+		ELSE
+		BEGIN
+			UPDATE Voditelj 
+			SET V_rabote=0
+			WHERE BOLD_ID=@driver_id;
+		END;
+	END;
+	
+	if(@count>0 AND @sync>=0)
+	BEGIN
+		if(@sync>0)
+		BEGIN
+			UPDATE Voditelj 
+			SET REMOTE_SYNC=1
+			WHERE BOLD_ID=@driver_id;
+		END
+		ELSE
+		BEGIN
+			UPDATE Voditelj 
+			SET REMOTE_SYNC=0
+			WHERE BOLD_ID=@driver_id;
+		END;
+	END;
+	
+END
+-------------------------------------------------
+--------------------------------------------------
+добавляем процедуру
+CREATE PROCEDURE [dbo].[GetDriverQueuePosition] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @pos_msg varchar(255) OUT)
+AS
+BEGIN 
+
+	DECLARE @sector_id int;
+	DECLARE @sector_name varchar(255);
+	DECLARE @last_order_time datetime;
+	DECLARE @position int;
+	DECLARE @driver_num int;
+	
+	SET @pos_msg='Не определен сектор водителя!';
+	SET @sector_id=-1;
+	SET @sector_name='НЕ ОПРЕДЕЛЕН';
+	SET @last_order_time=GETDATE();
+	
+	SELECT TOP 1 @sector_id=Voditelj.
+	rabotaet_na_sektore, @last_order_time=
+	Voditelj.Vremya_poslednei_zayavki,
+	@driver_num=Voditelj.Pozyvnoi 
+	FROM Voditelj 
+	WHERE Voditelj.BOLD_ID=@driver_id;
+	
+	IF(@sector_id>0)
+	BEGIN
+		SELECT @sector_name=sp.Naimenovanie 
+		FROM  Spravochnik sp 
+		WHERE sp.BOLD_ID=@sector_id;
+		
+		SELECT @position=COUNT(*)+1 
+		FROM Voditelj dr WHERE
+		dr.Vremya_poslednei_zayavki<
+		@last_order_time AND 
+		dr.rabotaet_na_sektore=@sector_id
+		AND dr.V_rabote=1 AND dr.Pozyvnoi>0;
+		
+		SET @pos_msg='Водитель '+
+			CAST(@driver_num as varchar(50))+
+			' на секторе "'+
+			@sector_name +
+			'" место в очереди - '+
+			CAST(@position as varchar(50));
+		
+	END
+	
+END
+---------------------------------------------------
+Добавляем функцию
+CREATE FUNCTION [dbo].[GetDrDaysIntervalFixedSumm]  (@Drnum int, @start_date datetime, @end_date datetime, @free_days_count int)
+RETURNS decimal(28, 10)
+AS
+BEGIN
+   DECLARE @onday_fixed decimal(28, 10),
+           @days_count int,
+           @dr_count int,
+           @res decimal(28, 10)
+   
+   SET @onday_fixed=0
+   SET @days_count=0
+   SET @dr_count=0
+   SET @res=0
+   
+   if (@end_date<@start_date)
+   begin
+	SET @end_date=@start_date
+   end
+   
+   select @dr_count=COUNT(*) from Voditelj
+   where Pozyvnoi=@Drnum 
+   
+   IF @dr_count=0 BEGIN
+     SET @res=0
+   END
+    ELSE
+   BEGIN
+      
+     SET @days_count=DATEDIFF(day, @start_date, @end_date) - 
+		@free_days_count;
+    
+	 select @onday_fixed=ovo.Kol_posl_dnei from Objekt_vyborki_otchyotnosti ovo
+	 where ovo.Tip_objekta='for_drivers';
+
+     SET @res=@onday_fixed*@days_count;
+   END  
+
+   RETURN(@res)
+END
+-------------------------------------
+Меняем процедуру
+CREATE PROCEDURE [dbo].[AddNewOrderNum] 
+	-- Add the parameters for the stored procedure here
+	(@bold_id int, @ord_num int OUTPUT)
+AS
+BEGIN 
+    DECLARE @new_ord_num int;
+    DECLARE @RETURN_VALUE int;   
+
+	--SET TRANSACTION ISOLATION LEVEL READ COMMITTED
+
+	BEGIN TRAN
+    
+    UPDATE Objekt_vyborki_otchyotnosti SET Ispoljz_priz_3=
+      (Ispoljz_priz_3+1);
+      
+    SELECT @new_ord_num=Ispoljz_priz_3 
+      FROM Objekt_vyborki_otchyotnosti 
+      
+    COMMIT TRAN
+     
+    SET @ord_num=@new_ord_num;
+    return
+END
+----------------------------------------
+Добавляем процедуру
+CREATE PROCEDURE [dbo].[InsertNewOrder] 
+	-- Add the parameters for the stored procedure here
+	(@bold_id int OUT)
+AS
+BEGIN 
+    DECLARE @new_ord_num int, @last_ct datetime, @curr_dt datetime;
+    DECLARE @last_ts int, @bold_ts int;   
+
+	--SET TRANSACTION ISOLATION LEVEL READ COMMITTED
+	
+	SET @bold_id = -1;
+	
+	BEGIN TRAN
+	
+	SELECT TOP 1 @bold_id=BOLD_ID FROM BOLD_ID;
+    
+    UPDATE [BOLD_ID] set [BOLD_ID] = [BOLD_ID]+1;
+    
+    UPDATE Objekt_vyborki_otchyotnosti SET Ispoljz_priz_3=
+      (Ispoljz_priz_3+1);
+      
+    SELECT TOP 1 @new_ord_num=Ispoljz_priz_3 
+      FROM Objekt_vyborki_otchyotnosti;
+    
+    INSERT INTO BOLD_XFILES 
+    (BOLD_ID, BOLD_TYPE, BOLD_TIME_STAMP, 
+    EXTERNAL_ID) 
+	VALUES (@bold_id, 18, 0, '{'+CONVERT(varchar(36),NEWID())+'}') 
+    
+    INSERT INTO BOLD_OBJECT(BOLD_ID, BOLD_TYPE,
+    [READ_ONLY]) VALUES(@bold_id, 18, 0);
+    
+    INSERT INTO Shablon_zakaza (BOLD_ID, BOLD_TYPE, Nomer_na_ulice, 
+		yavlyaetsya_vyzovom_na_ulicu, yavl_vyzovom_na_raion, yavl_vyzovom_na_objekt, 
+		imeet_pervuyu_ulicu_ugla, imeet_vtoruyu_ulicu_ugla) 
+		VALUES (@bold_id, 18, 0, -1, -1, -1, -1, -1);
+    
+    INSERT INTO Zakaz (BOLD_ID, BOLD_TYPE, Kolichestvo_chasov, 
+    Nachalo_zakaza_data, Konec_zakaza_data, 
+    Telefon_klienta, Nomer_zakaza, Data_podachi, 
+    Zavershyon, Arhivnyi, Uslovn_stoim, Adres_vyzova_vvodim, 
+    Predvariteljnyi, Data_predvariteljnaya, 
+    Zadeistv_predvarit, Data_po_umolchaniyu, 
+	Soobsheno_voditelyu, Adres_okonchaniya_zayavki, 
+	Yavl_pochasovym, Pozyvnoi_ustan, Data_pribytie, 
+	Ustan_pribytie, Nomer_skidki, Slugebnyi, Primechanie, 
+	Opr_s_obsh_linii, Data_na_tochke, vypolnyaetsya_voditelem, 
+	otpuskaetsya_dostepcherom, ocenivaetsya_cherez, 
+	adres_sektora, konechnyi_sektor_raboty, sektor_voditelya, 
+	otpravlyaetsya) 
+	VALUES (@bold_id, 18, 0.0, 
+	GETDATE(), GETDATE(), 
+	'', @new_ord_num, GETDATE(), 
+	0, 0, 0.0, '', 
+	0, GETDATE(), 
+	0, GETDATE(), 
+	0, '', 
+	0, 0, GETDATE(), 
+	0, 0, 0, '',
+	0, GETDATE(), -1,
+	-1, -1,
+	-1, -1, -1,
+	-1);
+	
+	SELECT TOP 1 @last_ts=LastTimestamp, 
+	@last_ct=LastClockTime FROM BOLD_LASTCLOCK;
+	
+	UPDATE [BOLD_TIMESTAMP] 
+	SET [BOLD_TIME_STAMP] = [BOLD_TIME_STAMP]+1;		
+    
+    SELECT TOP 1 @bold_ts=BOLD_TIME_STAMP 
+    FROM BOLD_TIMESTAMP;
+    
+    SET @curr_dt = GETDATE();
+    
+    INSERT INTO BOLD_CLOCKLOG (LastTimestamp, 
+    ThisTimestamp, LastClockTime, 
+	ThisClockTime) VALUES (@last_ts, @bold_ts, 
+	@last_ct, @curr_dt);
+	
+	UPDATE BOLD_LASTCLOCK SET LastTimestamp = @bold_ts, 
+	LastClockTime = @curr_dt;
+	
+	UPDATE BOLD_XFILES
+	SET BOLD_TIME_STAMP = @bold_ts
+	WHERE BOLD_ID = @bold_id;
+      
+    COMMIT TRAN
+     
+    --SET @ord_num=@new_ord_num;
+    --return
+END
+----------------------------------------
+Добавляем процедуры
+CREATE PROCEDURE [dbo].[InsertOrderWithStatus] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @adres varchar(255), 
+	@disp_id int, @status int, @order_id int OUT)
+AS
+BEGIN 
+
+	DECLARE @dr_num int;
+	
+	SET @dr_num = 0;
+	SET @order_id = -1;
+	
+	SELECT @dr_num=Pozyvnoi FROM Voditelj
+	WHERE BOLD_ID=@driver_id;
+	
+	if (@dr_num>0) BEGIN
+	
+	EXEC InsertNewOrder @bold_id = @order_id OUTPUT;
+	
+	if (@order_id>0)
+	BEGIN
+		UPDATE Zakaz SET REMOTE_DRNUM=@dr_num,
+		otpuskaetsya_dostepcherom=@disp_id,
+		Adres_vyzova_vvodim=@adres,
+		REMOTE_SET=@status
+		WHERE BOLD_ID=@order_id;
+	END
+	END
+END
+------------------
+НЕДОРАБОТАНА!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+CREATE PROCEDURE [dbo].[InsertOnHandAttemptOrder] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @adres varchar(255), 
+	@disp_id int, @order_id int OUT)
+AS
+BEGIN 
+
+	DECLARE @dr_num int;
+	
+	SET @dr_num = 0;
+	SET @order_id = -1;
+	
+	SELECT @dr_num=Pozyvnoi FROM Voditelj
+	WHERE BOLD_ID=@driver_id;
+	
+	if (@dr_num>0) BEGIN
+	
+	EXEC InsertNewOrder @bold_id = @order_id OUTPUT;
+	
+	if (@order_id>0)
+	BEGIN
+		UPDATE Zakaz SET REMOTE_DRNUM=@dr_num,
+		otpuskaetsya_dostepcherom=@disp_id,
+		Adres_vyzova_vvodim=@adres
+		WHERE BOLD_ID=@order_id;
+	END
+	END
+END
+-------------------------------------------
+Добавляем процедуру
+CREATE PROCEDURE [dbo].[SetDriverFromPretendents] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @driver_id int, @count int OUT)
+AS
+BEGIN 
+
+	DECLARE @dr_num int, @dr_count int, @accept_count int;
+	
+	SET @count = -1;
+	SET @dr_count = -1;
+
+	SELECT @dr_count=COUNT(*) FROM Voditelj  
+	WHERE Voditelj.BOLD_ID=@driver_id;
+	
+	EXEC ClearOrderAcceptByDrId @order_id,
+		@driver_id, @accept_count;
+	
+	IF (@dr_count>0) BEGIN
+	
+		SELECT @dr_num=Pozyvnoi FROM Voditelj
+		WHERE BOLD_ID=@driver_id;
+		
+		IF (@dr_num>0) BEGIN
+		
+			UPDATE Zakaz SET
+			REMOTE_SET=7,REMOTE_DRNUM=@dr_num
+			WHERE (((REMOTE_SET>0) AND 
+			(REMOTE_SET<7)) OR REMOTE_SET 
+			IN (23,24,25,26,12)) AND 
+			(BOLD_ID=@order_id); 
+			
+			SET @count = @@ROWCOUNT;
+		
+		END
+	
+	END
+	
+END
+-----------------------------------------
+Добавляем процедуру
+CREATE PROCEDURE [dbo].[ManualSetOrderRemoteStatus] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @dest_status int, @count int OUT)
+AS
+BEGIN 
+
+	SET @count = 0;
+	
+	--ORDER_NO_REM_STATUS
+	if (@dest_status=0) begin
+    
+		UPDATE Zakaz 
+		SET Zakaz.REMOTE_SET=@dest_status 
+		WHERE Zakaz.BOLD_ID=@order_id;
+	
+		SET @count=@@ROWCOUNT;
+    
+    end
+
+	--ORDER_OCCUPED_ALLOW
+    if (@dest_status=7) begin
+    
+		UPDATE Zakaz 
+		SET Zakaz.REMOTE_SET=@dest_status 
+		WHERE Zakaz.BOLD_ID=@order_id
+		AND Zakaz.REMOTE_DRNUM>0 AND 
+		(Zakaz.REMOTE_SET<7) AND 
+		(Zakaz.REMOTE_SET>0);
+	
+		SET @count=@@ROWCOUNT;
+    
+    end
+    
+    --ORDER_ONHAND_ALLOW
+    if (@dest_status=9) begin
+    
+		--ORDER_ONHAND_ATTEPMT = 23;
+		--ORDER_ONHAND_ALLOW_USER_WAIT = 25;
+		UPDATE Zakaz 
+		SET Zakaz.REMOTE_SET=@dest_status 
+		WHERE Zakaz.BOLD_ID=@order_id 
+		AND Zakaz.REMOTE_DRNUM>0 AND 
+		((Zakaz.REMOTE_SET=23) OR 
+		(Zakaz.REMOTE_SET=25));
+	
+		SET @count=@@ROWCOUNT;
+    
+    end
+    
+    --ORDER_DISP_CANCEL
+    if (@dest_status=11) begin
+    
+		--ORDER_OCCUPED_ALLOW = 7;
+		--ORDER_BUSY = 8; //???
+		--ORDER_ONHAND_ALLOW = 9;
+		--ORDER_ONHAND_ACTIVE = 10;
+		--ORDER_ALLOW_ASK_WAIT = 17;
+		--ORDER_ONHAND_ALLOW_ASK_WAIT = 18;
+		--ORDER_CLOSE_ERROR = 20;
+		--ORDER_DRCANCEL_DENY = 21;
+		--ORDER_ONHAND_ATTEPMT = 23;
+		--ORDER_ONHAND_DENY = 24;
+		--ORDER_ONHAND_ALLOW_USER_WAIT = 25;
+		UPDATE Zakaz 
+		SET Zakaz.REMOTE_SET=@dest_status 
+		WHERE Zakaz.BOLD_ID=@order_id;
+	
+		SET @count=@@ROWCOUNT;
+    
+    end
+	
+	if (@dest_status=100) begin
+    
+		--ORDER_DRV_COMPLETE = 15;
+		--ORDER_COMLETE_ALLOW = 16;
+		--ORDER_COMPLETE_ALLOW_USER_WAIT = 26;
+		--ORDER_CLOSE_ASK_WAIT = 27;
+		UPDATE Zakaz 
+		SET Zakaz.REMOTE_SET=@dest_status,
+		Zakaz.Zavershyon=1 
+		WHERE Zakaz.BOLD_ID=@order_id AND
+		Zakaz.REMOTE_SET IN (15,16,26,27);
+	
+		SET @count=@@ROWCOUNT;
+		
+		DECLARE @order_dr_id int;
+		
+		if(@count>0)
+		begin
+		
+			SELECT @order_dr_id=
+			ordr.vypolnyaetsya_voditelem 
+			FROM Zakaz ordr
+			WHERE ordr.BOLD_ID=@order_id;
+			
+			UPDATE Voditelj 
+			SET Vremya_poslednei_zayavki=CURRENT_TIMESTAMP
+			WHERE BOLD_ID=@order_dr_id;
+		
+			EXEC CheckDriverBusy @order_dr_id;
+		end;
+    
+    end
+    
+    --ORDER_ONHAND_DENY = 24;
+    --ORDER_CLOSE_ERROR = 20;
+    --ORDER_DRCANCEL_DENY = 21;
+    --ORDER_DRV_CANCEL_DISP_ALLOW = 14;
+    --ORDER_CLOSE = 100;
+    
+
+	
+END
+=========================================
+CREATE PROCEDURE [dbo].[ClearOrderAcceptByDrNum] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @dr_num int, @count int OUT)
+AS
+BEGIN 
+
+	SET @count=0;
+
+	DELETE FROM ORDER_ACCEPTING 
+	WHERE ORDER_ID=@order_id AND DRIVER_NUM=@dr_num;
+	
+	SET @count=@@ROWCOUNT;
+	
+END
+===========================================
+CREATE PROCEDURE [dbo].[ClearOrderAcceptByDrId] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @driver_id int, @count int OUT)
+AS
+BEGIN 
+
+	SET @count=0;
+
+	DELETE FROM ORDER_ACCEPTING 
+	WHERE ORDER_ID=@order_id AND DRIVER_ID=@driver_id;
+	
+	SET @count=@@ROWCOUNT;
+	
+END
+===========================================
+CREATE PROCEDURE [dbo].[AutoSetFromPretendents] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @delta_time_param int, @count int OUT,
+		@sort_with_accept int, @manual_before int)
+AS
+BEGIN 
+	DECLARE @order_dr_num int, 
+	@last_status_time datetime, 
+	@driver_id int, @accept_count int,
+	@dr_count int;
+	
+	SET @count = 0;
+	SET @last_status_time = NULL;
+	SET @order_dr_num = 0;
+	SET @dr_count = 0;
+
+	SELECT @order_dr_num=REMOTE_DRNUM,
+	@last_status_time=LAST_STATUS_TIME
+	FROM Zakaz
+	WHERE (Zakaz.BOLD_ID=@order_id);
+	
+	IF ((DATEDIFF(SECOND, @last_status_time, 
+		CURRENT_TIMESTAMP)>=@delta_time_param)
+		AND (@last_status_time IS NOT NULL) 
+		AND (@order_dr_num>0) 
+		AND (@last_status_time<CURRENT_TIMESTAMP))
+	BEGIN
+	
+	SELECT @accept_count=COUNT(*) FROM
+	ORDER_ACCEPTING WHERE ORDER_ID=@order_id
+	AND DRIVER_NUM=@order_dr_num;
+	
+	SELECT TOP 1 @driver_id=oa.DRIVER_ID 
+	FROM ORDER_ACCEPTING oa 
+	WHERE oa.ORDER_ID=@order_id AND 
+	oa.DRIVER_NUM=@order_dr_num
+	ORDER BY oa.ACCEPT_DATE DESC;
+	
+	--SELECT TOP 1 @driver_id=dr.BOLD_ID 
+	--FROM Voditelj dr 
+	--WHERE dr.Pozyvnoi=@order_dr_num;
+	
+	if (@accept_count=0)
+	BEGIN
+		SELECT @accept_count=COUNT(*) 
+		FROM ORDER_ACCEPTING
+		WHERE ORDER_ID=@order_id;
+		
+		if (@accept_count>0)
+		BEGIN
+		  if (@sort_with_accept>0)
+		  begin
+			
+			if(@manual_before=0)
+			BEGIN
+			
+			SELECT TOP 1 @driver_id=oa.DRIVER_ID
+			FROM ORDER_ACCEPTING oa JOIN Voditelj dr
+			ON oa.DRIVER_ID=dr.BOLD_ID
+			WHERE oa.ORDER_ID=@order_id
+			AND oa.IS_MANUAL=0
+			ORDER BY dr.Vremya_poslednei_zayavki ASC;
+			
+			SET @dr_count=@@ROWCOUNT;
+			
+			if (@dr_count=0)
+			BEGIN
+			
+			SELECT TOP 1 @driver_id=oa.DRIVER_ID
+			FROM ORDER_ACCEPTING oa 
+			WHERE oa.ORDER_ID=@order_id 
+			AND oa.IS_MANUAL>0
+			ORDER BY oa.ACCEPT_DATE ASC;
+			
+			SET @dr_count=@@ROWCOUNT;
+			
+			END;
+			
+			END
+			else
+			BEGIN
+			
+			SELECT TOP 1 @driver_id=oa.DRIVER_ID 
+			FROM ORDER_ACCEPTING oa 
+			WHERE oa.ORDER_ID=@order_id 
+			AND oa.IS_MANUAL>0
+			ORDER BY oa.ACCEPT_DATE ASC;
+			
+			SET @dr_count=@@ROWCOUNT;
+			
+			if (@dr_count=0)
+			BEGIN
+			SELECT TOP 1 @driver_id=oa.DRIVER_ID
+			FROM ORDER_ACCEPTING oa JOIN Voditelj dr
+			ON oa.DRIVER_ID=dr.BOLD_ID
+			WHERE oa.ORDER_ID=@order_id
+			AND oa.IS_MANUAL=0
+			ORDER BY dr.Vremya_poslednei_zayavki ASC;
+			
+			SET @dr_count=@@ROWCOUNT;
+			
+			END;
+			
+			END;
+		  end
+		  else
+			begin
+			
+			SELECT TOP 1 @driver_id=oa.DRIVER_ID 
+			FROM ORDER_ACCEPTING oa JOIN Voditelj dr
+			ON oa.DRIVER_ID=dr.BOLD_ID
+			WHERE oa.ORDER_ID=@order_id
+			ORDER BY dr.Vremya_poslednei_zayavki ASC;
+			
+			end;
+		END;
+		
+	END;
+	
+	if ((@accept_count>0) AND (@driver_id>0) 
+		AND (@dr_count>0))
+	BEGIN
+		EXEC SetDriverFromPretendents @order_id, 
+		@driver_id, @count = @count OUTPUT;
+	END
+	ELSE
+	BEGIN
+		EXEC ClearOrderAcceptByDrId @order_id,
+		@driver_id, @accept_count;
+	END;
+	
+	END;
+END
+===========================================
+CREATE PROCEDURE [dbo].[AutoSetOrderFinished] 
+	-- Add the parameters for the stored procedure here
+	(@order_id int, @delta_time_param int, @count int OUT)
+AS
+BEGIN 
+	DECLARE @order_dr_num int, 
+	@last_status_time datetime, 
+	@driver_id int, @accept_count int;
+	
+	SET @count = 0;
+	SET @last_status_time = NULL;
+	SET @order_dr_num = 0;
+
+	SELECT @order_dr_num=REMOTE_DRNUM,
+	@last_status_time=LAST_STATUS_TIME
+	FROM Zakaz
+	WHERE (Zakaz.BOLD_ID=@order_id);
+	
+	IF ((DATEDIFF(SECOND, @last_status_time, 
+		CURRENT_TIMESTAMP)>=@delta_time_param)
+		AND (@last_status_time IS NOT NULL) 
+		AND (@order_dr_num>0) 
+		AND (@last_status_time<CURRENT_TIMESTAMP))
+	BEGIN
+	
+	if (@order_dr_num>0)
+	BEGIN
+		EXEC ManualSetOrderRemoteStatus @order_id, 
+		100, @count = @count OUTPUT;
+	END;
+	
+	
+	END;
+END
+==================================
+Создаем функцию
+CREATE FUNCTION [dbo].[GetJSONSectorList] ()
+RETURNS varchar(1000)
+AS
+BEGIN
+	declare @res varchar(1000);
+	DECLARE @CURSOR cursor;
+	DECLARE @sector_id int, @sector_count int,
+		@sector_name varchar(255), @counter int;
+   
+	SET @res='{"command":"sector_list","sector_count":"';
+	SET @counter = 0;
+	
+	SELECT @sector_count=COUNT(*)  
+	FROM Sektor_raboty ws JOIN Spravochnik dict 
+	ON ws.BOLD_ID=dict.BOLD_ID;
+	
+	IF (@sector_count>0)
+	BEGIN
+	
+	SET @res=@res+CAST(@sector_count as varchar(20))+'"';
+	
+	SET @CURSOR  = CURSOR SCROLL
+	FOR
+	SELECT ws.BOLD_ID, dict.Naimenovanie  
+	FROM Sektor_raboty ws JOIN Spravochnik dict 
+	ON ws.BOLD_ID=dict.BOLD_ID;
+	
+	OPEN @CURSOR
+	
+	FETCH NEXT FROM @CURSOR INTO @sector_id, @sector_name
+	
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+
+        SET @res=@res+',"sector_id'+
+			CAST(@counter as varchar(20))+'":"'+
+			CAST(@sector_id as varchar(20))+'","sector_name'+
+			CAST(@counter as varchar(20))+'":"'+
+			REPLACE(REPLACE(@sector_name,'"',' '),'''',' ')+'"';
+        SET @counter=@counter+1;
+		
+		FETCH NEXT FROM @CURSOR INTO @sector_id, @sector_name
+	END
+	CLOSE @CURSOR
+	
+	SET @res=@res+',"msg_end":"ok"}';
+	
+	END
+	ELSE
+	BEGIN
+		SET @res=@res+'0","msg_end":"ok"}';	
+	END;
+
+	RETURN(@res)
+END
+=================================================
+CREATE PROCEDURE [dbo].[SetDriverSector] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @sector_id int, @count int OUT, 
+		@remote_sync int,	@sector_name varchar(255) OUT)
+AS
+BEGIN 
+
+	DECLARE @sect_num int;
+
+	SET @sector_name='';
+
+	SELECT @sector_name=dict.Naimenovanie,
+		@sect_num=ws.Nomer_sektora
+	FROM Sektor_raboty ws JOIN Spravochnik dict 
+	ON ws.BOLD_ID=dict.BOLD_ID
+	WHERE ws.BOLD_ID=@sector_id;
+	
+	SET @count=@@ROWCOUNT;
+	
+	IF(@count>0)
+	BEGIN
+		UPDATE Voditelj 
+		SET Voditelj.rabotaet_na_sektore=@sector_id,
+			Voditelj.REMOTE_SYNC=@remote_sync,
+			Voditelj.Nomer_posl_sektora=@sect_num 
+		WHERE Voditelj.BOLD_ID=@driver_id;
+	
+		SET @count=@@ROWCOUNT;
+	END;
+	
+END
+====================================
+CREATE PROCEDURE [dbo].[GetJSONDriverStatus] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @show_phone int, @res varchar(1000) OUT)
+AS
+BEGIN 
+
+	DECLARE @CURSOR cursor;
+	DECLARE @sector_id int, @dr_count int,
+		@sector_name varchar(255), @counter int,
+		@order_id int, @order_data varchar(255),
+		@order_count int, @on_launch int, @busy int,
+		@dr_status varchar(255);
+   
+	SET @res='{"command":"driver_status","driver_id":"';
+	SET @dr_count = 0;
+	SET @counter = 0;
+	
+	SELECT @dr_count=COUNT(*) FROM
+	Voditelj WHERE BOLD_ID=@driver_id;
+	
+	IF (@dr_count>0)
+	BEGIN
+	
+	UPDATE Voditelj SET V_rabote=1 
+	WHERE BOLD_ID=@driver_id;
+	
+	UPDATE Voditelj SET REMOTE_STATUS=1
+	WHERE REMOTE_STATUS<=0;
+	
+	EXEC CheckDriverBusy @driver_id;
+	
+	SELECT @busy=Zanyat_drugim_disp, @on_launch=Na_pereryve 
+	FROM Voditelj 
+	WHERE BOLD_ID=@driver_id;
+	
+	SET @dr_status='free';
+	
+	IF(@on_launch>0)
+	BEGIN
+		SET @dr_status='on_launch';
+	END;
+	
+	IF(@busy>0)
+	BEGIN
+		SET @dr_status='busy';
+	END;
+	
+	SET @res=@res+CAST(@driver_id as varchar(20))+
+		'","driver_status":"'+@dr_status+'"';
+	
+	SELECT @sector_id=ISNULL(ws.BOLD_ID,-1),
+	@sector_name=REPLACE(REPLACE(
+	ISNULL(dict.Naimenovanie,'НЕ ОПРЕДЕЛЕН'),'"',' '),'''',' ')  
+	FROM Sektor_raboty ws JOIN Spravochnik dict 
+	ON ws.BOLD_ID=dict.BOLD_ID JOIN Voditelj dr
+	ON dr.rabotaet_na_sektore=ws.BOLD_ID;
+	
+	SET @res=@res+',"sector_id":"'+
+		CAST(@sector_id as varchar(20))+'"';
+		
+	SET @res=@res+',"sector_name":"'+@sector_name+
+		'","order_count":"';
+	
+	SELECT @order_count=COUNT(*)
+	FROM Zakaz ord WHERE 
+		ord.vypolnyaetsya_voditelem=@driver_id AND
+		ord.Arhivnyi=0 AND ord.Soobsheno_voditelyu=0
+		AND Zavershyon=0;
+	
+	IF (@order_count>0)
+	BEGIN
+	
+		SET @res=@res+
+			CAST(@order_count as varchar(20))+'"';
+	
+		IF (@show_phone>0)
+		BEGIN
+			SET @CURSOR  = CURSOR SCROLL
+			FOR
+			SELECT BOLD_ID, (Telefon_klienta+
+			':'+Adres_vyzova_vvodim) as order_data  
+			FROM Zakaz ord WHERE 
+			ord.vypolnyaetsya_voditelem=@driver_id AND
+			ord.Arhivnyi=0 AND ord.Soobsheno_voditelyu=0
+			AND Zavershyon=0 
+			ORDER BY ord.Nachalo_zakaza_data DESC;
+		END
+		ELSE
+		BEGIN
+			SET @CURSOR  = CURSOR SCROLL
+			FOR
+			SELECT BOLD_ID, Adres_vyzova_vvodim as order_data  
+			FROM Zakaz ord WHERE 
+			ord.vypolnyaetsya_voditelem=@driver_id AND
+			ord.Arhivnyi=0 AND ord.Soobsheno_voditelyu=0
+			AND Zavershyon=0 
+			ORDER BY ord.Nachalo_zakaza_data DESC;
+		END;
+		/*Открываем курсор*/
+		OPEN @CURSOR
+		/*Выбираем первую строку*/
+		FETCH NEXT FROM @CURSOR INTO @order_id, @order_data
+		/*Выполняем в цикле перебор строк*/
+		WHILE @@FETCH_STATUS = 0
+		BEGIN
+
+			SET @res=@res+',"order_id'+
+				CAST(@counter as varchar(20))+'":"'+
+				CAST(@order_id as varchar(20))+'","order_data'+
+				CAST(@counter as varchar(20))+'":"'+
+				REPLACE(REPLACE(@order_data,'"',' '),'''',' ')+'"';
+			SET @counter=@counter+1;
+			/*Выбираем следующую строку*/
+			FETCH NEXT FROM @CURSOR INTO @order_id, @order_data
+		END
+		CLOSE @CURSOR
+	END
+	ELSE
+	BEGIN
+		SET @res=@res+'0"';
+	END;
+	
+	SET @res=@res+',"msg_end":"ok"}';
+	
+	END
+	ELSE
+	BEGIN
+		SET @res=@res+'-1","msg_end":"ok"}';	
+	END;
+	
+END
+=====================================
+CREATE PROCEDURE [dbo].[InsertFictiveDrOrder] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @comment varchar(255), 
+	@disp_id int, @order_id int OUT, @set_last_ord_time int)
+AS
+BEGIN 
+
+	DECLARE @dr_num int;
+	
+	SET @dr_num = 0;
+	SET @order_id = -1;
+	
+	SELECT @dr_num=Pozyvnoi FROM Voditelj
+	WHERE BOLD_ID=@driver_id;
+	
+	if (@dr_num>0) BEGIN
+	
+	EXEC InsertNewOrder @bold_id = @order_id OUTPUT;
+	
+	if (@order_id>0)
+	BEGIN
+		UPDATE Zakaz SET Pozyvnoi_ustan=@dr_num,
+		otpuskaetsya_dostepcherom=@disp_id,
+		Adres_vyzova_vvodim=@comment,
+		Soobsheno_voditelyu=1,
+		Data_podachi=CURRENT_TIMESTAMP,
+		Nachalo_zakaza_data=CURRENT_TIMESTAMP,
+		Zavershyon=1,
+		Konec_zakaza_data=CURRENT_TIMESTAMP,
+		Uslovn_stoim=0,
+		Telefon_klienta='Фиктивная'
+		WHERE BOLD_ID=@order_id;
+		
+		if(@set_last_ord_time>0)
+		BEGIN
+			UPDATE Voditelj 
+			SET Vremya_poslednei_zayavki=CURRENT_TIMESTAMP
+			WHERE BOLD_ID=@driver_id;
+		END;
+		
+	END
+	END
+END
+==============================================
+CREATE PROCEDURE [dbo].[InsertNewOrderDictItem] 
+	-- Add the parameters for the stored procedure here
+	(@phone varchar(255), @adr varchar(255), 
+	@sect_id int, @bold_id int OUT)
+AS
+BEGIN 
+    DECLARE @last_ct datetime, @curr_dt datetime;
+    DECLARE @last_ts int, @bold_ts int;   
+
+	--SET TRANSACTION ISOLATION LEVEL READ COMMITTED
+	
+	SET @bold_id = -1;
+	
+	BEGIN TRAN
+	
+	SELECT TOP 1 @bold_id=BOLD_ID FROM BOLD_ID;
+    
+    UPDATE [BOLD_ID] set [BOLD_ID] = [BOLD_ID]+1;
+    
+    INSERT INTO BOLD_XFILES 
+    (BOLD_ID, BOLD_TYPE, BOLD_TIME_STAMP, 
+    EXTERNAL_ID) 
+	VALUES (@bold_id, 7, 0, '{'+CONVERT(varchar(36),NEWID())+'}') 
+    
+    INSERT INTO BOLD_OBJECT(BOLD_ID, BOLD_TYPE,
+    [READ_ONLY]) VALUES(@bold_id, 7, 0);
+    
+    INSERT INTO Sootvetstvie_parametrov_zakaza
+		(BOLD_ID, BOLD_TYPE, Telefon_klienta, 
+		Adres_vyzova_vvodim, otnositsya_k_sektoru,
+		Summarn_chislo_vyzovov) 
+		VALUES (@bold_id, 7, @phone, @adr, 
+		@sect_id, 1);
+	
+	SELECT TOP 1 @last_ts=LastTimestamp, 
+	@last_ct=LastClockTime FROM BOLD_LASTCLOCK;
+	
+	UPDATE [BOLD_TIMESTAMP] 
+	SET [BOLD_TIME_STAMP] = [BOLD_TIME_STAMP]+1;		
+    
+    SELECT TOP 1 @bold_ts=BOLD_TIME_STAMP 
+    FROM BOLD_TIMESTAMP;
+    
+    SET @curr_dt = GETDATE();
+    
+    INSERT INTO BOLD_CLOCKLOG (LastTimestamp, 
+    ThisTimestamp, LastClockTime, 
+	ThisClockTime) VALUES (@last_ts, @bold_ts, 
+	@last_ct, @curr_dt);
+	
+	UPDATE BOLD_LASTCLOCK SET LastTimestamp = @bold_ts, 
+	LastClockTime = @curr_dt;
+	
+	UPDATE BOLD_XFILES
+	SET BOLD_TIME_STAMP = @bold_ts
+	WHERE BOLD_ID = @bold_id;
+      
+    COMMIT TRAN
+     
+    --SET @ord_num=@new_ord_num;
+    --return
+END
+====================================
+CREATE FUNCTION [dbo].[GetDiscountNumOnOrderCount]  ( @order_count int)
+RETURNS int
+AS
+BEGIN
+   declare @res int,
+		@use_bonus1 int, @bonus1_val int,
+		@use_bonus2 int, @bonus2_val int,
+		@use_bonus3 int, @bonus3_val int,
+		@use_bonus4 int, @bonus4_val int;
+		
+  SET @res=0;
+   
+  SELECT TOP 1 
+		@use_bonus1=ISNULL(Ispoljz_priz_1,0), 
+		@use_bonus2=ISNULL(Ispoljz_priz_2,0),
+		@use_bonus3=ISNULL(use_bonus3,0),
+		@use_bonus4=ISNULL(use_bonus4,0),
+		@bonus1_val=ISNULL(Prizovoe_kolichestvo_1,0),
+		@bonus2_val=ISNULL(Prizovoe_kolichestvo_2,0),
+		@bonus3_val=ISNULL(Prizovoe_kolichestvo_3,0),
+		@bonus4_val=ISNULL(Prizovoe_kolichestvo_4,0) 
+	FROM Objekt_vyborki_otchyotnosti
+	WHERE Tip_objekta='for_drivers';
+	
+	if (@use_bonus1>0) AND (@bonus1_val>0) 
+	begin
+		if ((@order_count % @bonus1_val)=0)
+		begin
+			SET @res=1;
+		end;
+	end;
+	
+	if (@use_bonus2>0) AND (@bonus2_val>0) 
+	begin
+		if ((@order_count % @bonus2_val)=0)
+		begin
+			SET @res=2;
+		end;
+	end;
+	
+	if (@use_bonus3>0) AND (@bonus3_val>0) 
+	begin
+		if ((@order_count % @bonus3_val)=0)
+		begin
+			SET @res=3;
+		end;
+	end;
+	
+	if (@use_bonus4>0) AND (@bonus4_val>0) 
+	begin
+		if ((@order_count % @bonus4_val)=0)
+		begin
+			SET @res=4;
+		end;
+	end;
+
+   RETURN(@res)
+END
+=======================================
+CREATE PROCEDURE [dbo].[SetDriverStatSyncStatus] 
+	-- Add the parameters for the stored procedure here
+	(@driver_id int, @status int, @count int OUT)
+AS
+BEGIN 
+
+	--DR_ERROR_CL_SOCKET = -2;
+	--DR_NOT_CONNECTED = -1;
+	--DR_NOT_AUTORIZED = 0;
+	--FREE_DRIVER = 1;
+	--DR_IN_DECISION = 2;
+	--DR_IN_WORKING = 3;
+	--DR_IN_WORKING_ONHAND = 4;
+	--DR_IN_CANCELING = 5;
+	--DR_IN_SELF_CANCELING = 6;
+	--DR_ON_REST = 7;
+	--DR_OUT_FROM_LINE = 8;
+	--DR_IN_WORKING_ONHAND_ATTEMPT = 9;
+	--DR_IN_CANCELING_ATTEMPT = 10;
+	--DR_IN_SELF_CANCELING_ATTEMPT = 11;
+	--DR_ON_REST_ATTEMPT = 12;
+	--DR_OUT_FROM_LINE_ATTEMPT = 13;
+	--DR_IN_WORKING_ONHAND_DENY = 14;
+	--DR_IN_SELF_CANCELING_DENY = 15; 
+	--DR_ON_REST_DENY = 16;
+	--DR_OUT_FROM_LINE_DENY = 17;
+	--DR_FROM_REST_ATTEMPT = 18;
+	--DR_NOACTIVE_STATUS=100;
+
+	SET @count=0;
+
+	UPDATE Voditelj 
+	SET Voditelj.SYNC_STATUS=@status 
+	WHERE Voditelj.BOLD_ID=@driver_id;
+		
+	SET @count=@@ROWCOUNT;
+	
+END
+=====================================
+Первое обновление после тотальной доделки под Интернет-версию
+5.4.0.3 в панели удаленного администрирования водителей 
+добавлен столбец Разреш. перемещения для водителя
+меняем программу-клиент для лок. сети
+======================================
+5.5.2.6
+060714 конец активных разработок нового комплекса
+меняем (синхронизируем) все файлы настроек и вообще все файлы папок
+включая папку запросов, отчетов, сами приложения сервера и клиентское локальное
+не забываем про кучу настроек в самой БД

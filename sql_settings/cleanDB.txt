@@ -1,0 +1,33 @@
+DELETE FROM BOLD_CLOCKLOG; (3108737 row(s) affected)
+DELETE FROM Zakaz; (15755 row(s) affected)
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=18; 3594160 row(s) affected)
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=18; (3587798 row(s) affected)
+DELETE FROM Shablon_zakaza; (48222 row(s) affected)
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=10; (0 row(s) affected)
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=10; (0 row(s) affected)
+DELETE FROM Vhody_poljz; (535 row(s) affected)
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=22; (25429 row(s) affected)
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=22; (25429 row(s) affected)
+DELETE FROM Sootvetstvie_parametrov_zakaza; (5326 row(s) affected)
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=7; (191895 row(s) affected)
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=7; (191895 row(s) affected)
+DELETE FROM Plohie_klienty;
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=6;
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=6;
+(1 row(s) affected) (5301 row(s) affected) (861 row(s) affected)
+DELETE FROM Vyruchka_ot_voditelya;
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=1;
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=1;
+(5 row(s) affected) (18 row(s) affected) (18 row(s) affected)
+DELETE FROM Prihod;
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=24;
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=24;
+(18 row(s) affected) (0 row(s) affected) (0 row(s) affected)
+DELETE FROM Rashod;
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=25;
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=25;
+(1 row(s) affected) (1 row(s) affected) (1 row(s) affected)
+DELETE FROM Log_operacii;
+DELETE FROM BOLD_XFILES WHERE BOLD_TYPE=3;
+DELETE FROM BOLD_OBJECT WHERE BOLD_TYPE=3;
+(3459 row(s) affected) (6539 row(s) affected) (6539 row(s) affected)

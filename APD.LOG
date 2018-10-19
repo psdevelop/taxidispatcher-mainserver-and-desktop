@@ -1,0 +1,10 @@
+APRO v4.07
+Compiler : Unknown
+Operating System : Windows XP 5.1 Service Pack 3
+Device: COM1
+Date/time: 27.01.10, 10:09:01
+Time      Type      SubType       Data      OtherData
+--------  --------  ------------  --------  ---------
+0000.024  TrDatChg  Avail         00000001  
+0000.024  TrgHdAlc  Window        000A0D6E  
+0000.024  Dispatch  WriteCom      0000001B  ATZ0S40.2=0+FCLASS=8&I3&W0[0D]

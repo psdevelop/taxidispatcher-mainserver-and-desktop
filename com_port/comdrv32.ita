@@ -1,0 +1,1183 @@
+
+ TCOMMPORTDRIVER (COMDRV32) GUIDA PER IL PROGRAMMATORE               © 1997 d3k
+--------------------------------------------------------------------------------
+
+
+                                  componente
+
+                         T C O M M P O R T D R I V E R
+
+                                (Unit COMDRV32)
+
+
+
+                            V1.08 19-NOVEMBRE-1997
+
+
+
+                                  scritto da
+                                   M. Cocco
+
+
+
+               © 1997 by Marco Cocco. Tutti i diritti riservati.
+                   © 1997 by d3k. Tutti i diritti riservati.
+
+
+                     Inviate i Vs commenti a: d3k@mdnet.it
+                        URL: http://www.mdlive.com/d3k/
+
+
+ [ L E G G E R E ]
+
+ ******************************************************************************
+ *     Il permesso di utilizzare, copiare, modificare e distribuire questo    *
+ *    software e la sua documentazione  senza alcuna richiesta di pagamento   *
+ *                      è consentita per qualsiasi scopo,                     *
+ *   se e solo se, le informazioni di copyright di  cui sopra e questo testo  *
+ *    siano mantenute su tutte le copie del software e della documentazione.  *
+ *                                                                            *
+ *                   E' VIETATA LA VENDITA DI QUESTO SOFTWARE                 *
+ *                                                                            *
+ *   NON SI ASSUME ALCUNA RESPONSABILITA' SULL'IDONEITA' DI QUESTO SOFTWARE   *
+ *   PER QUALSIASI SCOPO.  ESSO E' RESO DISPONIBILE "NEL SUO STATO ATTUALE"   *
+ *                  SENZA ALCUNA GARANZIA ESPLICITA O IMPLICITA.              *
+ *  NE MARCO COCCO NE LA D3K POTRANNO ESSERE CHIAMATI IN CAUSA PER QUALSIASI  *
+ *  DANNO, MATERIALE O IMMATERIALE, ECONOMICO O ALTRO, CAUSATO DALL'UTILIZZO  *
+ *                            DI QUESTO SOFTWARE.                             *
+ ******************************************************************************
+
+ [ A L T R O ]
+
+ Sono graditi commenti sulla documentazione e sul software. Questi dovranno
+ essere spedidi al seguente indirizzo email: d3k@mdnet.it.
+
+ Se aggiungete funzionalità a TCommPortDriver potete inviare i files modificati
+ e un piccolo testo esplicativo, in modo da rendere disponibili a tutti le
+ nuove funzionalità.
+
+ Sarò grato a chiunque vorrà aiutarmi nel rendere TCommPortDriver privo di
+ errori, potente e disponibile a tutti gratuitamente.
+
+ Se non si è un programmatore esperto o se si ha conescenze specifiche per la
+ gestione delle API di Windows o qualsiasi altro aspetto della programmazione,
+ si invii una richiesta di aiuto o di modifiche (migliorie) a questo software
+ all'indirizzo email sopra riportato.
+ Sono graditi suggerimenti se e solo se questi sono di tipo generale, ossia
+ utili a tutti coloro che vorranno utilizzare questo software.
+
+ Se utilizzate TCommPortDriver vi invitiamo a farci sapere per quale tipo
+ di applicazione lo state utilizzanto. Tutto ciò per renderci conto di quanto
+ questo componente possa essere utile e per decidere se supportarlo e
+ migliorarlo, oppure riporlo in un floppy disk poichè inutile o poco apprezzato.
+
+ Vi ricordiamo che TCommPortDriver è FREEWARE, ossia l'autore (Marco Cocco)
+ permette a chiunque l'utilizzo gratuito del componente, sia per applicazioni
+ commerciali sia per quelle non-commerciali.
+ Viene concesso a tutti l'utilizzo del software, tuttavia, il codice sorgente
+ e la documentazione allegata rimane di proprietà dell'autore.
+ E' vietata la vendita di questo software. E' tuttavia consentita la vendita
+ dei software utilizzanti questo software come "libreria per l'accesso alle
+ porte seriali".
+
+ E' permessa la distribuzione di questo software in CD-ROM contenenti altro
+ software, a patto che, e solo se, il costo del CD-ROM sia inteso come
+ costo di masterizzazione, marketing e pubblicità del supporto CD-ROM stesso e
+ non del materiale (software) in esso contenuto.
+
+ Se si utilizza questo software, si accetta implicitamente ogni clausola della
+ licenza d'uso. Con la frase "utilizzo del software" si intende: la
+ compilazione, il linking, l'apporto di modifiche e la distribuzione.
+
+ [ R I N G R A Z I A M E N T I ]
+
+ Si ringrazia:
+
+ - Igor Gitman (gitman@interlog.com)
+     * ha riscontrato il problema con la porta seriale COM1
+       (solo TCommPortDriver nella versione a 16bit)
+
+ - Vandersleyen Joachim (Vandersleyen@aisin-aw.co.jp) e
+   Bernard Lotteau (Bernard_LOTTEAU@compuserve.com):
+     * RX packet mechanism testing
+
+ - Chiunque utilizzi questo software.
+
+ [ S T O R I A ]
+
+ V1.00/32 - 15-FEB-1997 : prima implementazione( 32 BIT, solo per Delphi 2.0 )
+                          E' disponibile COMDRV16.ZIP per Delphi 1.0
+ V1.00/16 - 21-MAG-1997 : porting su Delphi 1.0
+ V1.01/32 - ??-MAG-1997 : aggiunti commenti al codice sorgente
+ V1.02/32 - 05-GIU-1997 : new prc: SendZString( s:pchar )
+                          new prc: FlushBuffers( inFlg, outFlg: boolean )
+                          new prc: ToggleDTR( onOff: boolean )
+                          new prc: ToggleRTS( onOff: boolean )
+                          new prp: EnableDTROnOpen: boolean
+                          new prc: OutFreeSpace: word
+                          chg prc: SendData( DataPtr: pointer;
+                                             DataSize,
+                                             TimeOutMS: integer ): integer
+ V1.03/32 - 18-LUG-1997   new prp: PacketSize: smallint
+                          new prp: PacketTimeout: integer
+                          new prp: PacketMode: TPacketMode
+                          chg prc: SendData( ... ) and others
+                                   (added support for RX packets timeout)
+ V1.04/32 - 22-LUG-1997   buf fix: la gestione a pacchetti dei dati in RX
+                                   ora funziona più che egregiamente.
+ V1.05/32 - 29-LUG-1997   bug fix: la gestione a pacchetti dei dati in RX
+                                   ora funziona "perfettamente" (?)
+                          new evt: se la gestione a pacchetti dei dati in RX
+                                   è abilitata, l'evento OnReceiveData non
+                                   viene mai chiamato. Si utilizzi l'evento
+                                   OnReceivePacket invece.
+ V1.06/32 - 22-OTT-1997   bug fix: "grosso" bug in SendData. Ora funziona
+                                   correttamente anche quando DataSize è
+                                   maggiore di ComPortOutBufSize.
+ V1.07/32 - 14-NOV-1997   new prc: ReadData(), ReadDataEx(), ReadByte(),
+                                   ReadChar(), IsPolling(), PausePolling(),
+                                   ContinuePolling()
+                          new prp: InputTimeout
+ V1.08/32 - 19-NOV-1997   new prc: GetLineStatus(): TComPortLineStatusSet
+                          new prp: CheckLineStatus: boolean
+                          chg prc: polling routine and other I/O procs.
+
+ [ D E S C R I Z I O N E ]
+
+ TCommPortDriver è un componente per il Borland Delphi 2.0 che ingloba le
+ chiamate API Win32 per le comunicazioni seriali.
+ Ciò permette una gestione semplificata (ma non per questo meno potente) delle
+ delle porte seriali e del sistema I/O di Windows.
+
+ [ C A R A T T E R I S T I C H E ]
+
+ - supporta COM1-COM16
+ - supporta 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200,
+   38400, 56000, 56700 e 115200 bps
+ - 5, 6, 7, 8 data bits
+ - 1, 1.5, 2 stop bits
+ - 5 tipi di parità: none, even, odd, mark and space
+ - none, RTS/CTS, XON/XOFF, RTS/CTS + XON/XOFF flow control
+ - controllo manuale delle linee RTS and CTS
+ - ricezione asincrona e/o sincrona dei dati
+ - dimensione dei buffers di input e output variabile
+ - flush dei buffers di ricezione/trasmissione
+ - RX di dati in packets con timeout
+
+ [PROBLEMI COMUNI]
+
+ <L'EVENTO ONRECEIVEDATA/ONRECEIVEPACKET NON VIENE MAI CHIAMATO>
+
+   1. Verificare (sempre) il valore restituito da Connect (ossia, verificare
+      che la configurazione della porta seriale sia corretta e che nessuna
+      altra applicazione stia controllando la porta seriale che si vuole
+      utilizzare).
+   2. Verificare che la ricezione asincrona non sia stato disabilitata con
+      una chiamata a PausePolling.
+   3. Se è stato abilitato il supporto per i packets, si verifichi che i valori
+      assegnati a PacketSize, PacketTimeout e PacketMode siano corretti.
+      Per esempio: supponendo che una porta seriale sia connessa ad un
+      dispositivo X e che questo invii continuamente dei packets di dimensione
+      4000 bytes ogni 60 secondi. Supponiamo inoltre che la velocità di
+      comunicazione sia impostata a 9600 bauds.
+      I valori da impostare sono:
+        a. PacketSize a 4000
+        b. PacketTimeout a -1 (supporto packets disabilitato), oppure ad un
+           valore non inferiore a due o tre volte il risultato della seguente
+           espressione:
+
+              round( PacketSize / (baudRate / 10) * 1000 ) = 4167 ms.
+
+           La formule precedente è valido solo se il dispositivo invia i
+           dati continuamente, ossia se tra i bytes componenti un packet sono
+           inviati alla massima velocità, uno dopo l'altro.
+        c. PackedMode a pmDiscard se si vuole ignorare i packets non completi
+           (ossia che non hanno raggiunto la dimensione di 4000 bytes dopo
+           2*4167 ms o 3*4167 ms). Oppure PackedMode a pmPass se si desidera
+           ricevere anche questi packets incompleti.
+   4. Se l'applicazione esegue una routine (un ciclo o simile) che impedisce
+      l'esecuzione del message loop di TApplication, si inserisca all'interno
+      di tale routine una chiamata a Application.ProcessMessages. In questo
+      modo si da l'opportunità ai messaggi WM_TIMER di arrivare a destinazione
+      (pilotano le routines di polling della porta seriale).
+   5. Se il meccanismo di gestione "RX packet" è abilitato (se PacketSize > 0),
+      l'evento OnReceiveData non viene MAI chiamato. Si utilizza l'evento
+      OnReceivePacket invece.
+
+ <IL SISTEMA SI BLOCCA QUANDO NESSUNA PERIFERICA E' COLLEGATA ALLA PORTA
+  SERIALE OPPURE QUANDO ESSA E' SPENTA>
+
+   1. Si imposti la proprietà CheckLineStatus al valore TRUE.
+      In questo modo si forza TCommPortDriver a verificare lo stato dei
+      segnali CTS, DSR, RING and RLSD (CD) prima di ogni operazione di I/O.
+      Se tutti i segnali sono off, TCommPortDriver assume che la periferica
+      sia spenta (o non collegata) e non effettuerà alcuna operazione di I/O.
+
+ [ P R O P R I E T A' ]
+
+   [COMPORT]
+
+     <Definizione> ComPort: TComPortNumber
+     <Default>     pnCOM2;
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPort determina quale porta seriale si deve
+                   utilizzare.
+                   Questi sono i valori possibili:
+
+                   Valore    Significato
+                   -------------------------------------------------------------
+                   pnCOM1    COM1
+                   pnCOM2    COM2
+                   pnCOM3    COM3
+                   pnCOM4    COM4
+                   ......    ....
+                   pnCOM15   COM15
+                   pnCOM16   COM16
+
+     <Altre info>  COM1 è di solito utilizzata per il mouse seriale
+                   COM2 è di solito libera o connessa ad un modem
+
+                   COM1 e COM3, COM2 e COM4 di solito condividono lo stesso
+                   IRQ: non è possibile quindi utilizzare contemporaneamente
+                   COM1 con COM3, o COM2 con COM4.
+
+                   Non è possibile cambiare il valore di ComPort se si è già
+                   connessi (ad un'altra porta seriale).
+                   Per modificare ComPort si deve chiamare Disconnect,
+                   modificare il suo valore e quindi chiamare Connect.
+
+     <Problemi>    "SCHEDE VIDEO S3"
+                   Le schede video S3 possono causare dei conflitti con la porta
+                   seriale COM4 e con i modem interni. Se si verificano dei
+                   problemi con un modem interno, si configuri il modem in modo
+                   che utilizzi una differente porta COM.
+
+   [COMPORTSPEED]
+
+     <Definizione> ComPortSpeed: TComPortSpeed
+     <Default>     br9600
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortSpeed determina la velocità (bauds) della
+                   porta seriale. Questi sono i possibili valori:
+
+                   Valore    Significato
+                   -------------------------------------------------------------
+                   br110     110 bauds
+                   br300     300 bauds
+                   br600     600 bauds
+                   br1200    1200 bauds
+                   br2400    2400 bauds
+                   br4800    4800 bauds
+                   br9600    9600 bauds
+                   br14400   14400 bauds
+                   br19200   19200 bauds
+                   br38400   38400 bauds
+                   br56000   56000 bauds
+                   br57600   57600 bauds
+                   br115200  115200 bauds
+
+     <Altre info>  I sistemi x86 sono capaci di trasmissioni seriali a valocità
+                   sino a 115200 bauds.
+                   Alcune schede seriali hanno difficoltà nel lavorare con
+                   alte velocità (di solito le vecchie 8250 UARTS).
+                   Altre schede seriali supportano velocità oltre i 115K bauds,
+                   tuttavia, esse non sono supportate direttamente dal sistema
+                   operativo.
+
+                   Le modifiche apportate al valore di ComPortSpeed sono
+                   applicate immediatamente, ossia, la velocità  viene
+                   modificata istantaneamente se si è già connessi ad una porta
+                   seriale.
+
+   [COMPORTDATABITS]
+
+     <Definizione> ComPortDataBits: TComPortDataBits
+     <Default>     db8BITS
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortDataBits determina la dimensione dalla
+                   parola dati che è possibile inviare e ricevere dalla porta
+                   seriale.
+                   Questi sono i possibili valori:
+
+                   Valore    Significato
+                   -------------------------------------------------------------
+                   db5BITS   5 bits
+                   db6BITS   6 bits
+                   db7BITS   7 bits
+                   db8BITS   8 bits
+
+     <Altre info>  L' UART 8250 non supporta le seguenti combinazioni:
+                    - 5 data bits con 2 stop bits.
+                    - 6, 7, o 8 data bits con 1.5 stop bits.
+
+                   Le modifiche apportate al valore di ComPortDataBits sono
+                   applicate immediatamente, ossia, la dimensione della parola
+                   dati viene modificata istantaneamente anche se si è già
+                   connessi ad una porta seriale.
+
+   [COMPORTSTOPBITS]
+
+     <Definizione> ComPortStopBits: TComPortStopBits
+     <Default>     sb1BITS
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortStopBits determina il numero di stop bits
+                   codificati dopo ongi parola dati inviata/ricevuta attraverso
+                   la porta seriale.
+
+                   Il bit di stop non indica la fine di una parola dati.
+                   Esso separa due parole dati consecutive portando il segnale
+                   nello stato 'mark' per un breve periodo di tempo, in modo
+                   che il bit di start successivo sia chiaramente
+                   identificabile.
+
+                   Questi sono i possibili valori:
+
+                   Valore         Significato
+                   -------------------------------------------------------------
+                   sb1BITS        1 stop bit
+                   sb1HALFBITS    1.5 stop bits
+                   sb2BITS        2 stop bits
+
+     <Altre info>  L' UART 8250 non supporta le seguenti combinazioni:
+                    - 5 data bits con 2 stop bits.
+                    - 6, 7, o 8 data bits con 1.5 stop bits.
+
+                   Le modifiche apportate al valore di ComPortStopBits sono
+                   applicate immediatamente, ossia, il numero di stop bits viene
+                   modificato istantaneamente se si è già connessi ad una porta
+                   seriale.
+
+   [COMPORTPARITY]
+
+     <Definizione> ComPortParity: TComPortParity
+     <Default>     ptNONE
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortParity determina il tipo di parità da
+                   utilizzare per la trasmissione/ricezione dei dati.
+                   Questi sono i possibili valori:
+
+                   Valore         Significato
+                   -------------------------------------------------------------
+                   ptNONE         nessuna parità
+                   ptODD          parità dispary (ODD)
+                   ptEVEN         parità pari (EVEN)
+                   ptMARK         parità MARK
+                   ptSPACE        parità SPACE
+
+     <Altre info>  Un bit di parità può essere concatenato ad una parola dati
+                   in modo da permettere l'identificazione di eventuali errori
+                   di trasmissione.
+                   I tipi di parità sono quattro (+1): odd, even, mark, space
+                   (+ none).
+
+                   La parità 'Odd' (dispari) significa che il numero di bit
+                   a livello 'low' ('mark') nella parola dati è sempre dispari.
+                   Il bit di parità viene quindi posto ad un livello low or high
+                   in modo che il numero di bit 'low' sia sempre dispari.
+
+                   La parità 'Even' (pari) significa che il numero di bit a
+                   livello 'low' ('mark') nella parola dati è sempre pari.
+                   Il bit di parità viene quindi posto ad un livello low or high
+                   in modo che il numero di bit 'low' sia sempre pari.
+
+                   La parità 'Mark' significa che il bit di parità è sempre
+                   nello stato 'mark' (low).
+
+                   La parità 'Space' significa che il bit di parità è sempre
+                   nello stato 'space' (high).
+
+                   Le modifiche apportate al valore di ComPortParity sono
+                   applicate immediatamente, ossia, il tipo di parità viene
+                   modificato istantaneamente se si è già connessi ad una porta
+                   seriale.
+
+
+   [COMPORTHWHANDSHAKING]
+
+     <Definizione> ComPortHwHandshaking: TComPortHwHandshaking
+     <Default>     hhNONE
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortHwHandshaking determina il tipo di
+                   controllo di flusso hardware da utilizzare.
+                   Questi sono i possibili valori:
+
+                   Valore       Significato
+                   -------------------------------------------------------------
+                   hhNONE       disabilita il controllo di flusso hardware
+                   hhNONERTSON  disabilita il controllo di flusso hardware ma
+                                abilita la linea RTS (sempre ON)
+                   hhRTSCTS     abilita il controllo di flusso RTS/CTR
+
+     <Altre info>  Il controllo di flusso è un metodo di scambio di segnali
+                   che permette una perfetta sincronizzazione tra il dispositivo
+                   trasmittente e il dispositivo ricevente.
+
+                   I segnali RTS e CTS sono stati appositamente pensati per il
+                   controllo di flusso dei dati.
+                   Il dispositivo trasmittente segnala al dispositivo ricevente
+                   che ha dei dati da inviare abilitando il segnale RTS
+                   ('Request To Send'). Il dispositivo ricevente conferma la sua
+                   disponibilità ad accettare dati abilitando il segnale CTS
+                   ('Clear To Send').
+
+                   Le modifiche apportate al valore di ComPortHwHandshaking sono
+                   applicate immediatamente, ossia, il tipo di controllo di
+                   flusso viene modificato istantaneamente se si è già connessi
+                   ad una porta seriale.
+
+   [COMPORTSWHANDSHAKING]
+
+     <Definizione> ComPortSwHandshaking: TComPortSwHandshaking
+     <Default>     shNONE
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortSwHandshaking determina il tipo di
+                   controllo di flusso software da utilizzare.
+                   Questi sono i possibili valori:
+
+                   Valore       Significato
+                   -------------------------------------------------------------
+                   shNONE       disabilita il controllo di flusso software
+                   shXONXOFF    abilita il controllo di flusso XON/XOFF
+
+     <Altre info>  Il controllo di flusso è un metodo di scambio di segnali
+                   che permette una perfetta sincronizzazione tra il dispositivo
+                   trasmittente e il dispositivo ricevente.
+
+                   Il controllo di flusso XON/XOFF utilizza due caratteri ASCII
+                   speciali: il carattere XON (DC1, Ctrl-Q, ASCII 17) e il
+                   carattere XOFF (DC3, Ctrl-S, ASCII 19).
+                   Quando il dispositivo ricevente vuole interrompere il flusso
+                   di dati in ricezione, invia XOFF ('Transmission Off').
+                   Quando è in grado di ricevere altri dati, invia XON
+                   (Transmission On').
+
+                   (In alcune implementazioni , XON e XOFF possono essere un
+                   qualsiasi codice ASCII).
+
+                   Il controll di flusso XON/XOFF è naturalmente limitato alla
+                   trasmissione di testi.
+                   Non può essere utilizzato per la trasmissione di dati binari
+                   poichè questi possono contenere anche i caratteri XON/XOFF
+                   e il controllo di flusso verrebbe disturbato.
+
+                   Le modifiche apportate al valore di ComPortSwHandshaking sono
+                   applicate immediatamente, ossia, il tipo di controllo di
+                   flusso viene modificato istantaneamente se si è già connessi
+                   ad una porta seriale.
+
+   [COMPORTINBUFSIZE]
+
+     <Definizione> ComPortInBufSize: word
+     <Default>     2048 bytes
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortInBufSize determina la dimensione del
+                   buffer utilizzato per la memorizzazione dei dati ricevuti.
+
+     <Altre info>  Si sconsiglia di impostare la dimensione del buffer di
+                   input ad un valore inferiore a:
+
+                      bps / (data bits + stop bits + 2) * pollingDelay / 1000.
+
+                   Impostare la dimensione del buffer di input ad una dimensione
+                   inferiore a quella di cui sopra, può provocare una perdita
+                   di dati.
+
+                   Non è possibile modificare ComPortInBufSize mentre si è
+                   connessi ad una porta seriale.
+
+   [COMPORTOUTBUFSIZE]
+
+     <Definizione> ComPortOutBufSize: word
+     <Default>     2048 bytes
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortOutBufSize determina la dimensione del
+                   buffer utilizzato per la memorizzazione dei dati inviati.
+
+     <Altre info>  Non è possibile modificare ComPortOutBufSize mentre si è
+                   connessi ad una porta seriale.
+
+   [PACKETSIZE]
+
+     <Definizione> PacketSize: smallint
+     <Default>     -1 (feature disabled)
+     <Published>   sì
+
+     <Descrizione> La proprietà PacketSize determina in qual modo i dati
+                   ricevuti dalla porta seriale debbano essere gestiti.
+                   Se Packetsize è <= 0, l'evento ONRECEIVEDATA viene chiamato
+                   ogni volta che la routine di polling trova qualche dato
+                   nel buffer di input.
+                   Se Packetsize è > 0, i dati in ingresso vengono suddivisi
+                   in pacchetti (packets) di dimensione PacketSize.
+
+                   Le regole seguite da TCommPortDriver sono le seguenti:
+
+                   1. se il buffer di input contiene almeno PacketSize bytes,
+                      i dati vengono suddivisi in packets di PacketSize bytes
+                      ognuto e l'evento ONRECEIVEPACKET viene chaiamato per
+                      ogni packet così ottenuto (DataSize è = a PacketSize).
+                      Nel caso in cui il numero di bytes nel buffer di input
+                      non siano sufficienti a formate un packet completo, si
+                      applica la regola 2.
+                   2. se il buffer di input contiene meno di PacketSize bytes,
+                      allora:
+                      a. se PacketTimeout è <= 0 (timeout disabilitato):
+                         i dati rimangono nel buffer di input sino a quando
+                         il loro numero non è tale da formare un packet
+                         completo. Ossia, l'evento ONRECEIVEPACKET non viene
+                         chiamato sino a quando non è disponibile un packet.
+                      b. se PacketTimeout è > 0 allora (timeout abilitato), i
+                         dati rimangono nel buffer di input sino a quando una
+                         delle seguenti condizioni è valida:
+                         aa) si ricevono i bytes necessari a completare
+                             il packet
+                         bb) non vengono ricevuti abbastanza bytes e il packet
+                             non viene completato prima di PacketTimeout
+                             millisecondi.
+                         Nel caso la aa) sia verificata, il packet ottenuto
+                         viene passato all'applicazione (con ONRECEIVEPACKET).
+                         Nel caso la bb) sia verificata ( prima della aa) ),
+                         la destinazione dei dati è determinata dal valore
+                         della proprietà PacketMode:
+                         - se PacketMode è = pmDiscard, il buffer di input
+                           viene svuotato. L'evento ONRECEIVEPACKET non viene
+                           chiamato.
+                         - se PacketMode è = pmPass, l'evento ONRECEIVEPACKET
+                           viene chiamato anche se il packet non è completo.
+                           In questo caso, il parametro DataSize sarà inferiore
+                           al valore impostato in PacketSize.
+
+     <Altre info>  I valori di PacketSize, PacketTimeout e PacketMode possono
+                   essere modificati in qualsiasi momento.
+
+   [PACKETTIMEOUT]
+
+     <Definizione> PacketTimeout: integer
+     <Default>     -1 (timeout disabilitato)
+     <Published>   sì
+
+     <Descrizione> La proprietà PacketTimeout determina per quanto tempo (in ms)
+                   TCommPortDriver deve attendere che un packet sia completato.
+
+                   Si veda la descrizione della proprietà PacketSize per
+                   maggiori informazioni.
+
+   [PACKETMODE]
+
+     <Definizione> PacketMode: TPacketMode
+     <Default>     pmDiscard
+     <Published>   sì
+
+     <Descrizione> La proprietà PacketMode determina come devono essere gestiti
+                   i packet che non vengono completati entro PacketTitemout
+                   millisecondi.
+
+                   I possibili valori di PacketMode sono:
+
+                   Valore       Significato
+                   -------------------------------------------------------------
+                   pmDiscard    ignora i packets non completi (l'evento
+                                ONRECEIVEDATA non viene chiamato)
+                   pmPass       invia comunque i packets incompleti.
+                                L'evento ONRECEIVEDATA viene chiamato e
+                                il parametro DataSize contiene la dimensione
+                                del packet non completo.
+
+                   Si veda la descrizione della proprietà PacketSize per
+                   maggiori informazioni.
+
+   [COMPORTPOLLINGDELAY]
+
+     <Definizione> ComPortPollingDelay: word
+     <Default>     50 ms (0.05 secondi, 20 volte al secondo)
+     <Published>   sì
+
+     <Descrizione> La proprietà ComPortPollingDelay determina l'intervallo di
+                   tempo minimo (in milisecondi) da attendere prima di
+                   verificare se ci sono dati in arrivo dalla porta seriale.
+
+     <Altre info>  Più piccolo è l'intervallo di tempo, più volte in un secondo
+                   la porta seriale sarà controllata per eventuali dati in
+                   arrivo.
+                   Non impostare mai l'intervallo di tempo ad un valore troppo
+                   piccolo (<20ms), specialmente su macchine lente.
+                   Non impostate mai l'intervallo di tempo ad un valore troppo
+                   alto (>500ms), specialmente si si sta utilizzando una
+                   velocità di trasmissione elevata (>14400 bauds).
+
+                   Le modifiche apportate al valore di ComPortPollingDelay sono
+                   applicate immediatamente.
+
+   [ENABLEDTRONOPEN]
+
+     <Definizione> EnableDTROnOpen: boolean
+     <Default>     true
+     <Published>   sì
+
+     <Descrizione> La proprietà EnableDTROnOpen determina se il segnale DTR
+                   ('Data Terminal Ready') deve essere attivato al momento
+                   della connessione alla porta seriale (ossia quando si
+                   chiama Connect).
+
+     <Altre info>  Il segnale DTR è utilizzato quando si apre una porta seriale
+                   per la communicazione. I due dispositivi di comunicazione
+                   portano il segnale DTR al livello alto per comunicare che
+                   sono attivi.
+                   Il primo dispositivo seriale imposta il DTR al livello alto,
+                   e l'altro dispositivo risponde impostando anche il DSR al
+                   livello alto. Il DSR ('Data Set Ready') è il segnale DTR
+                   del secondo dispositivo visto dal primo dispositivo.
+
+                   I modems spesso indicano la disconnessione dalla linea
+                   telefonica impostanto il DSR al livello basso.
+                   Quando il PC porta il DTR al livello basso, i modems chiudono
+                   la connessione telefonica.
+
+                   Il valore di EnableDTROnOpen può essere modificato anche se
+                   si è già connessi ad una porta seriale, tuttavia, esso
+                   sarà preso in considerazione solo alla successiva connessione
+                   utilizzando Connect (se necessario chiamare Disconnect per
+                   sconnetersi e quindi Connect per riconnettersi alla porta
+                   seriale).
+
+   [COMPORTHANDLE]
+
+     <Definizione> ComPortHandle: THANDLE
+     <Default>     0 (non connesso)
+     <Published>   no (disponibile solo a run-time)
+
+     <Descrizione> La proprietà ComPortHandle contiene l' handle restituito da
+                   Windows per identificare univocamente la porta seriale in
+                   uso.
+                   Questo handle è necessario per alcune chiamate API, di solito
+                   per le TAPI.
+
+     <Altre info>  Impostando ComPortHandle ad un handle ottenuto da una delle
+                   funzioni TAPI sarà possible cedere il controllo della porta
+                   seriale a TCommPortDriver.
+
+                   Impostando ComPortHandle al valore 0 (zero), si ottiene la
+                   disconnessione e il rilascio (la chiusura) della porta
+                   seriale.
+
+                   Se si vuole che TCommPortDriver rilasci il controllo della
+                   seriale senza che questa venga chiusa, si imposti
+                   ComPortHandle al valore $FFFFFFFF.
+                   Il valore originario in ComPortHandle verrà perso e
+                   sostituito con 0 (=disconnesso): per non perdere tale valore
+                   è necessario memorizzarlo in una variabile prima di impostare
+                   ComPortHandle a $FFFFFFFF.
+
+   [OUTPUTTIMEOUT]
+
+     <Definizione> OutputTimeout: word
+     <Default>     500 (millisecondi)
+     <Published>   sì
+
+     <Descrizione> Vedi SendData()
+
+   [INPUTTIMEOUT]
+
+     <Definizione> InputTimeout: UINT
+     <Default>     200 (millisecondi)
+     <Published>   sì
+
+     <Descrizione> Vedi ReadData()
+
+   [CHECKLINESTATUS]
+
+     <Definizione> CheckLineStatus: boolean
+     <Default>     FALSE
+     <Published>   sì
+
+     <Descrizione> Molti utenti hanno riscontrato il seguente problema: quando
+                   non c'è alcuna periferica collegata alla porta seriale, o
+                   quando questa è spenta, le chiamate API ReadFile/WriteFile
+                   possono bloccare il sistema o rallentarlo in maniera
+                   sensibile.
+                   Sembra che il kernel di Win32 controlli lo stato della linea
+                   DSR prima di effettuare qualsiasi operazione di I/O seriale.
+                   Per prevenire il blocco del sistema si imposti la proprietà
+                   CheckLineStatus a TRUE prima o subito dopo la chiamata a
+                   Connect().
+                   Quando CheckLineStatus è TRUE, TCommPortDriver evita di
+                   chiamare ReadFile/WriteFile se nessuno dei seguenti è vero:
+
+                     perReadFile:
+                        1.     almeno uno tra (CTS, DSR, RING, RLSD) deve essere
+                               attivo
+                        2. o : ci sono dati nel buffer di ricezione
+
+                     per WriteFile:
+                        1.     almeno uno tra (CTS, DSR, RING, RLSD) deve essere
+                               attivo
+                        2. e : il buffer di trasmissione è vuoto
+
+ [ M E T O D I ]
+
+   [CREATE]
+
+     <Definizione> constructor Create( AOwner: TComponent )
+
+     <Descrizione> Il metodo Create alloca la memoria necessaria per contenere
+                   i dati del componente e inizializza i sui dati a valori
+                   di default.
+                   Il proprietario del componente è definito dal parametro
+                   AOwner.
+                   Se si crea un istanza di un componente chiamando Create, e si
+                   passa un valore valido in AOwner ( <> NIL ), sarà lo stesso
+                   proprietario a deallocare il componente prima di deallocare
+                   se stesso. Se non si vuole che il componente sia posseduto
+                   da un altro componente, si imposti AOwner a NIL.
+
+     <Risultato>   -
+
+     <Altre info>  Il metodo Create inizializza le proprietà del componente a
+                   valori di default. Tali valori di default sono:
+
+                   Proprietà/Eveno           Default
+                   -------------------------------------------------------------
+                   ComPort                   pnCOM2
+                   ComPortHandle             0 (non connesso)
+                   ComPortBaudRate           br9600
+                   ComPortDataBits           db8BITS
+                   ComPortStopBits           sb1BITS
+                   ComPortParity             ptNONE
+                   ComPortHwHandshaking      hhNONE
+                   ComPortSwHandshaking      shNONE
+                   ComPortInBufSize          2048 (bytes)
+                   ComPortOutBufSize         2048 (bytes)
+                   ComPortPollingDelay       50 (ms)
+                   EnableDTROnOpen           true
+                   PacketSize                -1
+                   PacketTimeout             -1
+                   PacketMode                pmDiscard
+                   OutputTimeout             500 (ms)
+                   InputTimeout              200 (ms)
+                   CheckLineStatus           false
+
+                   Se si è modificato il valore di una proprietà dall'Object
+                   Inspector di Delphi, tale valore verrà automaticamente
+                   caricato e non sarà necessario impostarlo da codice.
+
+   [FREE]
+
+     <Definizione> procedure Free
+
+     <Descrizione> Il metodo Free distrugge l'oggetto, dealloca la memoria da
+                   esso occupata e chiude la porta seriale.
+                   Non si deve mai deallocare il componente quando è in
+                   esecuzione uno dei suoi stessi 'event handlers'.
+
+     <Risultato>   -
+
+     <Altre info>  -
+
+   [CONNECT]
+
+     <Definizione> function Connect: boolean
+
+     <Descrizione> Il metodo Connect apre la porta seriale e avvia le procedure
+                   di controllo dei dati in arrivo (polling).
+
+     <Risultato>   TRUE : la porta seriale è stata aperta
+                   FALSE: - la porta seriale non esiste
+                          - oppure: la porta seriale è già impegnata
+                          - oppure: si è verificato un errore non previsto.
+
+     <Altre info>  Quando si chiama Connect, il componente attiverà un timer
+                   che controllerà se ci sono dati in arrivo.
+                   Se uno o più bytes di dati sono disponibili, verrà generato
+                   l' evento OnReceiveData.
+                   La porta seriale verrà controllata N=1000/ComPortPollingDelay
+                   volte al secondo e potranno essere ricevuti al massimo
+                   N*ComPortInBufSize bytes al secondo.
+                   Mantenendo le impostazioni di default (ComPortPollingDelay=50
+                   e ComPortInBufSize=2048) si potranno ricevere al massimo
+                   1000/50*2048 = 40KB di dati al secondo (ben oltre i circa
+                   12KB ottenibili con una connessione a 115200 bauds).
+
+   [DISCONNECT]
+
+     <Definizione> procedure Disconnect
+
+     <Descrizione> Il metodo Disconnect chiude (disconnette) la porta seriale
+                   e ferma il timer di controllo.
+                   Se la porta non è mai sta aperta (connessa), Disconnect
+                   non ha alcun effetto.
+                   Dopo aver chiuso la porta seriale, essa sarà resa disponibile
+                   a qualsiasi applicazione ne faccia richiesta.
+
+     <Risultato>   -
+
+     <Altre info>  Si veda ComPortHandle per come rilasciare il controllo della
+                   seriale senza chiuderla.
+
+   [CONNECTED]
+
+     <Definizione> function Connected: boolean
+
+     <Descrizione> Il metodo Connected restituisce un flag che indica se il
+                   componente sta controllando una porta seriale (se è
+                   connesso).
+
+     <Risultato>   TRUE : il componente controlla una porta seriale
+                          (connesso)
+                   FALSE: il componente non controlla una porta seriale
+                          (disconnesso)
+
+     <Altre info>  Chiamare Connected equivale a verificare se ComPortHandle
+                   è diverso da zero.
+
+   [GETLINESTATUS]
+
+     <Definizione> function GetLineStatus: TComPortLineStatusSet
+
+     <Descrizione> Restituisce lo stato dei segnali CTS, DSR, RING and RLSD(CD).
+                   La funzione restituisce sempre [] se l'hardware non suporta
+                   i registri di controllo.
+
+     <Risultato>   Il risultato è un set di valori di tipo TCommPortLineStatus.
+
+                    Valore         Significato
+                   ------------------------------------------------------------
+                    lsCTS          il segnale CTS è ON
+                    lsDSR          il segnale DSR è ON
+                    lsRING         il segnale RING è ON
+                    lsRLSD         il segnale RLSD è ON
+
+   [FLUSHBUFFERS]
+
+     <Definizione> procedure FlushBuffers( inBuf, outBuf: boolean );
+
+     <Descrizione> Il metodo FlushBuffers svuota (flush) tutti i dati presenti
+                   nel buffer di input, nel buffer di output o in entrambi.
+
+                   inBuf     outBuf      Descrizione
+                   -------------------------------------------------------------
+                   FALSE     FALSE       i buffers non vengono svuotati
+                   FALSE     TRUE        il buffer di output viene svuotato
+                   TRUE      FALSE       il buffer di input viene svuotato
+                   TRUE      TRUE        entrambi i buffers vengono svuotati
+
+     <Risultato>   -
+
+     <Altre info>  -
+
+   [PAUSEPOLLING e CONTINUEPOLLING]
+
+     <Definizione> procedure PausePolling;
+                   procedure ContinuePolling;
+
+     <Descrizione> Il metodo PausePolling incrementa di 1 un contatore interno,
+                   il metodo ContinuePolling lo decrementa di 1.
+                   Il contatore è inizialmente a zero.
+
+                   Quando questo contatore è maggiore di zero la ricezione
+                   asincrona è disabilitata. Altrimenti la ricezione asincrona è
+                   abilitata.
+
+                   Se si disabilita la ricezione asincrona, TCommPortDriver
+                   smette di controllare se ci sono dati in ingresso e non
+                   genera mai gli eventi OnReceiveData/OnReceivePacket.
+                   Per leggere i dati è allora necessario utilizzare i metodi
+                   ReadData(), ReadByte() o ReadChar().
+
+   [ISPOLLING]
+
+     <Definizione> function IsPolling: boolean;
+
+     <Descrizione> La funzione IsPolling restituisce:
+                      TRUE  se la ricezione asincrona è abilitata
+                      FALSE se la ricezione asincrona è disabilitata
+
+   [SENDDATA]
+
+     <Definizione> function SendData( DataPtr: pointer;
+                                      DataSize: UINT ): UINT
+
+     <Descrizione> Il metodo SendData invia il contenuto di un blocco di memoria
+                   (DataPtr) grande DataSize bytes.
+                   Se il blocco di memoria è più grande dello spazio libero
+                   nel buffer di output, esso viene suddiviso in blocchi più
+                   piccoli e questi vengono inviati uno alla volta.
+                   La proprietà OutputTimeout definisce per quanto tempo questo
+                   metodo debba attendere che uno dei blocchi sia copiato nel
+                   buffer di output e quindi inviato attraverso la porta
+                   seriale.
+
+     <Risultato>   0 (zero): - la porta seriale non è stata aperta
+                             - oppure: DataSize è zero
+                             - oppure: non è stato possibile inviare i dati
+                                       poichè il buffer di output è pieno (non è
+                                       stato trasmesso nemmeno uno dei bytes che
+                                       già stavano nel buffer di output ed e
+                                       sono trascorsi almeno OutputTimeout
+                                       millisecondi dall'ultimo tentativo).
+                   = DataSize: tutti i dati sono stati inviati ( o almeno
+                               copiati nel buffer di output )
+                   < DataSize: non tutti i dati sono stati inviati perchè il
+                               buffer è saturo e/o sono trascorsi almeno
+                               OutputTimeout millisecondi dall'ultimo
+                               tentativo).
+
+     <Altre info>  -
+
+   [SENDDATAEX]
+
+     <Definizione> function SendDataEx( DataPtr: pointer;
+                                      DataSize, Timeout: UINT ): UINT
+
+     <Descrizione> Il metodo SendDataEx invia il contenuto di un blocco di
+                   memoria (DataPtr) grande DataSize bytes.
+                   Se il blocco di memoria è più grande dello spazio libero
+                   nel buffer di output, esso viene suddiviso in blocchi più
+                   piccoli e questi vengono inviati uno alla volta.
+                   Il parametro Timeout definisce per quanto tempo questo
+                   metodo debba attendere che uno dei blocchi sia copiato nel
+                   buffer di output e quindi inviato attraverso la porta
+                   seriale.
+
+     <Risultato>   0 (zero): - la porta seriale non è stata aperta
+                             - oppure: DataSize è zero
+                             - oppure: non è stato possibile inviare i dati
+                                       poichè il buffer di output è pieno (non è
+                                       stato trasmesso nemmeno uno dei bytes che
+                                       già stavano nel buffer di output ed e
+                                       sono trascorsi almeno OutputTimeout
+                                       millisecondi dall'ultimo tentativo).
+                   = DataSize: tutti i dati sono stati inviati ( o almeno
+                               copiati nel buffer di output )
+                   < DataSize: non tutti i dati sono stati inviati perchè il
+                               buffer è saturo e/o sono trascorsi almeno Timeout
+                               millisecondi dall'ultimo tentativo).
+
+     <Altre info>  -
+
+   [SENDBYTE]
+
+     <Definizione> function SendByte( Value: byte ): boolean;
+
+     <Descrizione> Il metodo SendByte invia un singolo byte.
+
+     <Risultato>   FALSE: - la porta seriale non è stata aperta
+                          - opuure: il byte non è stato inviato a causa di un
+                            errore di timeout (il buffer di output è pieno).
+                   TRUE : byte inviato
+
+   [READDATA]
+
+     <Definizione> function ReadData( DataPtr: pointer;
+                                      MaxDataSize: UINT ): UINT
+
+     <Descrizione> Il metodo ReadData legge un blocco di valori (DataPtr) lungo
+                   MaxDataSize bytes dal buffer di input.
+                   La proprietà InputTimeout determina per quanto tempo questo
+                   metodo debba attendere che tutti i dati richiesti siano
+                   letti (millisecondi).
+
+     <Risultato>   0 (zero): - la porta seriale non è stata aperta
+                             - oppure: MaxDataSize è zero
+                             - oppure: tempo massimo d'attesa raggiunto
+                   = MaxDataSize: tutti i dati richiesti sono stati copiati
+                               nel buffer DataPtr
+                   < MaxDataSize: non tutti i dati richiesti sono stati copiati
+                               nel buffer DataPtr. Il risultato è il numero
+                               di bytes copiati in DataPtr.
+
+   [READBYTE]
+
+     <Definizione> function ReadByte( var Value: byte ): boolean;
+
+     <Descrizione> Legge un singolo byte dalla porta seriale.
+
+     <Risultato>   TRUE : il byte è stato copiato in Value
+                   FALSE: non ci sono dati in input 
+
+   [READCHAR]
+
+     <Definizione> function ReadChar( var Value: char ): boolean;
+
+     <Descrizione> Legge un singolo carattere dalla porta seriale.
+
+     <Risultato>   TRUE : il carattere è stato copiato in Value
+                   FALSE: non ci sono dati in input 
+
+   [SENDCHAR]
+
+     <Declaration> function SendChar( Value: char ): boolean;
+
+     <Description> The SendChar method sends a single character value to the
+                   output buffer.
+
+     <Risultato>   FALSE: - la porta seriale non è stata aperta
+                          - opuure: il byte non è stato inviato a causa di un
+                            errore di timeout (il buffer di output è pieno).
+                   TRUE : byte inviato
+
+   [OUTFREESPACE]
+
+     <Definizione> function OutFreeSpace: word;
+
+     <Descrizione> Il metodo OutFreeSpace restituisce il numero di bytes
+                   liberi nel buffer di output.
+
+     <Risultato>   Numbero di bytes liberi
+
+     <Altre info>  E' possibile aumentare la dimensione del buffer di output
+                   tramite la proprietà ComPortOutBufSize.
+                   Per svuotare il buffer di output si chiami FlushBuffers(...).
+
+   [COUNTRX]
+
+     <Definizione> function CountRX: word;
+
+     <Descrizione> Il metodo CountRX restituisce il numero di bytes presenti
+                   nel buffer di input.
+
+     <Risultato>   Numero di bytes nel buffer di input
+
+     <Altre info>  E' possibile aumentare la dimensione del buffer di input
+                   tramite la proprietà ComPortInBufSize.
+                   Per svuotare il buffer di input si chiami FlushBuffers(...).
+
+   [SENDSTRING]
+
+     <Definizione> function SendString( s: string ): boolean
+
+     <Descrizione> Il metodo SendString invia il contenuto di una stringa
+                   (formato Pascal) utilizzando la porta seriale.
+                   Si veda SendData per una descrizione dei problemi di timeout.
+
+     <Risultato>   TRUE : la stringa è stata inviata
+                   FALSE: - la porta seriale non è stata aperta
+                          - oppure: non tutti i dati sono stati inviati a causa
+                                    di un timeout
+
+     <Altre info>  -
+
+   [SENDZSTRING]
+
+     <Definizione> function SendZString( s: pchar ): boolean
+
+     <Descrizione> Il metodo SendZString invia il contenuto di una stringa
+                   (formato C, terminata con #0) utilizzando la porta seriale.
+                   Si veda SendData per una descrizione dei problemi di timeout.
+
+     <Risultato>   TRUE : la stringa è stata inviata
+                   FALSE: - la porta seriale non è stata aperta
+                          - oppure: non tutti i dati sono stati inviati a causa
+                                    di un timeout
+
+
+     <Altre info>  SendZString( zstr ) equivale a:
+
+                     SendData( zstr, strlen(zstr) )
+
+   [TOGGLEDTR]
+
+     <Definizione> procedure ToggleDTR( onOff: boolean )
+
+     <Descrizione> Il metodo ToggleDTR imposta lo stato della linea DTR ('Data
+                   Terminal Ready').
+                   Questi sono i possibili valori di OnOff:
+
+                   OnOff        Significato
+                   -------------------------------------------------------------
+                   TRUE         imposta DTR al livello alto ('space')
+                   FALSE        imposta DTR al livello basso ('mark')
+
+     <Risultato>   -
+
+     <Altre info>  -
+
+   [TOGGLERTS]
+
+     <Definizione> procedure ToggleRTS( onOff: boolean )
+
+     <Descrizione> Il metodo ToggleRTS imposta lo stato della linea RTS
+                   ('Request To Send').
+                   Questi sono i possibili valori di OnOff:
+
+                   OnOff        Significato
+                   -------------------------------------------------------------
+                   TRUE         imposta RTS al livello alto ('space')
+                   FALSE        imposta RTS al livello basso ('mark')
+
+     <Risultato>   -
+
+     <Altre info>  Non si utilizzi mai ToggleRTS se si sta utilizzando il
+                   controllo di flusso hardware (RTS/CTS).
+
+ [ E V E N T S ]
+
+   [ONRECEIVEDATA]
+
+     <Definizione> property OnReceiveData: TComPortReceiveDataEvent
+     <Handler>     TComPortReceiveDataEvent =
+                      procedure( Sender: TObject; DataPtr: pointer;
+                                 DataSize: integer ) of object
+     <Published>   sì
+
+     <Descrizione> L'evento OnReceiveData ha luogo quando ci sono dati
+                   disponibili nel buffer di input e il supporto per il packets
+                   è disabilitato (PacketSize <= 0).
+                   
+                   Questo evento è asincrono, ossia può aver luogo in qualsiasi
+                   momento da quando la porta seriale è stata aperta.
+
+                   Il parametro DataPtr contiene l'indirizzo di un buffer
+                   temporaneo contenente i dati ricevuti e il parametro
+                   DataSize contiene il numero di bytes memorizzati nel buffer.
+                   Il primo byte ricevuto si trova all'indirizzo DataPtr, il
+                   secondo all'indirizzo DataPtr+1, è così via.
+
+     <Risultato>   -
+
+     <Altre info>  I dati vengono copiati dal buffer di input primario in un
+                   buffer secondario prima che l'evento OnReceiveData abbia
+                   luogo.
+                   Se non si provvede ad implementare il gestore dell'evento,
+                   tutti i dati in arrivo andranno naturalmente persi.
+
+   [ONRECEIVEPACKET]
+
+     <Definizione> property OnReceivePacket: TComPortReceivePacketEvent
+     <Handler>     TComPortReceivePacketEvent =
+                      procedure( Sender: TObject; Packet: pointer;
+                                 DataSize, ElapsedTime: integer ) of object
+     <Published>   sì
+
+     <Descrizione> L'evento OnReceivePacket ha luogo quando un pacchetto di dati
+                   è disponibile nel buffer di input.
+                   Questo evento è asincrono, ossia può aver luogo in qualsiasi
+                   momento da quando la porta seriale è stata aperta.
+
+                   (Vedi PacketSize, PacketTimeout and PacketMode per maggiori
+                    informazioni)
+
+                   Il parametro Packet contiene l'indirizzo di un buffer
+                   temporaneo contenente i dati ricevuti e il parametro
+                   DataSize contiene il numero di bytes memorizzati nel buffer.
+                   Il primo byte ricevuto si trova all'indirizzo DataPtr, il
+                   secondo all'indirizzo DataPtr+1, è così via.
+                   Il parametro ElapsedTime contiene il tempo impiegato per
+                   la ricezione del packet (+/- COMPORTPOLLINGDELAY ms).
+
+     <Risultato>   -
+
+     <Altre info>  I dati vengono copiati dal buffer di input primario in un
+                   buffer secondario prima che l'evento OnReceivePacket abbia
+                   luogo.
+                   Se non si provvede ad implementare il gestore dell'evento,
+                   tutti i dati in arrivo andranno naturalmente persi.
+

@@ -1,0 +1,1918 @@
+ INDYTcpServer.Active:=True; 
+
+
+  function GetAppServerRemoteDataRefreshState: Integer;
+
+function TRemoteControlForm.
+  GetAppServerRemoteDataRefreshState: Integer;
+var res: Integer;
+begin
+  res:=-1;
+  try
+    RDataStateADODS.Active:=False;
+    RDataStateADODS.Active:=True;
+    if (RDataStateADODS.RecordCount>0) then
+      begin
+        res:=RDataStateADODS.FieldByName('tdm_count').asInteger;
+      end;
+  except on E:Exception do
+   begin
+    ServerMainForm.WriteEvent('Ошибка запроса состояния удал. таблицы сообщений: '+E.Message+'.');
+   end;
+  end;
+  Result:=res;
+end;
+
+    function SyncOrdersWithMSGTable: Boolean;
+
+function TRemoteControlForm.SyncOrdersWithMSGTable: Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  Result:=res;
+end;
+
+    function SendTDMessage(OPERATION_NAME: string; SOURCE_ID, DEST_ID, OBJ_ID: Integer;
+      STR_PARAM_1, STR_PARAM_2, STR_PARAM_3: string;
+      INT_PARAM_1, INT_PARAM_2, INT_PARAM_3: Integer;
+      OPERATION_ID: Integer; DEST_NAME: string): Boolean;
+
+function TRemoteControlForm.SendTDMessage(OPERATION_NAME: string; SOURCE_ID, DEST_ID, OBJ_ID: Integer;
+      STR_PARAM_1, STR_PARAM_2, STR_PARAM_3: string;
+      INT_PARAM_1, INT_PARAM_2, INT_PARAM_3: Integer;
+      OPERATION_ID: Integer; DEST_NAME: string): Boolean;
+begin
+  try
+    AddOperationADOC.Parameters.ParamByName('OPERATION_NAME').Value:=
+      OPERATION_NAME;
+    AddOperationADOC.Parameters.ParamByName('OPERATION_ID').Value:=
+      OPERATION_ID;
+    AddOperationADOC.Parameters.ParamByName('SOURCE_ID').Value:=
+      SOURCE_ID;
+    AddOperationADOC.Parameters.ParamByName('DEST_ID').Value:=
+      DEST_ID;
+    AddOperationADOC.Parameters.ParamByName('DEST_NAME').Value:=
+      DEST_NAME;
+    AddOperationADOC.Parameters.ParamByName('OBJ_ID').Value:=
+      OBJ_ID;
+    AddOperationADOC.Parameters.ParamByName('STR_PARAM_1').Value:=
+      STR_PARAM_1;
+    AddOperationADOC.Parameters.ParamByName('STR_PARAM_2').Value:=
+      STR_PARAM_2;
+    AddOperationADOC.Parameters.ParamByName('STR_PARAM_3').Value:=
+      STR_PARAM_3;
+    AddOperationADOC.Parameters.ParamByName('INT_PARAM_1').Value:=
+      INT_PARAM_1;
+    AddOperationADOC.Parameters.ParamByName('INT_PARAM_2').Value:=
+      INT_PARAM_2;
+    AddOperationADOC.Parameters.ParamByName('INT_PARAM_3').Value:=
+      INT_PARAM_3;
+    AddOperationADOC.Parameters.ParamByName('CREATE_DT').Value:=
+      Today+Time;
+    AddOperationADOC.Execute;
+    Result:=True;
+  except on E:Exception do
+   begin
+    ServerMainForm.WriteEvent('Ошибка добавления сообщения: '+E.Message+'.');
+    Result:=False;
+   end;
+  end;
+end;
+
+SendTDMessage('MSG',0,DEST_ID,0,MSG,
+        '','',0,0,0,0,IntToStr(DEST_ID))
+
+    function LoadProcessedOrder: Boolean;
+
+function TRemoteControlForm.LoadProcessedOrder: Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  Result:=res;
+end;
+
+function SaveMessageTable: Boolean;
+
+function TRemoteControlForm.SaveMessageTable: Boolean;
+var bad_base_backup: Boolean;
+    back_up_time: Widestring;
+begin
+  bad_base_backup:=False;
+  try
+  try
+    back_up_time:=FloatToStr(Today+Time);
+    TDMessagesADOT.SaveToFile(CD+'\MSG_TABLE_BAKUP.adgt');
+    LocalMessageTableCDS.Active := False;
+    LocalMessageTableCDS.Active := True;
+    LocalMessageTableCDS.Refresh;
+    bad_base_backup:=True;
+    LocalMessageTableCDS.SaveToFile(CD+'\MSG_TABLE_BACKUP.cds');
+  except on E:Exception do
+   begin
+    LocalMessageTableCDS.SaveToFile(CD+'\MSG_TABLE_RESERVE_BACKUP'+
+      back_up_time+'.cds');
+    ServerMainForm.WriteEvent('Ошибка сохранения таблицы сообщений: '+E.Message+'.');
+   end;
+  end;
+  finally
+    //LocalMessageTableCDS.Active := False;
+  end;
+end;
+
+procedure addToSocksMemo(var Msg: TMessage); message APP_TO_SOCK_MEMO;
+
+procedure TRemoteControlForm.addToSocksMemo(var Msg: TMessage);
+begin
+  //SocksListView.Lines.Add(Msg.LParam);
+end;
+
+    function Set_Local_Order_Param(OrderID: Integer; ParamName, StrParam: string;
+      IntParam: Integer; FloatParam: Double): Boolean;
+
+
+function TRemoteControlForm.Set_Local_Order_Param(OrderID: Integer; ParamName, StrParam: string;
+      IntParam: Integer; FloatParam: Double): Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  try
+    SetOrderParamADOSP.Parameters.ParamByName('bold_id').Value:=
+      OrderID;
+    SetOrderParamADOSP.Parameters.ParamByName('param_name').Value:=
+      ParamName;
+    SetOrderParamADOSP.Parameters.ParamByName('str_value').Value:=
+      StrParam;
+    SetOrderParamADOSP.Parameters.ParamByName('int_value').Value:=
+      IntParam;
+    SetOrderParamADOSP.Parameters.ParamByName('float_value').Value:=
+      FloatParam;
+  except on E:Exception do
+   begin
+    ServerMainForm.WriteEvent('Ошибка выполнения удаленной процедуры установки параметров обработки удаленного заказа: '+E.Message+'.');
+    Result:=False;
+   end;
+  end;
+end;
+
+
+function TRemoteControlForm.SetSale(Sale: Double): Boolean;
+var temp_id: Integer;
+    date_prm: TParameter;
+begin
+
+end;
+
+
+function SetSale(Sale: Double): Boolean;
+
+function Set_Local_REMOTE_SET(OrderID, REMOTE_SET: Integer): Boolean;
+    function Set_Local_REMOTE_INCOURSE(OrderID, REMOTE_INCOURSE: Integer): Boolean;
+    function Set_Local_REMOTE_ACCEPTED(OrderID, REMOTE_ACCEPTED: Integer): Boolean;
+
+
+function TRemoteControlForm.Set_Local_REMOTE_SET(OrderID, REMOTE_SET: Integer): Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  Result:=res;
+end;
+
+function TRemoteControlForm.Set_Local_REMOTE_INCOURSE(OrderID, REMOTE_INCOURSE: Integer): Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  Result:=res;
+end;
+
+function TRemoteControlForm.Set_Local_REMOTE_ACCEPTED(OrderID, REMOTE_ACCEPTED: Integer): Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  Result:=res;
+end;
+
+
+function Set_Local_ORDER_CACHE(OrderID, CACHE: Double): Boolean;
+
+
+function TRemoteControlForm.Set_Local_ORDER_CACHE(OrderID, CACHE: Double): Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  Result:=res;
+end;
+
+
+{if IniFile.ReadString('BUSINESS_DATA',
+  'вести_контроль_удаленного_управления','NO')='YES' then
+  begin
+  if RemoteServerADOC.connected then
+    begin
+      StateRequestResult:=
+        GetAppServerRemoteDataRefreshState;
+      if StateRequestResult>=0 then
+        begin
+          //SmsSendForm.CheckSMSSending;
+          ServerMainForm.WriteEvent('Удачная проверка удаленного соединения!');
+        end
+      else if StateRequestResult<0 then
+        begin
+          RemoteServerADOC.connected:=False;
+        end
+      else
+        begin
+        end;
+    end;
+  if not RemoteServerADOC.connected then
+        begin
+          if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'пытаться_восстанавливать_неактивное_соединение',
+          'NO')='YES' then
+            begin
+              ServerMainForm.WriteEvent('Попытка установки удаленного соединения!');
+              ConnectToRemoteDB;
+            end;
+        end;
+  end;}
+
+
+IdPOP3, IdMessage, 
+ IdBaseComponent,
+  IdComponent, IdTCPConnection, IdTCPClient, IdExplicitTLSClientServerBase,
+  IdMessageClient,
+, BoldListBox, BoldTreeView
+, BoldImage
+, BoldCheckBox, BoldEdit, BoldComboBox
+--------------------------------------
+//dr_chng:=False;
+tsearch:='';
+inum:='';
+FindSectorNum:=-1;
+//all_discount_num:=0;
+//is_bad_num:=False;
+sql_text:='';
+ReleaseStructForm.CheckUsePeriod;
+  if BoldModelDM.GetCurrentArhVal(Nomer_zakaza) then
+  begin
+     RefreshMainGrid(-1);
+     ShowMessage('Данный заказ был удалён другим пользователем вообще или в архив!');
+  end
+ else
+  begin
+  
+    if (tnum <> BoldModelDM.GetCurrCustTNum(Nomer_zakaza)) and not not_after_post then
+          begin
+             RefreshMainGrid(Round(nomer_zakaza));
+             ShowMessage('Данная заявка уже изменена другим пользователем!');
+          end
+     else
+       begin
+          if not FirstForm.SpaceStr(tnum) or
+              (IniFile.ReadString('BUSINESS_DATA','enable_empty_tnum_set','NO')='YES')  then begin
+                  if ((tnum='') or not_after_post)  or
+                      (IniFile.ReadString('BUSINESS_DATA','disable_repeat_enter','NO')<>'YES') then
+                         begin
+
+                            if tnum<>'' then begin
+
+                              sql_text:='UPDATE Zakaz SET Nachalo_zakaza_data=GETDATE() ';
+                              if set_t_num then
+                                sql_text:=sql_text+',telefon_klienta='''+tnum+''' ';
+
+                              sql_text:=sql_text+' WHERE Nomer_zakaza='+IntToStr(Round(Nomer_zakaza));
+                              if not SendSQL(sql_text) then
+                                ShowMessage('Неудачная установка параметров заявки!');
+
+
+                              if Ask then
+                                if (IniFile.ReadString('BUSINESS_DATA',
+                                   'manual_operator_ask_mode','NO')='YES') then
+                                   FirstForm.StatusBar.Panels[2].Text:=
+                                      'ЕСТЬ ИЗМЕНЕНИЯ';
+
+                                 end
+                              else
+                                 ShowMessage('Невозможно установить пустое значение!');
+                         end
+                   else
+                       ShowMessage('Невозможно повторно установить значение!');
+             end
+           else
+              ShowMessage('Невозможно установить пустое значение!');
+
+       end;
+      //Условие проверки на изменённость поля другим пользователем
+  end;
+-------------------------------------------
+{if (IniFile.ReadString('BUSINESS_DATA',
+    'отправлять_СМС_через_порт',
+    'NO')='YES') then
+  begin
+      if (StrToInt64Def(phone,-1)<>-1) and
+        (Length(phone)=10) then
+      begin
+
+        try
+          try
+            nTel:='7'+phone;//'79181751955';
+            msg_text:=send_text;//'тел. 89883138837 угол ул. Крымской и Астраханской зовут Руслан';
+
+            m := msg_text;
+            // Полуоктеты представляют десятичные цифры, и, например, номер отправителя получается
+            // при перестановке десятичных цифр в каждом октете: от "72 38 88 09 00 F1" к "27 83 88 90 00 1F".
+            // Длина телефонного номера нечетна, поэтому в последний октет добавлен F.
+            if Length(nTel) mod 2 = 1 then
+                nTel := nTel + 'F';
+
+            for i := 1 to Length(nTel) do
+                if i mod 2 = 0 then
+                    tel := tel + nTel[i] + nTel[i-1];
+
+            nmes :=        '00'; // Длина информации о SMSC. Длина - 0 означает, что для отправки СМС должен использоваться номер SMSC, сохраненный в телефоне. Этот октет является дополнительным. Для некотоорых телефонов этот октет должен быть опущен! (Но все равно будет использоватьтся СМСЦ, сохраненный в телефоне.
+            nmes := nmes + '11'; // Первый октет SMS-SUBMIT
+            nmes := nmes + '00'; // TP-Message-Reference. Значение 0х00 указывает на то, что в качестве номера телефона отправителя будет использоваться номер.
+            nmes := nmes + '0B'; // Длина номера получателя (11)
+            nmes := nmes + '91'; // Тип-адреса. (91 указывает международный формат телефонного номера, 81 - местный формат).
+            nmes := nmes + tel;  // Телефонный номер получателя в международном формате в полуоктетах (46708251358). Если указать номер телефона в местном формате (Type-of-Address равен 81 вместо 91), то для указания номера телефона можно было бы использовать 10 октетов (0x0A) и октеты были бы представлены как 7080523185 (0708251358).
+            nmes := nmes + '00'; // TP-PID. Идентификатор протокола
+            nmes := nmes + '08'; // TP-DCS.
+            nmes := nmes + 'A8'; // TP-Validity-Period. "AA" означает 4 дня. Этот октет является дополнительным, см. 4 и 3 первого октета
+            hex_code := IntToHex(Length(m)*2,2);
+            nmes := nmes + hex_code; // TP-User-Data-Length. Длина сообщения.
+            SmsSendForm.DevInMemo.Lines.Add(nmes);
+            nmes := nmes + ucs2(m); //Encode7bit(m); // TP-User-Data. Эти октеты представляют сообщение "hellohello", преобразованное в 7 битку.
+            lngt := Round((length(nmes)-2)/2);
+
+            ApdComPort1.Open:=False;
+            if IniFile.ReadString('SMS_SENDING','use_COM_port_GSM1','NO')='YES' then
+            begin
+                ApdComPort1.Open:=True;
+            end;
+            if not ApdComPort1.Open then
+            begin
+                res:=False;
+                ServerMainForm.WriteEvent('Невозможно открыть COM-порт устройства!');
+            end
+            else
+            begin
+                ApdComPort1.PutString('AT+CMGS='+IntToStr(lngt)+#13);
+                DevInMemo.Lines.Add('AT+CMGS='+IntToStr(lngt)+#13);
+                sleep(1000);
+                ApdComPort1.PutString(nmes+^Z);
+                DevInMemo.Lines.Add(nmes+^Z);
+                //StartedSMSStackCDS.InsertRecord([(Today+Time),order_id,tel]);
+                ServerMainForm.WriteEvent('Отправлено устройству!');
+            end;
+
+          except on E:Exception do
+              begin
+                res:=False;
+                ServerMainForm.WriteEvent('Ошибка отсылки команды в COM-порт устройства!');
+              end
+          end;
+        finally
+          try
+              ApdComPort1.Open:=False;
+          except on E:Exception do
+              begin
+                res:=False;
+                ServerMainForm.WriteEvent('Ошибка закрытия порта!');
+              end;
+          end;
+        end;
+
+      end
+      else
+      begin
+          res:=False;
+          ServerMainForm.WriteEvent('Неподходящие формат или длина номера для отправки водителю!');
+      end;
+  end;}
+--------------------------------------
+procedure TSocketCoordinator.appToSocksMemo(appStr: string);
+begin
+  RemoteControlForm.SocksListView.Lines.Add(appStr);
+end;
+--------------------------------
+procedure TSocketCoordinator.ClearSocksMemo;
+var i:Integer;
+begin
+  RemoteControlForm.SocksListView.Clear;
+  RemoteControlForm.socksStatusLabel.Caption:=
+    'Всего сокет-нитей: '+IntToStr(FTCPClientCollection.Count);
+  if true then
+      for i:=0 to FTCPClientCollection.Count-1 do
+      begin
+        try
+        if FTCPClientCollection.Items[i].
+          GetTreadObject<>nil then
+        appToSocksMemo(
+          'id='+IntToStr(FTCPClientCollection.
+          Items[i].ClientID)+', поз. '+IntToStr(
+          FTCPClientCollection.Items[i].Pozyvnoi)+
+          ':'+FTCPClientCollection.Items[i].
+          GetTreadObject.StatusStr);
+        except on E:Exception do
+          RemoteControlForm.socksStatusLabel.Caption:=
+            E.Message;
+        end;
+      end;
+end;
+---------------------------------
+  //checkSendMSGCollectionOnDelete();
+  //ServerMainForm.MainSB.Panels[0].Text:=
+  //  'Проход коллекции нитей...';
+
+  //ServerMainForm.MainSB.Panels[0].Text:=
+  //  'Отправка исходящих команд...'
+  //  +IntToStr(SendMessages.Count);
+--------------------------------
+procedure TTDClientSocketThread.SyncProc;
+begin
+
+end;
+  if FCmd='CLR' then
+    RemoteControlForm.Test2Memo.Clear
+  else if FCmd='TXT' then                                            
+    RemoteControlForm.Test2Memo.Lines.Add(FData)
+  else if FCmd='BUY' then
+  begin
+    Self.Terminate;
+    RemoteControlForm.Test2Memo.Lines.Add(
+      'Отключился');
+  end
+  else
+    RemoteControlForm.Test2Memo.Lines.Add(
+      'Подключился');
+---------------------------------------
+function TReleaseStructForm.AddNewCust(ColorCheck: Boolean=False; SetIndParam: Integer=0; ItIsANDOrder: Boolean=False): TZakaz;
+var TmpBE: TBoldElement;
+    discount_num: Integer;
+begin
+  CheckUsePeriod;
+  TmpBE:=TZakaz.Create(nil,True);
+  (TmpBE as TZakaz).Data_podachi:=Today+Time;
+  (TmpBE as TZakaz).Nomer_zakaza:=BoldModelDM.GetNewOrderNumber;
+  (TmpBE as TZakaz).Opr_s_obsh_linii:=
+    ColorCheck;
+
+  if  SetIndParam>0 then
+    begin
+      (TmpBE as TZakaz).Telefon_klienta:=
+        SetIndividNumForm.Edit4.Text;
+      (TmpBE as TZakaz).Adres_vyzova_vvodim:=
+        SetIndividNumForm.Edit5.Text;
+      (TmpBE as TZakaz).Adres_okonchaniya_zayavki:=
+           IntToStr(NewINumber);
+   end;
+
+  if (IniFile.ReadString('BUSINESS_DATA',
+     'manual_operator_ask_mode','NO')='YES')
+     and not (ItIsANDOrder and 
+     (IniFile.ReadString('BUSINESS_DATA',
+     'не_считать_АОН_заявку_как_принятую_оператором','NO')='YES'))then
+   begin
+    (TmpBE as TZakaz).Yavl_pochasovym:=True;
+   end;
+
+  //if (IniFile.ReadString('BUSINESS_DATA','убрать_район_поместить_номер_абонента','NO')='NO') then
+  //if BoldHandlesDM.blhAllRegion.List.Count>0 then
+  //  begin
+  //    BoldHandlesDM.blhAllRegion.First;
+  //    (TmpBE as TZakaz).Adres_okonchaniya_zayavki:='';
+  //      (BoldHandlesDM.blhAllRegion.CurrentElement as
+  //      TRaion).Naimenovanie;
+  //  end;
+
+  (TmpBE as TZakaz).otpuskaetsya_dostepcherom:=
+    (BoldHandlesDM.blhCurrUser.CurrentElement as TPersonal);
+  BoldModelDM.BoldUpdateDBAction1.Execute;
+
+  Result:=(TmpBE as TZakaz);
+end;
+-----------------------------------------
+{if BoldModelDM.bsh.Active then
+     begin
+
+      if (BoldHandlesDM.blhDriversUnion.CurrentElement as
+         TObjekt_vyborki_otchyotnosti).Vybratj_poslednie_nesk_dnei and
+         (IniFile.ReadString('BUSINESS_DATA',
+           'запись_по_факту_определения_номера','NO')='NO') and
+         (IniFile.ReadString('BUSINESS_DATA',
+           'запись_по_факту_добавления_заявки','NO')='NO')
+          then
+           begin
+             SoundRecForm.RecordTalk;
+           end;
+      end;  }
+-----------------------------------------
+//!!!!!Функция не используется
+procedure TSetIndividNumForm.CheckIndNum(sinum: String);
+var NewIN, discount_num: Integer;
+begin
+
+  NewIN:=PrevAnalyzeIN(sinum);
+  if sinum<>'' then
+  begin
+    try
+    if StrToIntDef(sinum,-1)>0 then
+    begin
+     if BoldModelDM.IPersPerINumADOQuery.RecordCount=1 then
+       begin
+
+         if not (IniFile.ReadString('BUSINESS_DATA','manual_operator_ask_mode','NO')='YES') then
+           BoldModelDM.AskManipForAll(False)
+         else
+           FirstForm.StatusBar.Panels[2].Text:='ЕСТЬ ИЗМЕНЕНИЯ';
+
+       end
+     else if BoldModelDM.IPersPerINumADOQuery.RecordCount>1 then
+       begin
+         ShowMessage('Система нашла несколько записей по данному абоненту, выберите одну из них в таблице!');
+       end
+     else if BoldModelDM.IPersPerINumADOQuery.RecordCount=0 then
+       begin
+         ShowMessage('Нет абонента с таким номером!');
+       end
+     else
+       begin
+       end;
+    end
+    except
+        //Если система предложила нов. номер (в поле введена пустая строка)
+    end;
+  end;
+
+end;
+--------------------------------------------
+{if (AllDriverADOTable.FindField('Zanyat_drugim_disp').AsInteger=0)
+          and (blhCurrSyncDriver.CurrentElement as TVoditelj).
+          Zanyat_drugim_disp then
+           begin
+            (blhCurrSyncDriver.CurrentElement as TVoditelj).
+            Zanyat_drugim_disp:=
+              False;
+            //FirstForm.basrDrList.Changed; ReleaseStructForm.BoldTreeView1.Repaint;
+           end
+       else if (AllDriverADOTable.FindField('Zanyat_drugim_disp').AsInteger=1)
+          and not (blhCurrSyncDriver.CurrentElement as TVoditelj).
+          Zanyat_drugim_disp then
+         begin
+           (blhCurrSyncDriver.CurrentElement as TVoditelj).
+           Zanyat_drugim_disp:=
+            True;
+            //FirstForm.basrDrList.Changed; ReleaseStructForm.BoldTreeView1.Repaint;
+         end
+       else
+         begin
+         end;}
+--------------------------------------------
+{if (blhCurrSyncDriver.CurrentElement as TVoditelj).
+          V&&remya_poslednei_zayavki<>
+          AllDriverADOTable.FindField(
+          'Vremya_poslednei_zayavki').AsDateTime then
+       begin
+         (blhCurrSyncDriver.CurrentElement as TVoditelj).
+          V&&remya_poslednei_zayavki:=
+           AllDriverADOTable.FindField(
+           'V&&remya_poslednei_zayavki').AsDateTime;
+
+       end; }
+----------------------------------------------------
+       {if (AllDriverADOTable.FindField('ITS_REMOTE_CLIENT').AsInteger=0)
+         and (blhCurrSyncDriver.CurrentElement as TVoditelj).B_klass then
+        begin
+          (blhCurrSyncDriver.CurrentElement as TVoditelj).B_klass:=
+            False;
+           //FirstForm.basrDrList.Changed; ReleaseStructForm.BoldTreeView1.Repaint;
+        end
+      else if (AllDriverADOTable.FindField('ITS_REMOTE_CLIENT').AsInteger=1)
+         and not (blhCurrSyncDriver.CurrentElement as TVoditelj).B_klass then
+        begin
+          (blhCurrSyncDriver.CurrentElement as TVoditelj).B_klass:=
+            True;
+          //FirstForm.basrDrList.Changed; ReleaseStructForm.BoldTreeView1.Repaint;
+        end
+      else
+        begin
+        end;
+
+      (blhCurrSyncDriver.CurrentElement as TVoditelj).Indeks_ocheryodnosti:=
+        AllDriverADOTable.FindField('DR_SUMM').AsInteger;  }
+----------------------------------------------------
+      // if (ActiveCustADOQuery.FindField('Telefon_klienta').AsString<>'') then
+      //  DescendingCallSummByNum(ActiveCustADOQuery.FindField('Telefon_klienta').AsString);
+
+      //Процедуры декрементации количества вызовов
+      //try
+      //  del_inum:=StrToInt(ADOConnectDM.ActiveCustADOQuery.FieldByName('Adres_okonchaniya_zayavki').AsString);
+      //except
+         //ShowMessage('Данная заявка не привязана к абонентскому номеру!');
+      //end;
+      //Конец процедур декрементации
+--------------------------------------------------
+if CurrQueryFieldName='Adres_okonchaniya_zayavki' then
+    if (IniFile.ReadString('BUSINESS_DATA','предлагать_учет_по_номеру_абонента','NO')='YES') then
+      begin
+
+        if (ActiveCustADOQuery.FindField('Adres_okonchaniya_zayavki').AsString<>'') and
+          (IniFile.ReadString('BUSINESS_DATA','запретить_менять_установленный_аб_номер','YES')='YES') then
+             begin
+
+
+               ReleaseStructForm.AddCurrUserLog('Попытка изменения абонетского номера '+
+               ActiveCustADOQuery.FindField('Adres_okonchaniya_zayavki').AsString+' заявки с номером '+
+               IntToStr(ActiveCustADOQuery.FindField('Nomer_zakaza').AsInteger)+'.');
+               ShowMessage('Нельзя менять установленный аб. номер, ваши действия будут отражены в журнале!');
+             end;
+      end;
+--------------------------------------------------------
+     if (BoldHandlesDM.blhDriversUnion.CurrentElement as
+           TObjekt_vyborki_otchyotnosti).ne_uchit_zanyat_drug_disp then
+         begin
+           if ActiveCustADOQuery.FindField('telefon_klienta').AsString<>'' then
+             begin
+
+               ReleaseStructForm.AddCurrUserLog('Попытка изменения телефонного номера '+
+               ActiveCustADOQuery.FindField('telefon_klienta').AsString+' заявки с номером '+
+               IntToStr(ActiveCustADOQuery.FindField('Nomer_zakaza').AsInteger)+'.');
+               ShowMessage('Нельзя менять номер телефона, ваши действия будут отражены в журнале!');
+             end;
+         end;
+---------------------------------------------------
+if ActiveCustADOQuery.FindField('telefon_klienta').AsString<>'' then
+             begin
+               if (IniFile.ReadString('BUSINESS_DATA','декрементировать_показатели_при_попытке_смены_телефона_и_аб_номера','YES')='YES') then
+                 if (ADOConnectDM.ActiveCustADOQuery.FindField('Telefon_klienta').AsString<>'')
+                    then
+                      ADOConnectDM.DescendingCallSummByNum(ADOConnectDM.ActiveCustADOQuery.FindField('Telefon_klienta').AsString);
+               //Конец процедур декрементации
+             end;
+-----------------------------------------------------
+if (ActiveCustADOQuery.FindField('Adres_okonchaniya_zayavki').AsString<>'') then
+          //Процедуры декрементации количества вызовов
+               if (IniFile.ReadString('BUSINESS_DATA','декрементировать_показатели_при_попытке_смены_телефона_и_аб_номера','YES')='YES') then
+               begin
+try
+                 del_inum:=StrToInt(ADOConnectDM.ActiveCustADOQuery.FieldByName('Adres_okonchaniya_zayavki').AsString);
+                 if (IniFile.ReadString('BUSINESS_DATA','предлагать_учет_по_номеру_абонента','NO')='YES') then
+                   BoldModelDM.DecrementINumOrdersCount(
+                     del_inum,
+                     ADOConnectDM.ActiveCustADOQuery.
+                      FindField('Telefon_klienta').AsString,
+                      ADOConnectDM.ActiveCustADOQuery.
+                      FindField('Adres_vyzova_vvodim').AsString);
+                 except
+                    //ShowMessage('Данная заявка не привязана к абонентскому номеру!');
+                 end;
+end;
+--------------------------------------------------------      
+	  BoldModelDM.IncrementINumOrdersCount(
+      NewINumber,
+      SetIndividNumForm.Edit4.Text,
+      SetIndividNumForm.Edit5.Text);
+---------------------------------------------------
+if IniFile.ReadString('BUSINESS_DATA','автоматически_предлагать_ввести_номер_при_доб_заявки','NO')='YES' then
+            begin
+             UseIPrm:=
+               ADOConnectDM.SetIndividNum;
+             if UseIPrm then
+               ADOConnectDM.AddDISPCust(False,1)
+             else
+               ADOConnectDM.AddDISPCust(False,0);
+            end
+           else
+----------------------------------------------------
+      if BoldModelDM.bsh.Active then
+     begin
+      //ShowMessage('rtwergfr');
+      if (BoldHandlesDM.blhDriversUnion.CurrentElement as
+         TObjekt_vyborki_otchyotnosti).Vybratj_poslednie_nesk_dnei and
+         (IniFile.ReadString('BUSINESS_DATA',
+           'запись_по_факту_определения_номера','NO')='YES')
+          then
+           begin
+             //ShowMessage(';;;;');
+             SoundRecForm.RecordTalk;
+           end;
+      end;
+---------------------------------------------------
+{if BoldModelDM.bsh.Active then
+     begin
+      if (BoldHandlesDM.blhDriversUnion.CurrentElement as
+         TObjekt_vyborki_otchyotnosti).Vybratj_poslednie_nesk_dnei and
+         (IniFile.ReadString('BUSINESS_DATA',
+           'запись_по_факту_добавления_заявки','NO')='YES')
+          then
+           begin
+             //ShowMessage(';;;;');
+             SoundRecForm.RecordTalk;
+           end;
+      end;  }
+-----------------------------------------------------
+      if  SetIndParam>0 then
+      //Начало условия обработки призов для абонентских номеров
+      if (IniFile.ReadString('BUSINESS_DATA','разрешить_призовые_по_номеру_абонента','NO')='YES') then
+        begin
+          discount_num:=
+            BoldModelDM.HasBonusByIndNumber(NewINumber);
+
+            if (discount_num>0) then
+              begin
+                if ADOConnectDM.PresentMessageDlg('Данный номер определяет заказ как призовой для данного индивидуального номера абонента, тип '+IntToStr(discount_num)+'. СДЕЛАТЬ СКИДКУ?') then
+                  begin
+                    (TmpBE as TZakaz).Nomer_skidki:=discount_num;
+                    BoldModelDM.BoldUpdateDBAction1.Execute;
+                  end;
+              end;
+        end;
+      //Конец условия обработки призов для абонентских номеров
+--------------------------------------------------
+       //Начало условия обработки призов для абонентских номеров
+      if (IniFile.ReadString('BUSINESS_DATA','разрешить_призовые_по_номеру_абонента','NO')='YES') then
+        begin
+          discount_num:=
+            BoldModelDM.HasBonusByIndNumber(StrToInt(sinum));
+
+            if (discount_num>0) then
+              begin
+                if ADOConnectDM.PresentMessageDlg('Данный номер определяет заказ как призовой для данного индивидуального номера абонента, тип '+IntToStr(discount_num)+'. СДЕЛАТЬ СКИДКУ?') then
+                  begin
+                    if not ADOConnectDM.SendSQL('UPDATE Zakaz SET '+
+                      'Nomer_skidki='''+IntToStr(discount_num)+''''
+                      +' WHERE BOLD_ID='+IntToStr(ADOConnectDM.ActiveCustADOQuery.
+                      FindField('BOLD_ID').AsInteger)) then
+                        ShowMessage('Неудачная установка признака призовой заявки по абонентскому номеру!');
+                  end;
+              end;
+        end;
+      //Конец условия обработки призов для абонентских номеров
+------------------------------------------------------
+if HasPrevCust and
+  (IniFile.ReadString('BUSINESS_DATA','show_prev_attention','NO')='YES') then
+ begin
+   
+   AllActiveEngineMemo.Color:=clRed;
+   AllActiveEngineMemo.Font.Size:=22;
+   AllActiveEngineMemo.Font.Color:=clWhite;
+   res:='ПРОВЕРЬТЕ ПРЕДВАРИТЕЛЬНЫЕ ЗАЯВКИ';
+   AllActiveEngineMemo.Clear;
+   AllActiveEngineMemo.Lines.Add(res);
+
+ end
+else
+begin
+if IniFile.ReadString('BUSINESS_DATA','show_top_aggregate_text','NO')='YES' then
+begin
+ AllActiveEngineMemo.Color:=clWhite;
+   AllActiveEngineMemo.Font.Size:=16;
+   AllActiveEngineMemo.Font.Color:=clBlack;
+ res:='НА ЛИНИИ СВОБОДНЫ:';
+ if BoldHandlesDM.blhAllActiveDrivers.Count>0 then
+  begin
+  BoldHandlesDM.blhAllActiveDrivers.First;
+  while True do
+    begin
+    if not (BoldHandlesDM.blhAllActiveDrivers.CurrentElement as TVoditelj).Zanyat_drugim_disp
+      and not False then
+      begin
+      if BoldHandlesDM.blhAllActiveDrivers.CurrentIndex<>0 then
+        res:=res+',';
+      res:=res+' '+IntToStr((BoldHandlesDM.blhAllActiveDrivers.CurrentElement as TVoditelj).Pozyvnoi);
+      end;
+      if BoldHandlesDM.blhAllActiveDrivers.HasNext then
+        BoldHandlesDM.blhAllActiveDrivers.Next
+      else
+        Break;
+
+    end;
+  end;
+
+
+
+  res:=res+' НА ЛИНИИ ЗАНЯТЫ:';
+ if BoldHandlesDM.blhAllActiveDrivers.Count>0 then
+  begin
+  BoldHandlesDM.blhAllActiveDrivers.First;
+  while True do
+    begin
+    if (BoldHandlesDM.blhAllActiveDrivers.CurrentElement as TVoditelj).Zanyat_drugim_disp
+      and not False then
+      begin
+      if BoldHandlesDM.blhAllActiveDrivers.CurrentIndex<>0 then
+        res:=res+',';
+      res:=res+' '+IntToStr((BoldHandlesDM.blhAllActiveDrivers.CurrentElement as TVoditelj).Pozyvnoi);
+      end;
+      if BoldHandlesDM.blhAllActiveDrivers.HasNext then
+        BoldHandlesDM.blhAllActiveDrivers.Next
+      else
+        Break;
+    end;
+  end;
+
+  res:=res+' В ПЕРВУЮ ОЧЕРЕДЬ:';
+ if BoldHandlesDM.blhAllActiveDrivers.Count>0 then
+  begin
+  BoldHandlesDM.blhAllActiveDrivers.First;
+  while True do
+    begin
+    if not (BoldHandlesDM.blhAllActiveDrivers.CurrentElement as TVoditelj).Zanyat_drugim_disp
+      and False then
+      begin
+      if BoldHandlesDM.blhAllActiveDrivers.CurrentIndex<>0 then
+        res:=res+',';
+      res:=res+' '+IntToStr((BoldHandlesDM.blhAllActiveDrivers.CurrentElement as TVoditelj).Pozyvnoi);
+      end;
+      if BoldHandlesDM.blhAllActiveDrivers.HasNext then
+        BoldHandlesDM.blhAllActiveDrivers.Next
+      else
+        Break;
+    end;
+  end;
+
+  AllActiveEngineMemo.Clear;
+  AllActiveEngineMemo.Lines.Add(res);
+end;
+end;
+
+------------------------------------------------
+BoldHandlesDM.bvhCurrTime.Value.SetAsVariant(Today+Time);
+BoldHandlesDM.bvhFixSmDT.Value.SetAsVariant(
+      StartOfTheDay(Today)+
+        StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov));
+   BoldHandlesDM.bvhFixDTPlHalfDay.Value.SetAsVariant(
+      StartOfTheDay(Today)+
+        StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov)+
+          StrToTime('12:00:00'));
+   BoldHandlesDM.bvhPrevFixDate.Value.SetAsVariant(
+      StartOfTheDay(Today)+
+        StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov)-
+          StrToTime('12:00:00'));
+============================================
+function TADOConnectDM.SetDriverFromSectionLowLevel(id: Integer; Sector: TBoldElement): Boolean;
+var IsDriver, res: Boolean;
+    date_prm: TParameter;
+begin
+res:=False;
+if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozap_nach_sektora then
+begin
+ if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Naznach_iz_obsh__spiska then
+ begin
+   //res:=SetDriverFromAllDriversListLowLevel(id);
+ end
+ else
+ begin
+  if (Sector=nil) and not ReleaseStructForm.TNSetMode then
+   begin
+   if not (BoldHandlesDM.blhDriversUnion.CurrentElement as
+                TObjekt_vyborki_otchyotnosti).simv_avtom_ustan then
+    begin
+      SelectStartSectorLowLevel(id);
+      if BoldHandlesDM.blhSectorByCode.List.Count>0 then
+        Sector:=BoldHandlesDM.blhSectorByCode.CurrentElement;
+    end;
+   end;
+
+  if Sector<>nil then
+    begin
+      BoldModelDM.RefreshDriverData(False);
+      if not SendSQL('UPDATE Zakaz SET adres_sektora='+IntToStr(SectIDByCode((Sector as TSektor_raboty).kod_sektora))+
+              ' WHERE BOLD_ID='+IntToStr(id)) then
+                ShowMessage('Неудачная установка начального сектора!');
+      SetEndSectorLowLevel(id);
+      if (Sector as TSektor_raboty).yavl_sekt_raboty_dlya.Count>0 then
+        begin
+          BoldHandlesDM.blhAllWorkSector.CurrentIndex:=
+            BoldHandlesDM.blhAllWorkSector.List.IndexOf(Sector);
+          IsDriver:=False;
+          if BoldHandlesDM.blhSectorDrivers.List.Count>0 then
+          begin
+          BoldHandlesDM.blhSectorDrivers.First;
+
+          ReleaseStructForm.HasOnTempStop:=False;
+          while True do
+            begin
+              if (BoldHandlesDM.blhSectorDrivers.CurrentElement as TVoditelj).Na_pereryve then
+                ReleaseStructForm.HasOnTempStop:=True;
+              if not (BoldHandlesDM.blhSectorDrivers.CurrentElement as TVoditelj).Zanyat_drugim_disp
+                 and not (BoldHandlesDM.blhSectorDrivers.CurrentElement as TVoditelj).Na_pereryve then
+                begin
+                 if MainADOCommand.Parameters.Count=0 then
+                    begin
+                     date_prm:=MainADOCommand.Parameters.AddParameter;
+                     date_prm.DataType:=ftDateTime;
+                     date_prm.Name:='date_prm';
+                     date_prm.Value:=Today+Time;
+                    end;
+                 MainADOCommand.Parameters[0].Value:=Today+Time;
+       if not SendSQL('UPDATE Zakaz SET Nachalo_zakaza_data=:date_prm'+
+              ' WHERE BOLD_ID='+IntToStr(id)) then
+                ShowMessage('Неудачная установка времени начала заявки!');
+
+                  //BoldModelDM.B??oldUpdateDBAction1.Execute;
+                  if ActiveCustADOQuery.FindField('vypolnyaetsya_voditelem').AsInteger<0
+                   then
+                   begin
+
+                    if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozapoln_sektorov
+                     then
+                      begin
+                        if not SendSQL('UPDATE Zakaz SET vypolnyaetsya_voditelem='+IntToStr(DrIDByNum((BoldHandlesDM.blhSectorDrivers.CurrentElement as TVoditelj).Pozyvnoi))+
+                           ' WHERE BOLD_ID='+IntToStr(id)) then
+                              ShowMessage('Неудачная установка водителя на заявку!')
+                        else
+                          res:=True;
+                        (BoldHandlesDM.blhSectorDrivers.CurrentElement as TVoditelj).Zanyat_drugim_disp:=True;
+                        if not SendSQL('UPDATE Zakaz SET Pozyvnoi_ustan='+IntToStr((BoldHandlesDM.blhSectorDrivers.CurrentElement as TVoditelj).Pozyvnoi)+
+                              ' WHERE BOLD_ID='+IntToStr(id)) then
+                                 ShowMessage('Неудачная установка позывного заявки!');
+                         HasDrChange:=True;
+                      end;
+
+                    //BoldModelDM.B??oldUpdateDBAction1.Execute;
+                    BoldModelDM.AskManipForAll;
+
+                    FirstForm.basrDrList.Changed;
+                    ReleaseStructForm.BoldTreeView1.Repaint;
+                   end
+                  else
+                    begin
+                    end;
+                  FirstForm.BoldAsStringRenderer2.Changed;
+                  IsDriver:=True;
+                  Break;
+                end;
+              if BoldHandlesDM.blhSectorDrivers.HasNext then
+                BoldHandlesDM.blhSectorDrivers.Next
+              else
+                Break;
+            end;
+           end
+             else
+               IsDriver:=False;
+           if not IsDriver then
+            if ReleaseStructForm.HasOnTempStop then
+             FirstForm.ShowAttention('В сект. присутствуют свободные водители, но они на перерыве!')
+            else
+             FirstForm.ShowAttention('В сект. отправки отс. свободные водители, либо отс. вообще!');
+        end
+      else
+        FirstForm.ShowAttention('Выбранный сектор не имеет ни одной машины!');
+    end;
+   end;
+  end;
+Result:=res;
+end;
+========================================================
+function TADOConnectDM.SetDriverFromAllDriversListLowLevel(id: Integer): Boolean;
+var IsDriver, res: Boolean;
+    date_prm: TParameter;
+begin
+res:=False;
+if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozapoln_sektorov
+and (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Naznach_iz_obsh__spiska
+then
+begin
+
+   MainADOCommand.Parameters[0].Value:=Today+Time;
+       if not SendSQL('UPDATE Zakaz SET Nachalo_zakaza_data=:date_prm'+
+              ' WHERE BOLD_ID='+IntToStr(id)) then
+                ShowMessage('Неудачная установка времени начала заявки!');
+   BoldModelDM.RefreshDriverData(False);  
+   if BoldHandlesDM.blhActDrTimeOut.List.Count>0 then
+    begin
+      BoldHandlesDM.blhActDrTimeOut.First;
+      IsDriver:=False;
+      ReleaseStructForm.HasOnTempStop:=False;
+      while True do
+        begin
+          if (BoldHandlesDM.blhActDrTimeOut.CurrentElement as TVoditelj).Na_pereryve then
+            ReleaseStructForm.HasOnTempStop:=True;
+          if not (BoldHandlesDM.blhActDrTimeOut.CurrentElement as TVoditelj).Zanyat_drugim_disp
+             and not (BoldHandlesDM.blhActDrTimeOut.CurrentElement as TVoditelj).Na_pereryve
+            then
+              begin
+                 if MainADOCommand.Parameters.Count=0 then
+                    begin
+                     date_prm:=MainADOCommand.Parameters.AddParameter;
+                     date_prm.DataType:=ftDateTime;
+                     date_prm.Name:='date_prm';
+                     date_prm.Value:=Today+Time;
+                    end;
+                 MainADOCommand.Parameters[0].Value:=Today+Time;
+       if not SendSQL('UPDATE Zakaz SET Nachalo_zakaza_data=:date_prm'+
+              ' WHERE BOLD_ID='+IntToStr(id)) then
+                ShowMessage('Неудачная установка времени начала заявки!');
+
+                //B&&oldModelDM.BoldUpdateDBAction1.Execute;
+                if ActiveCustADOQuery.FindField('vypolnyaetsya_voditelem').AsInteger<0
+                  then
+                   begin
+                    //BoldModelDM.RefreshDriverInfo;
+                     if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozap_nach_sektora
+                      then
+
+                        if not SendSQL('UPDATE Zakaz SET vypolnyaetsya_voditelem='+IntToStr(DrIDByNum((BoldHandlesDM.blhActDrTimeOut.CurrentElement as TVoditelj).Pozyvnoi))+
+              ' WHERE BOLD_ID='+IntToStr(id)) then
+                ShowMessage('Неудачная установка водителя на заявку!')
+                        else
+                          res:=True;
+              (BoldHandlesDM.blhActDrTimeOut.CurrentElement as TVoditelj).Zanyat_drugim_disp:=True;
+                   if not SendSQL('UPDATE Zakaz SET Pozyvnoi_ustan='+IntToStr((BoldHandlesDM.blhActDrTimeOut.CurrentElement as TVoditelj).Pozyvnoi)+
+              ' WHERE BOLD_ID='+IntToStr(id)) then
+                ShowMessage('Неудачная установка позывного заявки!');
+                       HasDrChange:=True;
+                       //B&&oldModelDM.BoldUpdateDBAction1.Execute;
+
+                       BoldModelDM.AskManipForAll;
+
+                       FirstForm.basrDrList.Changed;
+                       ReleaseStructForm.BoldTreeView1.Repaint;
+                 end
+                  else
+                    begin
+
+                    end;
+                FirstForm.BoldAsStringRenderer2.Changed;
+                IsDriver:=True;
+                  Break;
+              end;
+          if BoldHandlesDM.blhActDrTimeOut.HasNext then
+            BoldHandlesDM.blhActDrTimeOut.Next
+          else
+            break;
+        end;
+        if not IsDriver then
+           if ReleaseStructForm.HasOnTempStop then
+             ShowMessage('В общем списке "В РАБОТЕ" секторе присутствуют свободные водители, но они на перерыве (помечены светло-жёлтым цветом)!')
+            else
+             ShowMessage('В общем списке "В РАБОТЕ" отсутствуют свободные водители, либо отсутствуют вообще!');
+    end;
+end;
+Result:=res;
+end;
+================================================
+             DuplicateTNumListBox.Items.Add(DetectNum);
+             if DuplicateTNumListBox.Count>=3 then
+               DuplicateTNumListBox.Items[2]:=
+                 DuplicateTNumListBox.Items[1];
+             if DuplicateTNumListBox.Count>=2 then
+               DuplicateTNumListBox.Items[1]:=
+                 DuplicateTNumListBox.Items[0];
+             DuplicateTNumListBox.Items[0]:=
+               DetectNum;
+             if DuplicateTNumListBox.Count>3 then
+               DuplicateTNumListBox.Items.Delete(3);
+             FirstForm.ShowAttention('Повторяющийся номер вызова!');
+================================================
+{if PrevOnLaunch then
+					begin
+						ReleaseStructForm.AddFictiveCustByDrNum(
+							DrInfoADOQuery.FindField('pozyvnoi').
+							AsInteger,'Снялся с перерыва');
+					end; }
+==========================
+if (IniFile.ReadString('BUSINESS_DATA','предлагать_учет_по_номеру_абонента','NO')='YES') then
+                                    begin
+                                      inum:=BoldModelDM.HasINumPourPhone(
+                                                   tnum);
+
+                                      if inum<>'' then
+                                        begin
+                                          
+                                          tsearch:=BoldModelDM.INumPourPhoneADOQuery.FieldByName('Ulica').AsString;
+                                          ReleaseStructForm.StatusBar2.Panels[2]
+                                            .Text:='Последний аб-т '+
+                                            BoldModelDM.INumPourPhoneADOQuery.
+                                            FieldByName('Familiya').AsString+' '+
+                                            BoldModelDM.INumPourPhoneADOQuery.
+                                            FieldByName('Imya').AsString+' '+
+                                            BoldModelDM.INumPourPhoneADOQuery.
+                                            FieldByName('Otchestvo').AsString;
+
+                                         BoldModelDM.IncrementINumOrdersCount(StrToInt(inum),
+                                            BoldModelDM.INumPourPhoneADOQuery.
+                                            FieldByName('Rabochii_telefon').AsString,
+                                            BoldModelDM.INumPourPhoneADOQuery.
+                                            FieldByName('Ulica').AsString);
+                                        end
+                                      else
+                                        begin
+                                          //ShowMessage('1');
+                                          //Если не определен по аб. номеру то пробуем через обычный справочник
+                                          tsearch:=BoldModelDM.FindHistByNumber(tnum);
+
+                                        end;
+                                    end
+                                 else
+                                    begin
+                                      tsearch:=BoldModelDM.FindHistByNumber(tnum);
+                                    end;
+
+                                if ((tsearch<>'') or (inum<>'')) then
+                                       begin
+
+                                         if (inum<>'') then
+                                           begin
+
+                                           //Начало условия обработки призов для абонентских номеров
+                                           if (IniFile.ReadString('BUSINESS_DATA','разрешить_призовые_по_номеру_абонента','NO')='YES') then
+                                             begin
+                                               idiscount_num:=
+                                                 BoldModelDM.HasBonusByIndNumber(StrToInt(inum));
+
+                                             if (idiscount_num>0) then
+                                               begin
+                                             if PresentMessageDlg('Данный номер определяет заказ как призовой для данного индивидуального номера абонента, тип '+IntToStr(idiscount_num)+'. СДЕЛАТЬ СКИДКУ?') then
+                                               begin
+                                                 all_discount_num:=
+                                                   idiscount_num;
+                                               end;
+                                               end;
+                                            end;
+                                            //Конец условия обработки призов для абонентских номеров
+
+                                           end;
+
+                                       end
+                                     else
+                                       begin
+
+                                       end;
+if (inum='') then
+                                        begin
+
+                                          if (IniFile.ReadString('BUSINESS_DATA','предлагать_учет_по_номеру_абонента','NO')='NO')
+                                            or ((IniFile.ReadString('BUSINESS_DATA','считать_призовой_по_телефону_если_аб_не_определен','NO')='YES')
+                                            and (IniFile.ReadString('BUSINESS_DATA','предлагать_учет_по_номеру_абонента','NO')='YES')) then
+                                            begin
+                                              if not BoldModelDM.SendSQL('UPDATE Sootvetstvie_parametrov_zakaza SET '+
+                                                'Summarn_chislo_vyzovov=Summarn_chislo_vyzovov+1 WHERE Telefon_Klienta='''+tnum+'''') then
+                                                    ShowMessage('Неудачное увеличение числа заявок с текущего телефона!');
+                                            end;
+                                         end;
+//Начало условия обработки призов в режиме подсчета по телефонным номерам
+                             if (IniFile.ReadString('BUSINESS_DATA','view_bonus','NO')='YES')  then
+                                 begin
+                                     discount_num:=
+                                         BoldModelDM.HasBonusByNumber(tnum);
+                                     if BoldModelDM.HasAllCounterOverflow then
+                                         begin
+
+                                             if PresentMessageDlg('Данный номер определяет заказ как общепризовой, отметить?') then
+                                                  begin
+                                                    all_discount_num:=
+                                                      -100;
+                                                    BoldModelDM.EmptyAllCounter;
+                                                   end;
+                                           end;
+                                        if (discount_num>0) then
+                                           begin
+                                               if PresentMessageDlg('Данный номер определяет заказ как призовой, тип '+IntToStr(discount_num)+', призовое кол-во: '+IntToStr(CallCount)+'. СДЕЛАТЬ СКИДКУ?') then
+                                                    begin
+                                                      all_discount_num:=
+                                                        discount_num;
+                                                                                                         end;
+                                                    end;
+                                  end;
+                              //Конец условия обработки призов в режиме подсчета по телефонным номерам
+                         
+						 if all_discount_num<>0 then
+                               begin
+                                 sql_text:=sql_text+',Nomer_skidki='+IntToStr(all_discount_num)+' ';
+                               end;
+
+if BoldModelDM.FindBadByNumber(tnum) then
+                                        begin
+                                           FirstForm.ShowAttention('Данный номер входит'+' в состав нежелательных...');
+                                          if all_discount_num<>0 then
+                                            sql_text:=sql_text+', Adres_vyzova_vvodim='''+BadAdr+''' '
+                                          else
+                                            sql_text:=sql_text+',Nomer_skidki=-1000, Adres_vyzova_vvodim='''+BadAdr+''' ';
+                                        end
+                              else
+                               begin
+                                 if Adres_vyzova_vvodim='' then
+                                  sql_text:=sql_text+', Adres_vyzova_vvodim='''+tsearch+''' ';
+                               end;
+                              if inum<>'' then
+                                sql_text:=sql_text+',Adres_okonchaniya_zayavki='''+inum+''' ';
+=====================================
+         {if (ADOConnectDM.ActiveCustADOQuery.
+            FindField('telefon_klienta').
+            AsString='') and
+            (ADOConnectDM.ActiveCustADOQuery.
+            FindField('Adres_vyzova_vvodim').
+            AsString='')
+            then
+             begin
+               if not ADOConnectDM.SendSQL('UPDATE Zakaz SET telefon_klienta='''+
+               BoldModelDM.IPersPerINumADOQuery.
+               FieldByName('Rabochii_telefon').AsString+''','+
+               'Adres_vyzova_vvodim='''+BoldModelDM.IPersPerINumADOQuery.
+               FieldByName('Ulica').AsString+''''
+               +' WHERE BOLD_ID='+IntToStr(ADOConnectDM.ActiveCustADOQuery.
+               FindField('BOLD_ID').AsInteger)) then
+                  ShowMessage('Неудачная установка параметров абонентского номера!');
+
+               ReleaseStructForm.StatusBar2.Panels[2]
+                       .Text:='Последний аб-т '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Familiya').AsString+' '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Imya').AsString+' '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Otchestvo').AsString;
+
+               BoldModelDM.IncrementINumOrdersCount(StrToInt(sinum),
+                 BoldModelDM.IPersPerINumADOQuery.
+                 FieldByName('Rabochii_telefon').AsString,
+                 BoldModelDM.IPersPerINumADOQuery.
+                 FieldByName('Ulica').AsString);
+            end
+          else if (ADOConnectDM.ActiveCustADOQuery.
+            FindField('telefon_klienta').
+            AsString<>'') and
+            (ADOConnectDM.ActiveCustADOQuery.
+            FindField('Adres_vyzova_vvodim').
+            AsString='') then
+              begin
+                if not ADOConnectDM.SendSQL('UPDATE Zakaz SET '+
+               'Adres_vyzova_vvodim='''+BoldModelDM.IPersPerINumADOQuery.
+               FieldByName('Ulica').AsString+''''
+               +' WHERE BOLD_ID='+IntToStr(ADOConnectDM.ActiveCustADOQuery.
+               FindField('BOLD_ID').AsInteger)) then
+                  ShowMessage('Неудачная установка параметров абонентского номера!');
+
+               ReleaseStructForm.StatusBar2.Panels[2]
+                       .Text:='Последний аб-т '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Familiya').AsString+' '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Imya').AsString+' '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Otchestvo').AsString;
+
+               BoldModelDM.IncrementINumOrdersCount(StrToInt(sinum),
+                 BoldModelDM.IPersPerINumADOQuery.
+                 FieldByName('Rabochii_telefon').AsString,
+                 BoldModelDM.IPersPerINumADOQuery.
+                 FieldByName('Ulica').AsString);
+
+              end
+          else if (ADOConnectDM.ActiveCustADOQuery.
+            FindField('telefon_klienta').
+            AsString='') and
+            (ADOConnectDM.ActiveCustADOQuery.
+            FindField('Adres_vyzova_vvodim').
+            AsString<>'') then
+              begin
+                if not ADOConnectDM.SendSQL('UPDATE Zakaz SET telefon_klienta='''+
+               BoldModelDM.IPersPerINumADOQuery.
+               FieldByName('Rabochii_telefon').AsString+''''+
+               ' WHERE BOLD_ID='+IntToStr(ADOConnectDM.ActiveCustADOQuery.
+               FindField('BOLD_ID').AsInteger)) then
+                  ShowMessage('Неудачная установка параметров абонентского номера!');
+
+               ReleaseStructForm.StatusBar2.Panels[2]
+                       .Text:='Последний аб-т '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Familiya').AsString+' '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Imya').AsString+' '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Otchestvo').AsString;
+
+               BoldModelDM.IncrementINumOrdersCount(StrToInt(sinum),
+                 BoldModelDM.IPersPerINumADOQuery.
+                 FieldByName('Rabochii_telefon').AsString,
+                 BoldModelDM.IPersPerINumADOQuery.
+                 FieldByName('Ulica').AsString);
+              end
+          else
+            begin
+            if BoldModelDM.IPersPerINumADOQuery.
+               FieldByName('Ulica').AsString<>'' then
+              //ShowMessage('Поля телефона или/и адреса уже заполнены!');
+              if not ADOConnectDM.SendSQL('UPDATE Zakaz SET '+
+               'Adres_vyzova_vvodim='''+BoldModelDM.IPersPerINumADOQuery.
+               FieldByName('Ulica').AsString+''''
+               +' WHERE BOLD_ID='+IntToStr(ADOConnectDM.ActiveCustADOQuery.
+               FindField('BOLD_ID').AsInteger)) then
+                  ShowMessage('Неудачная установка параметров абонентского номера!');
+
+               ReleaseStructForm.StatusBar2.Panels[2]
+                       .Text:='Последний аб-т '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Familiya').AsString+' '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Imya').AsString+' '+
+                       BoldModelDM.IPersPerINumADOQuery.
+                       FieldByName('Otchestvo').AsString;
+
+               BoldModelDM.IncrementINumOrdersCount(StrToInt(sinum),
+                 BoldModelDM.IPersPerINumADOQuery.
+                 FieldByName('Rabochii_telefon').AsString,
+                 BoldModelDM.IPersPerINumADOQuery.
+                 FieldByName('Ulica').AsString);
+            end;    }
+===================================
+{tsearch:=BoldModelDM.FindHistByNumber(ActiveCustADOQuery.FindField('Telefon_klienta').AsString);
+                                    if (tsearch='') then
+                                         begin
+                                            ABE:=TSootvetstvie_parametrov_zakaza.Create(nil, True);
+                                            (ABE as TSootvetstvie_parametrov_zakaza).Telefon_klienta:=ActiveCustADOQuery.FindField('Telefon_klienta').AsString;
+                                            (ABE as TSootvetstvie_parametrov_zakaza).Adres_vyzova_vvodim:=adr;
+                                              if (BoldHandlesDM.blhSectorByCode.List.Count>0) then
+                                                (ABE as TSootvetstvie_parametrov_zakaza).otnositsya_k_sektoru:=(BoldHandlesDM.blhSectorByCode.CurrentElement as TSektor_raboty);
+                                                (ABE as TSootvetstvie_parametrov_zakaza).Summarn_chislo_vyzovov:=1;
+                                                BoldModelDM.BoldUpdateDBAction1.Execute;
+                                         end;}
+=====================================
+adrsearch:=BoldModelDM.FindHistByAdress(adr);
+                                    if (adrsearch<>'') and (ActiveCustADOQuery.FindField('Telefon_klienta').AsString='') then
+                                       begin
+                                           sql_text:=sql_text+',Telefon_klienta='''+adrsearch+''' ';
+
+                                           if FindSectorNum<>-1 then
+                                             if FirstForm.GetSectorByNum(FindSectorNum)<>nil then
+                                               begin
+                                                 CurrCustBOLD_ID:=
+                                                    ActiveCustADOQuery.FindField('BOLD_ID').AsInteger;
+                                                 ReleaseStructForm.TNSetMode:=True;
+                                                 if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozap_nach_sektora
+                                                   then
+                                                     dr_chng:=SetDriverFromSectionLowLevel(CurrCustBOLD_ID,FirstForm.GetSectorByNum(FindSectorNum));
+                                                  ReleaseStructForm.TNSetMode:=False;
+                                              end;
+                                       end
+                                     else
+                                       begin
+                                         CurrCustBOLD_ID:=
+                                            ActiveCustADOQuery.FindField('BOLD_ID').AsInteger;
+
+                                       if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozap_nach_sektora
+                                         then
+                                           SetDriverFromSectionLowLevel(CurrCustBOLD_ID,nil);
+
+                                       end;
+==========================================
+//?STAS/???Comment? as un effective program function /STAS/
+                                     if (IniFile.ReadString('BUSINESS_DATA','искать_плохие_номера_дополнительно_по_адресу','NO')='YES')  then
+                                       if BoldModelDM.FindBadByAdress(adr) then
+                                          begin
+                                             FirstForm.ShowAttention('Данный номер входит'+' в состав нежелательных...');
+
+                                             //if not SendSQL('UPDATE Zakaz SET Nomer_skidki=-1000, Adres_vyzova_vvodim='''+BadAdr+
+                                             //  ''' WHERE BOLD_ID='+IntToStr(ActiveCustADOQuery.FindField('BOLD_ID').AsInteger)) then
+                                             //   ShowMessage('Неудачная установка признака нежелательного заказа!');
+                                          end;
+============================================
+                                  MainADOCommand.Parameters.Clear;
+                                  if MainADOCommand.Parameters.Count=0 then
+                                    begin
+                                      date_prm:=MainADOCommand.Parameters.AddParameter;
+                                      date_prm.DataType:=ftDateTime;
+                                      date_prm.Name:='date_prm';
+                                      date_prm.Value:=Today+Time;
+                                    end;
+                                  if MainADOCommand.Parameters.Count=1  then
+                                    begin
+                                      date_prm:=MainADOCommand.Parameters.AddParameter;
+                                      date_prm.DataType:=ftDateTime;
+                                      date_prm.Name:='date_prm2';
+                                      date_prm.Value:=Today+Time;
+                                    end;
+                                    MainADOCommand.Parameters[0].Value:=Today+Time;
+                                    MainADOCommand.Parameters[1].Value:=Today+Time;
+
+==============================================
+                   if (FindSectorNum<>-1) and (Adres_vyzova_vvodim='') then
+                                             if FirstForm.GetSectorByNum(FindSectorNum)<>nil then
+                                              begin
+                                                 CurrCustBOLD_ID:=
+                                                    BOLD_ID;
+                                                 ReleaseStructForm.TNSetMode:=True;
+                                                 if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozap_nach_sektora
+                                                   then
+                                                     dr_chng:=SetDriverFromSectionLowLevel(CurrCustBOLD_ID,FirstForm.GetSectorByNum(FindSectorNum));
+                                                 ReleaseStructForm.TNSetMode:=False;
+                                              end;
+
+==============================================
+                              MainADOCommand.Parameters.Clear;
+                              if MainADOCommand.Parameters.Count=0 then
+                                begin
+                                  date_prm:=MainADOCommand.Parameters.AddParameter;
+                                  date_prm.DataType:=ftDateTime;
+                                  date_prm.Name:='date_prm';
+                                  date_prm.Value:=Today+Time;
+                                end;
+                              if MainADOCommand.Parameters.Count=1  then
+                                begin
+                                  date_prm:=MainADOCommand.Parameters.AddParameter;
+                                  date_prm.DataType:=ftDateTime;
+                                  date_prm.Name:='date_prm2';
+                                  date_prm.Value:=Today+Time;
+                                end;
+                              MainADOCommand.Parameters[0].Value:=Today+Time;
+                              MainADOCommand.Parameters[1].Value:=Today+Time;
+							  
+							  MainADOCommand.Parameters.Clear;
+=================================================
+    {if find_sect_bold_id>0 then
+    begin
+          //ShowMessage('1');
+          BoldHandlesDM.bvhDrNum.Value.SetAsVariant(ActiveCustADOQuery.FindField('Pozyvnoi_ustan').AsInteger);
+          if BoldHandlesDM.blhDrSearch.Count>0 then
+            begin
+
+              BoldHandlesDM.bvhSectByNum.Value.SetAsVariant(
+                SectByStrADOQuery.FindField('Nomer_sektora').AsInteger);
+              if BoldHandlesDM.blhSectByNum.Count>0 then
+                begin
+                  (BoldHandlesDM.blhDrSearch.CurrentElement as TVoditelj).rabotaet_na_sektore:=
+                    (BoldHandlesDM.blhSectByNum.CurrentElement as TSektor_raboty);
+                  (BoldHandlesDM.blhDrSearch.CurrentElement as TVoditelj).Nomer_posl_sektora:=
+                 StrToInt((BoldHandlesDM.blhSectByNum.CurrentElement as TSektor_raboty).Kod_sektora);
+                  BoldModelDM.BoldUpdateDBAction1.Execute;
+                  BoldModelDM.AskManipForAll;
+                  FirstForm.basrDrList.Changed;
+                  ReleaseStructForm.BoldTreeView1.Repaint;
+                  //BoldModelDM.BoldUpdateDBAction1.Execute;
+                  //BoldModelDM.AskManipForAll;
+                end;
+            end;
+
+          
+    end; }
+============
+function TADOConnectDM.SetSaleRemote(Sale: Double; OrderId: Integer;
+	EnableSpecZeroSet: Boolean=False): Boolean;
+var temp_id: Integer;
+    date_prm: TParameter;
+    SMSSendState: Integer;
+begin
+
+ReleaseStructForm.CheckUsePeriod;
+
+  try
+    RemOrderByIdADODS.Active:=False;
+	RemOrderByIdADODS.Parameters.
+		ParamByName('order_id').Value:=OrderId;
+	RemOrderByIdADODS.Active:=True;
+	if RemOrderByIdADODS.RecordCount=0 then
+	begin
+		ShowMessage('Не найдена заявка в БД!');
+		Exit;
+	end;
+  except on E:Exception do
+  begin
+	ShowMessage('Ошибка запроса удал пар-ров тек заявки!'+
+		E.Message);
+	Exit;
+  end;
+  end;
+
+if (RemOrderByIdADODS.FieldByName('Slugebnyi').AsInteger=0)
+	and EnableSpecZeroSet then
+    begin
+        ShowMessage('Данная заявка не помечена как служебная!');
+        Exit;
+    end;
+	
+if Sale=NULL then
+  Sale:=0;
+  
+if (Sale>0) or EnableSpecZeroSet then
+	begin
+
+		try
+
+			temp_id:=RemOrderByIdADODS.
+				FindField('BOLD_ID').AsInteger;
+			CurrCustActivityADOQuery.Parameters[0].Value:=
+				temp_id;
+			CurrCustActivityADOQuery.Active:=False;
+			CurrCustActivityADOQuery.Active:=True;
+		except
+			ShowMessage('Неудачная проверка завершённости текущего заказа!');
+			Exit;
+		end;
+		
+		if CurrCustActivityADOQuery.RecordCount=1 then
+		begin
+		if CurrCustActivityADOQuery.
+			FindField('Zavershyon').AsInteger=0 then
+		begin
+
+			//Проверка на наличие установленного позывного
+			if MainADOCommand.Parameters.Count=0 then
+            begin
+                date_prm:=MainADOCommand.Parameters.AddParameter;
+                date_prm.DataType:=ftDateTime;
+                date_prm.Name:='date_prm';
+                date_prm.Value:=Today+Time;
+            end;
+			
+			MainADOCommand.Parameters[0].Value:=
+				Today+Time;
+				
+			if not SendSQL('UPDATE Zakaz SET Konec_zakaza_data=:date_prm'+
+					' WHERE BOLD_ID='+IntToStr(RemOrderByIdADODS.
+					FindField('BOLD_ID').AsInteger)) then
+				ShowMessage('Неудачная установка времени окончания заявки!');
+
+			if not SendSQL('UPDATE Zakaz SET Zavershyon=1'+
+					' WHERE BOLD_ID='+IntToStr(RemOrderByIdADODS.
+					FindField('BOLD_ID').AsInteger)) then
+                ShowMessage('Неудачная установка признака завершения заявки!');
+
+			//Выбор конечного сектора на карте
+			if (BoldHandlesDM.blhDriversUnion.
+				CurrentElement as TObjekt_vyborki_otchyotnosti).
+				Avtozapoln_sektorov
+				and not (BoldHandlesDM.blhDriversUnion.
+				CurrentElement as TObjekt_vyborki_otchyotnosti).
+				Naznach_iz_obsh__spiska then
+			begin
+				if RemOrderByIdADODS.FindField
+					('konechnyi_sektor_raboty').
+					AsInteger=-1 then
+				begin
+					StateMapForm.ShowModal;
+					if StateMapForm.HasResult then
+					begin
+						if not SendSQL('UPDATE Zakaz SET konechnyi_sektor_raboty='+
+							IntToStr(SectByCodeADOQuery.
+							FindField('BOLD_ID').AsInteger)+
+							' WHERE BOLD_ID='+IntToStr(RemOrderByIdADODS.
+							FindField('BOLD_ID').AsInteger)) then
+							ShowMessage('Неудачная установка конечного сектора!');
+					end;
+
+				end;
+			end;
+			//Конец блока выбора конечного сектора
+
+            //Блок отработки состояния водителя после отчета
+			if GetDrByNum(RemOrderByIdADODS.
+				FindField('pozyvnoi_ustan').AsInteger) then
+            begin
+
+				BoldHandlesDM.bvhDrNum.Value.SetAsVariant(
+					RemOrderByIdADODS.FindField
+					('pozyvnoi_ustan').AsInteger);
+					
+				if BoldHandlesDM.blhDrSearch.List.Count>1 then
+				begin
+					ShowMessage('Более одного водителя с позывным '+
+					IntToStr(RemOrderByIdADODS.FindField
+					('pozyvnoi_ustan').AsInteger));
+					Exit;
+				end
+				else if BoldHandlesDM.blhDrSearch.List.Count=0 then
+                begin
+					ShowMessage('Одним из пользователей добавлен'+
+						' новый водитель, позывной - '+
+						IntToStr(RemOrderByIdADODS.FindField
+						('pozyvnoi_ustan').AsInteger));
+					BoldModelDM.RefreshDBData;
+                end
+				else
+                begin
+                end;
+				
+				BoldHandlesDM.bvhDrNum.Value.SetAsVariant(
+					RemOrderByIdADODS.FindField('pozyvnoi_ustan').AsInteger);
+
+              //if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozapoln_sektorov
+              //   and not (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Naznach_iz_obsh__spiska then
+              //    begin
+              //      (BoldHandlesDM.blhDrSearch.CurrentElement as TVoditelj).rabotaet_na_sektore:=
+              //        (BoldHandlesDM.blhSectorByCode.CurrentElement as TSektor_raboty);
+              //      (BoldHandlesDM.blhDrSearch.CurrentElement as TVoditelj).Nomer_posl_sektora:=
+              //        (BoldHandlesDM.blhSectorByCode.CurrentElement as TSektor_raboty).Nomer_sektora;
+              //    end;
+
+				if (RemOrderByIdADODS.FindField
+					('Nomer_skidki').AsInteger>0) or
+					(RemOrderByIdADODS.FindField
+					('Slugebnyi').AsInteger=1) then
+				begin
+					(BoldHandlesDM.blhDrSearch.CurrentElement 
+					as TVoditelj).Vremya_poslednei_zayavki:=
+						IncDay(ADOConnectDM.GetServerDateTime,-10);
+				end
+				else
+					(BoldHandlesDM.blhDrSearch.
+					CurrentElement as TVoditelj).
+					Vremya_poslednei_zayavki:=
+					ADOConnectDM.GetServerDateTime;
+					
+				if OccupateByID(DrInfoADOQuery.
+						FindField('BOLD_ID').AsInteger) then
+					(BoldHandlesDM.blhDrSearch.
+					CurrentElement as TVoditelj).
+					Zanyat_drugim_disp:=
+						True
+				else
+					(BoldHandlesDM.blhDrSearch.
+					CurrentElement as TVoditelj).
+					Zanyat_drugim_disp:=
+						False;
+						
+				BoldModelDM.BoldUpdateDBAction1.Execute;
+				FirstForm.basrDrList.Changed;
+				ReleaseStructForm.BoldTreeView1.Repaint;
+
+                if not SendSQL('UPDATE Zakaz SET sektor_voditelya='
+					+IntToStr(DrInfoADOQuery.FindField('rabotaet_na_sektore').AsInteger)+
+                   ' WHERE BOLD_ID='+IntToStr(RemOrderByIdADODS.
+				   FindField('BOLD_ID').AsInteger)) then
+                        ShowMessage('Неудачная установка начального'+
+						' сектора водителя заявки!');
+
+            end
+            else
+                ShowMessage('Не найдена запись водителя, системный ключ - '+IntToStr(DrInfoADOQuery.FindField('BOLD_ID').AsInteger));
+			//Конец блока отработки состояния водителя
+				
+			//Отсылаем СМС клиенту, данная функция задействована 
+			//только в ручном режиме
+			if (IniFile.ReadString('удаленный_контроль',
+                'отсылать_данные_клиент_отчет','NO')='YES') then
+            begin
+
+				if (RemOrderByIdADODS.FindField
+					('Adres_vyzova_vvodim').AsString='') or
+                    (RemOrderByIdADODS.FindField
+					('Telefon_klienta').AsString='') then
+                begin
+                    ShowMessage('Не установлен адрес,'+
+					' телефон или нет связки с объектом'+
+					' водителя (попробуйте заново ввести позывной)!');       
+                end
+                else
+                begin
+                    SMSSendState:=
+                        GetClSMSSendState(RemOrderByIdADODS.
+						FindField('BOLD_ID').AsInteger);
+                          
+					if (SMSSendState<>1) and
+                            (RemOrderByIdADODS.FindField
+							('CLIENT_SMS_SEND_STATE').
+							AsInteger<>1) then
+                    begin
+                              
+                        if (Length(RemOrderByIdADODS.
+							FindField('Telefon_klienta').AsString)=10) then
+                        begin
+                            SendSaleToClient
+                                (RemOrderByIdADODS.
+								FindField('BOLD_ID').AsInteger);
+                        end
+                        else
+                            ShowMessage('Неподходящий номер'+
+							' телефона клиента для отправки СМС!');
+                    end
+                    else
+                        ShowMessage('SMS по данной заявке уже'+
+						' отправляется системой, дождитесь результата!');
+
+                end;
+				
+            end;
+			//Конец блока отсылки СМС клиенту
+
+			BoldModelDM.AskManipForAll;
+			BoldModelDM.IncrementAllCounter;
+        end
+		else
+			ShowMessage('Данная заявка уже завершена другим пользователем!');
+		end
+		else
+			ShowMessage('Данная заявка удалена'+
+				' из базы другим пользователем, либо'+
+				' несколько заявок с одним ID!');    
+       //Процедура добавления информации к
+       //базе о ранее имеющихся заявках
+	end;
+end;
+==============================
+			//Блок установки параметров водителя
+			{if not SendSQL('UPDATE Voditelj SET '+
+				'Zanyat_drugim_disp=1, Na_pereryve=0 '+
+				' WHERE BOLD_ID='+IntToStr(DrInfoADOQuery.
+				FindField('BOLD_ID').AsInteger)) then
+					ShowMessage('Неудачная установка признака занятости водителя!')
+			else
+            begin
+				if PrevOnLaunch then
+                begin
+					ReleaseStructForm.AddFictiveCustByDrNum(
+						DrInfoADOQuery.FindField('pozyvnoi').
+						AsInteger,'Снялся с перерыва');
+                end;
+
+				BoldHandlesDM.bvhDrNum.Value.SetAsVariant(
+					DrInfoADOQuery.FindField('pozyvnoi').AsInteger);
+
+				if BoldHandlesDM.blhDrSearch.List.Count>1 then
+				begin
+					ShowMessage('Более одного водителя с позывным '+
+						IntToStr(DrInfoADOQuery.FindField('pozyvnoi').AsInteger));
+					Exit;
+				end
+				else if BoldHandlesDM.blhDrSearch.List.Count=0 then
+                begin
+					ShowMessage('Нет такого водителя на линии'+
+						' либо, одним из пользователей добавлен'+
+						' новый водитель, позывной - '+
+						IntToStr(DrInfoADOQuery.FindField
+						('pozyvnoi').AsInteger)+
+						'. Произведите заполнение заново!');
+					Exit;
+                end
+				else
+                begin
+                end;
+
+				BoldHandlesDM.bvhDrNum.Value.SetAsVariant(
+					DrInfoADOQuery.FindField('pozyvnoi').AsInteger);
+				(BoldHandlesDM.blhDrSearch.CurrentElement
+					as TVoditelj).Zanyat_drugim_disp:=
+					True;
+				(BoldHandlesDM.blhDrSearch.CurrentElement
+				as TVoditelj).Na_pereryve:=
+                False;
+				BoldModelDM.BoldUpdateDBAction1.Execute;
+				FirstForm.basrDrList.Changed;
+				ReleaseStructForm.BoldTreeView1.Repaint;
+				res:=True;
+
+            end;  }
+			//Конец блока установки параметров водителя
+
+			//Блок установки пар-в прежнего водителя
+			{if HasPrevDrv then
+			begin
+				BoldHandlesDM.bvhDrNum.
+				Value.SetAsVariant(
+                PrevPoz);
+
+				if not OccupateByID(PrevDrvNum) then
+				begin
+
+					if not SendSQL('UPDATE Voditelj SET'+
+						' Zanyat_drugim_disp=0'+
+                        ' WHERE BOLD_ID='+IntToStr(PrevDrvNum))
+					then
+                        ShowMessage('Неудачная установка'+
+						' признака незанятости прежнего водителя!');
+
+					if BoldHandlesDM.blhDrSearch.List.Count>0 then
+					begin
+
+						(BoldHandlesDM.blhDrSearch.CurrentElement
+						as TVoditelj).Zanyat_drugim_disp:=
+						False;
+					end;
+				end
+				else
+				begin
+					if not SendSQL('UPDATE Voditelj SET '+
+						'Zanyat_drugim_disp=1'+
+                        ' WHERE BOLD_ID='+IntToStr(PrevDrvNum)) 
+					then
+                        ShowMessage('Неудачная установка'+
+						' признака занятости прежнего водителя!');
+						
+					if BoldHandlesDM.blhDrSearch.List.Count>0 then
+						(BoldHandlesDM.blhDrSearch.
+						CurrentElement as TVoditelj).
+						Zanyat_drugim_disp:=
+							True;
+				end;
+             //вторая часть проверки на заранее уст позывной
+             //SelectSectorForDrivers
+			end;  }
+==========================
+			{//Проверка на наличие установленного позывного
+			if MainADOCommand.Parameters.Count=0 then
+            begin
+                date_prm:=MainADOCommand.Parameters.AddParameter;
+                date_prm.DataType:=ftDateTime;
+                date_prm.Name:='date_prm';
+                date_prm.Value:=Today+Time;
+            end;
+
+			MainADOCommand.Parameters[0].Value:=
+				Today+Time;
+
+			if not SendSQL('UPDATE Zakaz SET Konec_zakaza_data=:date_prm'+
+					' WHERE BOLD_ID='+IntToStr(ActiveCustADOQuery.
+					FindField('BOLD_ID').AsInteger)) then
+				ShowMessage('Неудачная установка времени окончания заявки!'); }
+=================================
+			//Выбор конечного сектора на карте
+			{if (BoldHandlesDM.blhDriversUnion.
+				CurrentElement as TObjekt_vyborki_otchyotnosti).
+				Avtozapoln_sektorov
+				and not (BoldHandlesDM.blhDriversUnion.
+				CurrentElement as TObjekt_vyborki_otchyotnosti).
+				Naznach_iz_obsh__spiska then
+			begin
+				if ActiveCustADOQuery.FindField
+					('konechnyi_sektor_raboty').
+					AsInteger=-1 then
+				begin
+					StateMapForm.ShowModal;
+					if StateMapForm.HasResult then
+					begin
+						if not SendSQL('UPDATE Zakaz SET konechnyi_sektor_raboty='+
+							IntToStr(SectByCodeADOQuery.
+							FindField('BOLD_ID').AsInteger)+
+							' WHERE BOLD_ID='+IntToStr(ActiveCustADOQuery.
+							FindField('BOLD_ID').AsInteger)) then
+							ShowMessage('Неудачная установка конечного сектора!');
+					end;
+
+				end;
+			end;  }
+			//Конец блока выбора конечного сектора
+
+=============================
+				BoldHandlesDM.bvhDrNum.Value.SetAsVariant(
+					ActiveCustADOQuery.FindField
+					('pozyvnoi_ustan').AsInteger);
+					
+				if BoldHandlesDM.blhDrSearch.List.Count>1 then
+				begin
+					ShowMessage('Более одного водителя с позывным '+
+					IntToStr(ActiveCustADOQuery.FindField
+					('pozyvnoi_ustan').AsInteger));
+					Exit;
+				end
+				else if BoldHandlesDM.blhDrSearch.List.Count=0 then
+                begin
+					ShowMessage('Одним из пользователей добавлен'+
+						' новый водитель, позывной - '+
+						IntToStr(ActiveCustADOQuery.FindField
+						('pozyvnoi_ustan').AsInteger));
+					BoldModelDM.RefreshDBData;
+                end
+				else
+                begin
+                end;
+				
+				BoldHandlesDM.bvhDrNum.Value.SetAsVariant(
+					ActiveCustADOQuery.FindField('pozyvnoi_ustan').AsInteger);
+						
+				BoldModelDM.BoldUpdateDBAction1.Execute;
+				FirstForm.basrDrList.Changed;
+				ReleaseStructForm.BoldTreeView1.Repaint;
+
+                if not SendSQL('UPDATE Zakaz SET sektor_voditelya='+IntToStr(DrInfoADOQuery.FindField('rabotaet_na_sektore').AsInteger)+
+                   ' WHERE BOLD_ID='+IntToStr(ActiveCustADOQuery.FindField('BOLD_ID').AsInteger)) then
+                        ShowMessage('Неудачная установка начального сектора водителя заявки!');
+
+=================
+       {if (ActiveCustADOQuery.FindField
+					('Nomer_skidki').AsInteger>0) or
+					(ActiveCustADOQuery.FindField
+					('Slugebnyi').AsInteger=1) then
+				begin
+					(BoldHandlesDM.blhDrSearch.CurrentElement 
+					as TVoditelj).Vremya_poslednei_zayavki:=
+						IncDay(ADOConnectDM.GetServerDateTime,-10);
+				end
+				else
+					(BoldHandlesDM.blhDrSearch.
+					CurrentElement as TVoditelj).
+					Vremya_poslednei_zayavki:=
+					ADOConnectDM.GetServerDateTime;   }
+===========================
+                  //if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozapoln_sektorov
+              //   and not (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Naznach_iz_obsh__spiska then
+              //    begin
+              //      (BoldHandlesDM.blhDrSearch.CurrentElement as TVoditelj).rabotaet_na_sektore:=
+              //        (BoldHandlesDM.blhSectorByCode.CurrentElement as TSektor_raboty);
+              //      (BoldHandlesDM.blhDrSearch.CurrentElement as TVoditelj).Nomer_posl_sektora:=
+              //        (BoldHandlesDM.blhSectorByCode.CurrentElement as TSektor_raboty).Nomer_sektora;
+              //    end;
+
+				
+					
+				{if OccupateByID(DrInfoADOQuery.
+						FindField('BOLD_ID').AsInteger) then
+					(BoldHandlesDM.blhDrSearch.
+					CurrentElement as TVoditelj).
+					Zanyat_drugim_disp:=
+						True
+				else
+					(BoldHandlesDM.blhDrSearch.
+					CurrentElement as TVoditelj).
+					Zanyat_drugim_disp:=
+						False;  }

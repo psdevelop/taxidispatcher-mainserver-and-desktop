@@ -1,0 +1,1 @@
+{"command":"take_order","order_id":"3779350","order_data":"mayak","client_id":"568","msg_end":"ok"}

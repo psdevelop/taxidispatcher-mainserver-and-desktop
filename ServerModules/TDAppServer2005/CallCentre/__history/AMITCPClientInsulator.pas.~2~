@@ -1,0 +1,626 @@
+unit AMITCPClientInsulator;
+
+interface
+
+uses TCPClientUnit, Classes, WinSock, Windows, StdCtrls,
+      Controls, SysUtils, Dialogs, MessageCollection,
+      uLkJSON, IdTCPServer, Sockets, DateUtils;
+
+type
+
+  TSocketCoordinator = class;
+  //TMessageCollection = class;
+  TItemChangeEvent = procedure(Item: TCollectionItem) of object;
+
+  TSocketCoordinator = class(TThread)
+    private
+      FTCPClientCollection: TTCPClientCollection;
+    protected
+      wData: WSADATA;
+      sServerListen: TSOCKET;
+      localaddr, clientaddr : sockaddr_in;
+      iSize, ListenPort: Integer;
+      ServerIsActive: Boolean;
+      UseUsDGRProt: Boolean;
+      Terminated: Boolean;
+      procedure Execute; override;
+      procedure SetTCPClientCollection(const Value: TTCPClientCollection);
+    public
+      constructor Create(ServListenPort: Integer; UseUDP: Boolean=False);
+      destructor Destroy;
+      function CheckClients(SendMessages: TMessageCollection): TMessageCollection;
+      function SetLoginThreadClientItem(ClientID: Integer; Login: String): Boolean;
+      function GetClientItemIndexByDrNum(DrNum: Integer): Integer;
+      function GetClientItemIndexByDrId(DrId: Integer): Integer;
+      procedure deleteOldClientThreads(newClientID: Integer=-1; newDrNum: Integer=-1);
+      function GetActiveClientItemIndexByClientId(ClientId: Integer): Integer;
+      procedure ShowAcceptMsg;
+      procedure ShowAcceptMaxConnCountDenyMsg;
+      procedure ShowErrorMsg;
+      procedure TestWinSockError(S:String);
+      procedure ShowConnMsg;
+      procedure ShowMemoStr;
+      function TestFuncError
+        (iErr:Integer; FuncName:String): Boolean;
+      procedure ShowSendErr;
+    published
+      property TCPClientCollection: TTCPClientCollection read FTCPClientCollection
+        write SetTCPClientCollection;
+  end;
+
+var
+  sFullErr:String;
+  MemoStr: String;
+
+const
+  APP_TO_SOCK_MEMO = 3;
+
+implementation
+
+uses RemoteControlUnit, ServerMainUnit;
+
+procedure TSocketCoordinator.TestWinSockError(S:String);
+var
+ iErr:Integer;
+begin
+
+ iErr:=WSAGetLastError();
+ sFullErr:='Неизвестная ошибка '+IntToStr(iErr);
+
+ case iErr of
+  WSANOTINITIALISED: sFullErr:='Нужно сначала вызвать функцию WSASturtup, а потом создавать сокет';
+	WSAENETDOWN: sFullErr:='Cвязь нарушена, возможные причины - отошёл кабель или отключились от Интернета';
+	WSAEADDRINUSE: sFullErr:='Указанный адрес уже используется';
+	WSAEFAULT: sFullErr:='Параметры name и namelen не соответствуют выбранной адресации. Параметр namelen может быть меньше необходимого значения, а name содержать некорректные данные';
+	WSAEINPROGRESS: sFullErr:='Выполняется операция в блокирующем режиме. Вы уже запустили на выполнение какую-то функцию и нужно дождаться завершения её работы';
+	WSAEINVAL: sFullErr:='Сокет уже связан с адресом';
+	WSAENOBUFS: sFullErr:='Недостаточно буферов, слишком много соединений';
+	WSAENOTSOCK: sFullErr:='Неверный дескриптор сокета';
+  WSAEISCONN: sFullErr:='Сокет уже подключён';
+  WSAEMFILE: sFullErr:='Нет больше доступных дескрипторов';
+ end;
+
+ sFullErr:=S+' '+sFullErr;
+ Synchronize(ShowErrorMsg);
+end;
+
+function TSocketCoordinator.TestFuncError
+  (iErr:Integer; FuncName:String): Boolean;
+begin
+ Result:=false;
+ if iErr = SOCKET_ERROR then
+  begin
+   TestWinSockError(FuncName);
+   Result:=true;
+  end;
+end;
+
+constructor TSocketCoordinator.Create(ServListenPort: Integer; UseUDP: Boolean=False);
+begin
+  inherited Create(True);
+  ServerIsActive:=False;
+  Terminated:=False;
+  FTCPClientCollection := TTCPClientCollection.Create(nil);
+
+  ListenPort := ServListenPort;
+
+  // Загрузка WinSock
+  if WSAStartup(MAKEWORD(1,1), wData) <> 0 then
+	  begin
+      MessageBox(0, 'Не могу загрузить WinSock', 'Ошибка', 0);
+      Exit;
+	  end;
+
+  // Создание сокета
+  sServerListen := Socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+  if sServerListen = INVALID_SOCKET then
+    begin
+      MessageBox(0, 'Ошибка создания прослушивающего сокета сервера', 'Ошибка', 0);
+      Exit;
+    end;
+
+  // Запонение структуры адреса
+  localaddr.sin_addr.s_addr := htonl(INADDR_ANY);
+  localaddr.sin_family := AF_INET;
+  localaddr.sin_port := htons(ListenPort);
+
+  //Связывание сокета с локальным адресом
+  if Bind(sServerListen, localaddr, sizeof(localaddr)) =
+      SOCKET_ERROR then
+    begin
+      TestWinSockError('Bind');
+      Exit;
+    end;
+
+  //Прослушивание
+  if TestFuncError(Listen(sServerListen, 4), 'Listen') then
+    Exit;
+
+  ServerIsActive:=True;
+  Synchronize(ShowConnMsg);
+end;
+
+destructor TSocketCoordinator.Destroy;
+begin
+  ShutDown(sServerListen, SD_BOTH);
+  CloseSocket(sServerListen);
+  Terminated:=True;
+  WSACleanup;
+  FTCPClientCollection.Free;
+  inherited Destroy;
+end;
+
+procedure TSocketCoordinator.SetTCPClientCollection(const Value: TTCPClientCollection);
+begin
+  //FTCPClientCollection
+  FTCPClientCollection.Assign(Value);
+end;
+
+procedure TSocketCoordinator.ShowConnMsg;
+begin
+  RemoteControlForm.SocketLogMemo.Lines.Add(
+    'Сервер запущен! '+
+    'Порт: '+IntToStr(ListenPort)+'.');
+end;
+
+procedure TSocketCoordinator.ShowMemoStr;
+begin
+  RemoteControlForm.SocketLogMemo.Lines.Add(
+    MemoStr);
+end;
+
+procedure TSocketCoordinator.ShowErrorMsg;
+begin
+  RemoteControlForm.SocketLogMemo.Lines.Add(
+    'Ошибка в функции - '+sFullErr);
+end;
+
+procedure TSocketCoordinator.ShowAcceptMsg;
+begin
+  RemoteControlForm.SocketLogMemo.Lines.
+          Add('Подключен клиент!');
+end;
+
+procedure TSocketCoordinator.ShowSendErr;
+begin
+  RemoteControlForm.SocketLogMemo.Lines.
+          Add('Ошибка нитевой процедуры отправки!');
+end;
+
+procedure TSocketCoordinator.ShowAcceptMaxConnCountDenyMsg;
+begin
+  RemoteControlForm.SocketLogMemo.Lines.
+          Add('Отключен по макс. числу соединений клиент!');
+end;
+
+procedure TSocketCoordinator.Execute;
+var NewClientItem: TTCPClientCollectionItem;
+    sClient : TSOCKET;
+begin
+  while (not Terminated) do
+    begin
+      try
+      iSize := sizeof(clientaddr);
+      //Приём нового соединения
+      sClient := accept(sServerListen, @clientaddr, @iSize);
+      if FTCPClientCollection.Count>=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'макс_число_одновременных_подключений',5) then
+      begin
+        try
+          Shutdown(sClient, SD_Both);
+          CloseSocket(sClient);
+        except on E:Exception do
+        end;
+        Synchronize(ShowAcceptMaxConnCountDenyMsg);
+      end
+      else
+      begin
+        if sClient = INVALID_SOCKET then
+          begin
+            TestWinSockError('accept');
+            Continue;
+          end;
+        //if (FTCPClientCollection<>nil) then
+        Synchronize(ShowAcceptMsg);
+        NewClientItem := FTCPClientCollection.Add;
+        if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'использовать_неблокирующие_сокеты',
+          'NO')='YES' then
+          NewClientItem.CreateClientThread(sClient, True)
+        else
+          NewClientItem.CreateClientThread(sClient, False);
+      end;
+      except on E:Exception do
+      end;
+    end;
+  //Советуют предварительно вызвать
+  Shutdown(sServerListen, SD_Both);
+  CloseSocket(sServerListen);
+end;
+
+function TSocketCoordinator.CheckClients(SendMessages: TMessageCollection): TMessageCollection;
+var client_count, i, j: Integer;
+    InputJSONObject: TLkJSONObject;
+    InputMSGCollection: TMessageCollection;
+    InputMSGCollectionItem: TMessageCollectionItem;
+    MSGClientID: Integer;
+begin
+  client_count:=FTCPClientCollection.Count;
+  InputMSGCollection := TMessageCollection.Create();
+  InputJSONObject := TLkJSONObject.Create();
+
+  for i:=0 to SendMessages.Count-1 do
+    begin
+      MSGClientID:=SendMessages.Items[i].GetMessage().ClientID;
+
+      for j:=0 to FTCPClientCollection.Count-1 do
+        begin
+          if FTCPClientCollection.Items[j].ClientID=MSGClientID then
+          begin
+            if not FTCPClientCollection.Items[j].GetTreadObject().ErrorClientSocket then
+            begin
+              if not FTCPClientCollection.Items[j].GetTreadObject().SendingNoComplete then
+              begin
+                if not FTCPClientCollection.Items[j].GetTreadObject().LastSendindNOHasASK then
+                begin
+
+                  if SendMsgCollection.Items[i].OnDeleted then
+                  begin
+                     SendMsgCollection.Items[i].
+                      OnDeletedASKed := True;
+                     Break;
+                  end;
+
+                  if FTCPClientCollection.
+                    Items[j].GetTreadObject().
+                    SendUTFString(
+                    SendMessages.Items[i].
+                    GetMessage().GetStrJSON()) then
+                  begin
+                    //Подтверждение доставки проверится
+                    //при следующей отправке клиенту
+                    //Сделать проверку на успешность и
+                    //пометить на удаление сообщение
+                    SendMsgCollection.Items[i].OnDeleted:=
+                      True;
+                  end
+                  else
+                  begin
+                    //Ошибка нитевой процедуры отправки
+                    Synchronize(ShowSendErr);
+                  end;
+
+                end
+                else
+                begin
+                  //Нет подтверждения предыдущей
+                  //отправки в нити
+                  MemoStr:=
+                      'Нет подтверждения предыдущей'+
+                      ' отправки в нити клиента '+IntToStr(
+                      FTCPClientCollection.Items[j].
+                      ClientID);
+                  Synchronize(ShowMemoStr);
+                end;
+                //Конец условия на отсутствие другой отправки
+              end
+              else
+              begin
+                //Еще отправляется что-то в нити
+                MemoStr:=
+                      'Еще отправляется что-то'+
+                      ' в нити клиента '+IntToStr(
+                      FTCPClientCollection.Items[j].
+                      ClientID);
+                Synchronize(ShowMemoStr);
+              end;
+
+              //Если прошла попытка посыла через рабочий сокет-нить
+              Break;
+            end
+            else
+            begin
+              //Ошибка в работе нити
+              //надо гасить поток
+              MemoStr:=
+                'УРОВЕНЬ КООРДИНАТОРА Ошибка в работе при отправке команды'+
+                ' в нити клиента '+IntToStr(
+                FTCPClientCollection.Items[j].
+                ClientID);
+              Synchronize(ShowMemoStr);
+            end;
+          //Конец условия совпадания id найденной
+          //нити и id сообщения, выходим из
+          //цикла перебора клиентов неважно от успешности
+          end;
+        //Конец цикла перебора клиентов
+        end;
+
+    end;
+
+    deleteOldClientThreads;
+
+    for j:=0 to FTCPClientCollection.Count-1 do
+    begin
+      if not FTCPClientCollection.Items[j].
+      GetTreadObject().ErrorClientSocket or True then
+      begin
+
+        FTCPClientCollection.Items[j].StatusStr:=
+          FTCPClientCollection.Items[j].GetTreadObject().StatusStr;
+
+        if FTCPClientCollection.Items[j].GetTreadObject().InputDataStringList.Count>0 then
+        begin
+          for i:=0 to FTCPClientCollection.Items[j].GetTreadObject().InputDataStringList.Count-1 do
+          begin
+            MemoStr:='Data from client '+
+              IntToStr(FTCPClientCollection.Items[j].ClientID)+
+              ': '+FTCPClientCollection.Items[j].GetTreadObject().
+              InputDataStringList.Strings[i];
+            Synchronize(ShowMemoStr);
+
+            try
+              InputJSONObject :=  TLkJSON.ParseText(
+                FTCPClientCollection.Items[j].GetTreadObject().
+                InputDataStringList.Strings[i]) as TLkJSONObject;
+
+              InputMSGCollectionItem:=
+                InputMSGCollection.Add;
+              InputMSGCollectionItem.MSGJSONObject:=
+                InputJSONObject;
+              InputMSGCollectionItem.ClientID:=
+                FTCPClientCollection.Items[j].ClientID;
+              InputMSGCollectionItem.Pozyvnoi:=
+                FTCPClientCollection.Items[j].Pozyvnoi;
+              InputMSGCollectionItem.DriverDBID:=
+                FTCPClientCollection.Items[j].DriverDBID;
+
+              if Pos('{"sync":"',FTCPClientCollection.
+                Items[j].GetTreadObject().
+                InputDataStringList.Strings[i])<>0 then
+              begin
+                InputMSGCollectionItem.itsSystemMessage:=True;
+              end
+              else
+              begin
+                
+              end;
+
+            except on E:Exception do
+            begin
+              MemoStr:=
+                'Неудачный парсинг JSON: '+E.Message;
+              Synchronize(ShowMemoStr);
+            end;  
+            end;
+          end;
+          FTCPClientCollection.Items[j].GetTreadObject().
+              InputDataStringList.Clear;
+        end;
+
+        if FTCPClientCollection.Items[j].GetTreadObject().ThreadMessagesStringList.Count>0 then
+        begin
+          for i:=0 to FTCPClientCollection.Items[j].GetTreadObject().ThreadMessagesStringList.Count-1 do
+          begin
+            MemoStr:='Message from client-thread '+
+              IntToStr(FTCPClientCollection.Items[j].ClientID)+
+              ': '+FTCPClientCollection.Items[j].GetTreadObject().
+              ThreadMessagesStringList.Strings[i];
+            Synchronize(ShowMemoStr);
+          end;
+          FTCPClientCollection.Items[j].GetTreadObject().
+              ThreadMessagesStringList.Clear;
+        end;
+
+      end;
+      //else
+      if FTCPClientCollection.Items[j].
+      GetTreadObject().ErrorClientSocket then
+      begin
+        //Ошибка в нити, гасим ее!!!
+        MemoStr:=
+          'УРОВЕНЬ КООРДИНАТОРА При проверке '+
+          'входящих запросов по ID найдена ошибка в работе'+
+          ' нити клиента '+IntToStr(
+          FTCPClientCollection.Items[j].
+          ClientID);
+        Synchronize(ShowMemoStr);
+      end;
+      //Конец цикла опроса нитей
+    end;
+
+   Result:=InputMSGCollection;
+
+end;
+
+function TSocketCoordinator.SetLoginThreadClientItem(ClientID: Integer; Login: String): Boolean;
+var j: Integer;
+    res: Boolean;
+begin
+  res:=False;
+  for j:=0 to FTCPClientCollection.Count-1 do
+    begin
+      if FTCPClientCollection.Items[j].ClientID=ClientID then
+      begin
+
+        if not FTCPClientCollection.Items[j].GetTreadObject().ErrorClientSocket then
+        begin
+        FTCPClientCollection.Items[j].
+          Autorized:=True;
+        FTCPClientCollection.Items[j].
+          Login:=Login;
+        res:=True;
+        end
+        else
+        begin
+          MemoStr:=
+            'УРОВЕНЬ КООРДИНАТОРА При занесении параметров авторизации по ID найдена ошибка в работе'+
+            ' нити клиента '+IntToStr(
+            FTCPClientCollection.Items[j].
+            ClientID);
+          Synchronize(ShowMemoStr);
+        end;
+
+      end;
+    end;
+
+end;
+
+function TSocketCoordinator.GetClientItemIndexByDrNum(DrNum: Integer): Integer;
+var res: Integer;
+    j: Integer;
+begin
+  res:=-1;
+
+  for j:=0 to FTCPClientCollection.Count-1 do
+    begin
+      if FTCPClientCollection.Items[j].Pozyvnoi=DrNum then
+      begin
+        if not FTCPClientCollection.Items[j].GetTreadObject().ErrorClientSocket then
+        begin
+          res:=j;
+        end
+        else
+        begin
+          MemoStr:=
+            'УРОВЕНЬ КООРДИНАТОРА При поиске нити по позывному ошибка в работе'+
+            ' нити клиента '+IntToStr(
+            FTCPClientCollection.Items[j].
+            ClientID);
+          Synchronize(ShowMemoStr);
+        end;
+      end;
+    end;
+
+  Result:=res;
+end;
+
+function TSocketCoordinator.GetClientItemIndexByDrId(DrId: Integer): Integer;
+var res: Integer;
+    j: Integer;
+begin
+  res:=-1;
+
+  for j:=0 to FTCPClientCollection.Count-1 do
+    begin
+      if FTCPClientCollection.Items[j].DriverDBID=DrId then
+      begin
+        if not FTCPClientCollection.Items[j].GetTreadObject().ErrorClientSocket then
+        begin
+          res:=j;
+        end
+        else
+        begin
+          MemoStr:=
+            'УРОВЕНЬ КООРДИНАТОРА При поиске нити по позывному ошибка в работе'+
+            ' нити клиента '+IntToStr(
+            FTCPClientCollection.Items[j].
+            ClientID);
+          Synchronize(ShowMemoStr);
+        end;
+      end;
+    end;
+
+  Result:=res;
+end;
+
+function TSocketCoordinator.GetActiveClientItemIndexByClientId(ClientId: Integer): Integer;
+var res: Integer;
+    j: Integer;
+begin
+  res:=-1;
+
+  for j:=0 to FTCPClientCollection.Count-1 do
+    begin
+      if FTCPClientCollection.Items[j].ClientID=ClientId then
+      begin
+        if not FTCPClientCollection.Items[j].GetTreadObject().ErrorClientSocket then
+        begin
+          res:=j;
+        end
+        else
+        begin
+          MemoStr:=
+            'УРОВЕНЬ КООРДИНАТОРА При поиске'+
+            ' нити по ID клиента найдена ошибка в работе'+
+            ' нити клиента '+IntToStr(
+            FTCPClientCollection.Items[j].
+            ClientID);
+          Synchronize(ShowMemoStr);
+        end;
+      end;
+    end;
+
+  Result:=res;
+end;
+
+procedure TSocketCoordinator.deleteOldClientThreads(newClientID: Integer=-1; newDrNum: Integer=-1);
+var i: Integer;
+    itsDeleting: Boolean;
+begin
+
+  if (FTCPClientCollection.Count>0) then
+  begin
+    itsDeleting:=True;
+    while(itsDeleting) do
+      begin
+        itsDeleting:=False;
+        for i:=0 to FTCPClientCollection.Count-1 do
+          begin
+
+            try
+
+            if ((FTCPClientCollection.Items[i].Pozyvnoi=newDrNum)
+              and (FTCPClientCollection.Items[i].
+              ClientID<>newClientID) and (newDrNum>0) and
+              (newClientID>0)) or FTCPClientCollection.
+              Items[i].GetTreadObject.ErrorClientSocket
+              then
+              begin
+                MemoStr:=
+                'Удаляется за ненадобностью или из-за '+
+                'ошибки сокета клиент id='+IntToStr(FTCPClientCollection.
+                Items[i].ClientID)+', позывной '+IntToStr(
+                FTCPClientCollection.Items[i].Pozyvnoi);
+                Synchronize(ShowMemoStr);
+
+                FTCPClientCollection.Items[i].
+                  GetTreadObject.Terminated:=True;
+                FTCPClientCollection.Delete(i);
+
+                itsDeleting:=True;
+                Break;
+              end;
+              if not FTCPClientCollection.Items[i].Autorized then
+                if ABS(SecondsBetween(FTCPClientCollection.
+                  Items[i].AcceptDateTime, Today+Time))>20 then
+              begin
+                MemoStr:=
+                'Удаляется из-за таймаута авторизации'+
+                ' клиент id='+IntToStr(FTCPClientCollection.
+                Items[i].ClientID);
+                Synchronize(ShowMemoStr);
+
+                FTCPClientCollection.Items[i].
+                  GetTreadObject.Terminated:=True;
+                FTCPClientCollection.Delete(i);
+
+                itsDeleting:=True;
+                Break;
+              end;
+
+            except
+              MemoStr:=
+                'Косяк удаления нити!';
+              Synchronize(ShowMemoStr);
+            end;
+            
+          end;
+      end;
+
+  end;
+end;
+
+end.

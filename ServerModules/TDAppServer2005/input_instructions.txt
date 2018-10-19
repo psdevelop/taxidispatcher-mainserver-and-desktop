@@ -1,0 +1,1 @@
+{"command":"accept_order","order_id":"3779350","client_id":"568","msg_end":"ok"}

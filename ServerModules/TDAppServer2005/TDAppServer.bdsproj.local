@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2011.07.02 23:39:10.453.pas,C:\Documents and Settings\Admin\Мои документы\Borland Studio Projects\Unit1.pas=C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\ServerMainUnit.pas</Transaction>
+    <Transaction>2011.07.02 23:39:10.468.dfm,C:\Documents and Settings\Admin\Мои документы\Borland Studio Projects\Unit1.dfm=C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\ServerMainUnit.dfm</Transaction>
+    <Transaction>2011.07.03 22:58:07.671.pas,C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\Unit1.pas=C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\AppServerComClassUnit.pas</Transaction>
+    <Transaction>2011.07.03 22:58:07.671.dfm,C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\Unit1.dfm=C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\AppServerComClassUnit.dfm</Transaction>
+    <Transaction>2011.07.28 23:19:02.312.pas,C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\SendSMS\MainUnit.pas=C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\SendSMS\SMSSendUnit.pas</Transaction>
+    <Transaction>2011.07.28 23:19:02.312.dfm,C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\SendSMS\MainUnit.dfm=C:\DEVELOP(1)\Sources\TD_RECOVER\Таксопарк\TMRelease4\TaxiManager\ServerModules\SendSMS\SMSSendUnit.dfm</Transaction>
+    <Transaction>2011.10.14 20:59:43.984.pas,C:\DEVELOP(1)\TD_OPTIMIZED\Таксопарк\TMRelease4\TaxiManager\ServerModules\TDAppServer2005\Unit1.pas=C:\DEVELOP(1)\TD_OPTIMIZED\Таксопарк\TMRelease4\TaxiManager\ServerModules\TDAppServer2005\WinNotifyUnit.pas</Transaction>
+    <Transaction>2012.05.05 08:29:21.140.pas,C:\DEVELOP(1)\TD5\Таксопарк\TMRelease4\TaxiManager\ServerModules\TDAppServer2005\Unit1.pas=C:\DEVELOP(1)\TD5\Таксопарк\TMRelease4\TaxiManager\ServerModules\TDAppServer2005\uGetHttpThreadUnit.pas</Transaction>
+    <Transaction>2013.08.06 16:10:14.765.pas,C:\DEVELOP(1)\TD5_3_2\TaxiManager\ServerModules\TDAppServer2005\uGetHttpThreadUnit.pas=</Transaction>
+    <Transaction>2013.08.06 16:10:19.312.pas,C:\DEVELOP(1)\TD5_3_2\TaxiManager\ServerModules\TDAppServer2005\WinNotifyUnit.pas=</Transaction>
+    <Transaction>2013.11.21 01:57:58.218.pas,C:\DEVELOP(1)\TD_5_4_0_6\TaxiManager\ServerModules\TDAppServer2005\Unit1.pas=C:\DEVELOP(1)\TD_5_4_0_6\TaxiManager\ServerModules\TDAppServer2005\CallCentre\AMIClient.pas</Transaction>
+    <Transaction>2013.11.21 01:57:58.218.dfm,C:\DEVELOP(1)\TD_5_4_0_6\TaxiManager\ServerModules\TDAppServer2005\Unit1.dfm=C:\DEVELOP(1)\TD_5_4_0_6\TaxiManager\ServerModules\TDAppServer2005\CallCentre\AMIClient.dfm</Transaction>
+    <Transaction>2013.11.23 18:36:14.031.pas,C:\DEVELOP(1)\TD_5_4_0_7\TaxiManager\ServerModules\TDAppServer2005\Unit1.pas=C:\DEVELOP(1)\TD_5_4_0_7\TaxiManager\ServerModules\TDAppServer2005\CallCentre\SimpleTCPUnit.pas</Transaction>
+    <Transaction>2014.06.05 03:02:55.515.pas,C:\DEVELOP(1)\TD_5_5_1_9\TaxiManager\ServerModules\TDAppServer2005\Unit1.pas=C:\DEVELOP(1)\TD_5_5_1_9\TaxiManager\ServerModules\TDAppServer2005\CallCentre\AMIConnectUnit.pas</Transaction>
+    <Transaction>2016.09.12 01:30:37.437.pas,C:\DEVELOP\TD_6_2_1_2\TaxiManager\ServerModules\TDAppServer2005\Unit1.pas=C:\DEVELOP\TD_6_2_1_2\TaxiManager\ServerModules\TDAppServer2005\CallCentre\AMITCPClientInsulator.pas</Transaction>
+    <Transaction>2016.09.12 04:10:39.312.pas,C:\DEVELOP\TD_6_2_1_2\TaxiManager\ServerModules\TDAppServer2005\CallCentre\AMITCPClientInsulator.pas=</Transaction>
+  </Transactions>
+</BorlandProject>

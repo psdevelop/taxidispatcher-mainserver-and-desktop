@@ -1,0 +1,6 @@
+action=post_sms
+user=userX
+pass=blabla
+message=Направлен ***___br***___msg_text
+target=7***___dest_number
+sender=NULL

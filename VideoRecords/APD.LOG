@@ -1,0 +1,20 @@
+APRO v4.07
+Compiler : Unknown
+Operating System : Windows XP 5.1 Service Pack 3
+Device: COM1
+Date/time: 26.03.09, 01:38:26
+Time      Type      SubType       Data      OtherData
+--------  --------  ------------  --------  ---------
+0000.033  TrDatChg  Avail         00000001  
+0000.033  TrgHdAlc  Window        00190B92  
+0000.033  Dispatch  WriteCom      00000005  ATZ0[0D]
+0000.053  Dispatch  ReadCom       00000005  ATZ0[0D]
+0000.053  Trigger   Avail         00000005  
+0000.247  Dispatch  WriteCom      00000005  ATQ0[0D]
+0000.349  Dispatch  WriteCom      0000000A  ATS40.2=1[0D]
+0000.450  Dispatch  WriteCom      00000006  AT&W0[0D]
+0001.023  Dispatch  ReadCom       0000002D  [0D][0A]OK[0D][0A]ATQ0[0D][0D]
+                                            [0A]OK[0D][0A]ATS40.2=1[0D][0D]
+                                            [0A]OK[0D][0A]AT&W0[0D][0D][0A]OK
+                                            [0D][0A]
+0001.023  Trigger   Avail         0000002D  

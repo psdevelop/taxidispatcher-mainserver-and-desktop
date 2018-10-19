@@ -1,0 +1,598 @@
+object SystemEnumsForm: TSystemEnumsForm
+  Left = 0
+  Top = 0
+  Width = 708
+  Height = 493
+  Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082#1080
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  OnClose = FormClose
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object PageControl1: TPageControl
+    Left = 0
+    Top = 0
+    Width = 700
+    Height = 466
+    ActivePage = TabSheet3
+    Align = alClient
+    TabOrder = 0
+    object TabSheet1: TTabSheet
+      Caption = #1058#1077#1083#1077#1092#1086#1085#1085#1099#1081' '#1089#1087#1088#1072#1074#1086#1095#1085#1080#1082
+      TabVisible = False
+      object Panel3: TPanel
+        Left = 0
+        Top = 32
+        Width = 692
+        Height = 406
+        Align = alClient
+        BevelOuter = bvNone
+        TabOrder = 0
+        object AdrPhoneRelDBGrid: TDBGrid
+          Left = 0
+          Top = 48
+          Width = 692
+          Height = 317
+          Align = alClient
+          DataSource = DataSource1
+          TabOrder = 0
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -11
+          TitleFont.Name = 'Tahoma'
+          TitleFont.Style = []
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'Adres_vyzova_vvodim'
+              Title.Caption = #1040#1076#1088#1077#1089
+              Width = 238
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Telefon_klienta'
+              Title.Caption = #1058#1077#1083#1077#1092#1086#1085
+              Width = 149
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Summarn_chislo_vyzovov'
+              Title.Caption = #1042#1089#1077#1075#1086' '#1074#1099#1079#1086#1074#1086#1074
+              Width = 101
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'bonus_summ'
+              Title.Caption = #1041#1086#1085#1091#1089#1085#1099#1081' '#1089#1095#1077#1090
+              Width = 150
+              Visible = True
+            end>
+        end
+        object Panel4: TPanel
+          Left = 0
+          Top = 365
+          Width = 692
+          Height = 41
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 1
+          object BitBtn3: TBitBtn
+            Left = 488
+            Top = 8
+            Width = 131
+            Height = 25
+            Action = DataSetDelete1
+            Caption = #1059#1076#1072#1083#1080#1090#1100
+            TabOrder = 0
+            Glyph.Data = {
+              76010000424D7601000000000000760000002800000020000000100000000100
+              04000000000000010000130B0000130B00001000000000000000000000000000
+              800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+              FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+              333333333333333333FF33333333333330003333333333333777333333333333
+              300033FFFFFF3333377739999993333333333777777F3333333F399999933333
+              3300377777733333337733333333333333003333333333333377333333333333
+              3333333333333333333F333333333333330033333F33333333773333C3333333
+              330033337F3333333377333CC3333333333333F77FFFFFFF3FF33CCCCCCCCCC3
+              993337777777777F77F33CCCCCCCCCC399333777777777737733333CC3333333
+              333333377F33333333FF3333C333333330003333733333333777333333333333
+              3000333333333333377733333333333333333333333333333333}
+            NumGlyphs = 2
+          end
+          object BitBtn4: TBitBtn
+            Left = 328
+            Top = 8
+            Width = 137
+            Height = 25
+            Action = DataSetInsert1
+            Caption = #1044#1086#1073#1072#1074#1080#1090#1100
+            TabOrder = 1
+            Glyph.Data = {
+              76010000424D7601000000000000760000002800000020000000100000000100
+              04000000000000010000130B0000130B00001000000000000000000000000000
+              800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+              FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+              33333333FF33333333FF333993333333300033377F3333333777333993333333
+              300033F77FFF3333377739999993333333333777777F3333333F399999933333
+              33003777777333333377333993333333330033377F3333333377333993333333
+              3333333773333333333F333333333333330033333333F33333773333333C3333
+              330033333337FF3333773333333CC333333333FFFFF77FFF3FF33CCCCCCCCCC3
+              993337777777777F77F33CCCCCCCCCC3993337777777777377333333333CC333
+              333333333337733333FF3333333C333330003333333733333777333333333333
+              3000333333333333377733333333333333333333333333333333}
+            NumGlyphs = 2
+          end
+        end
+        object Panel7: TPanel
+          Left = 0
+          Top = 0
+          Width = 692
+          Height = 48
+          Align = alTop
+          BevelOuter = bvNone
+          TabOrder = 2
+          object CheckBox1: TCheckBox
+            Left = 8
+            Top = 16
+            Width = 145
+            Height = 17
+            Caption = #1059#1087#1086#1088#1103#1076#1086#1095#1080#1090#1100' '#1087#1086' '#1072#1076#1088#1077#1089#1091
+            TabOrder = 0
+            OnClick = CheckBox3Click
+          end
+          object CheckBox3: TCheckBox
+            Left = 320
+            Top = 16
+            Width = 169
+            Height = 17
+            Caption = #1059#1087#1086#1088#1103#1076#1086#1095#1080#1090#1100' '#1087#1086' '#1082#1086#1083'-'#1074#1091' '#1074#1099#1079'.'
+            TabOrder = 1
+            OnClick = CheckBox3Click
+          end
+          object CheckBox2: TCheckBox
+            Left = 152
+            Top = 16
+            Width = 161
+            Height = 17
+            Caption = #1059#1087#1086#1088#1103#1076#1086#1095#1080#1090#1100' '#1087#1086' '#1090#1077#1083#1077#1092#1086#1085#1091
+            TabOrder = 2
+            OnClick = CheckBox3Click
+          end
+        end
+      end
+      object Panel5: TPanel
+        Left = 0
+        Top = 0
+        Width = 692
+        Height = 32
+        Align = alTop
+        Caption = 
+          #1041#1072#1079#1072' '#1089#1086#1086#1090#1074#1077#1090#1089#1090#1074#1080#1081' '#1090#1077#1083#1077#1092#1086#1085#1086#1074' '#1080' '#1072#1076#1088#1077#1089#1086#1074' + '#1082#1086#1083'-'#1074#1086' '#1074#1099#1079#1086#1074#1086#1074' '#1087#1086' '#1086#1090#1076'. '#1085 +
+          #1086#1084#1077#1088#1072#1084
+        TabOrder = 1
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082' '#1072#1073#1086#1085#1077#1085#1090#1086#1074
+      ImageIndex = 1
+      object Panel8: TPanel
+        Left = 0
+        Top = 372
+        Width = 692
+        Height = 66
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 0
+        object Label1: TLabel
+          Left = 8
+          Top = 16
+          Width = 40
+          Height = 13
+          Caption = #1048#1057#1050#1040#1058#1068
+        end
+        object Label2: TLabel
+          Left = 72
+          Top = 16
+          Width = 44
+          Height = 13
+          Caption = #1060#1072#1084#1080#1083#1080#1103
+        end
+        object Label3: TLabel
+          Left = 264
+          Top = 16
+          Width = 19
+          Height = 13
+          Caption = #1048#1084#1103
+        end
+        object BitBtn6: TBitBtn
+          Left = 328
+          Top = 32
+          Width = 123
+          Height = 25
+          Caption = #1044#1086#1073#1072#1074#1080#1090#1100
+          TabOrder = 0
+          OnClick = BitBtn6Click
+          Glyph.Data = {
+            76010000424D7601000000000000760000002800000020000000100000000100
+            04000000000000010000130B0000130B00001000000000000000000000000000
+            800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+            33333333FF33333333FF333993333333300033377F3333333777333993333333
+            300033F77FFF3333377739999993333333333777777F3333333F399999933333
+            33003777777333333377333993333333330033377F3333333377333993333333
+            3333333773333333333F333333333333330033333333F33333773333333C3333
+            330033333337FF3333773333333CC333333333FFFFF77FFF3FF33CCCCCCCCCC3
+            993337777777777F77F33CCCCCCCCCC3993337777777777377333333333CC333
+            333333333337733333FF3333333C333330003333333733333777333333333333
+            3000333333333333377733333333333333333333333333333333}
+          NumGlyphs = 2
+        end
+        object CheckBox4: TCheckBox
+          Left = 8
+          Top = 40
+          Width = 153
+          Height = 17
+          Caption = #1059#1087#1086#1088#1103#1076#1086#1095#1080#1090#1100' '#1087#1086' '#1092#1072#1084#1080#1083#1080#1080
+          TabOrder = 1
+          OnClick = CheckBox4Click
+        end
+        object Edit1: TEdit
+          Left = 120
+          Top = 8
+          Width = 121
+          Height = 19
+          Ctl3D = False
+          ParentCtl3D = False
+          TabOrder = 2
+          OnChange = Edit1Change
+        end
+        object Edit2: TEdit
+          Left = 288
+          Top = 8
+          Width = 113
+          Height = 19
+          Ctl3D = False
+          ParentCtl3D = False
+          TabOrder = 3
+          OnChange = Edit2Change
+        end
+        object INumDelBitBtn: TBitBtn
+          Left = 464
+          Top = 32
+          Width = 115
+          Height = 25
+          Caption = #1059#1076#1072#1083#1080#1090#1100'...'
+          Enabled = False
+          TabOrder = 4
+          OnClick = INumDelBitBtnClick
+          Glyph.Data = {
+            76010000424D7601000000000000760000002800000020000000100000000100
+            04000000000000010000130B0000130B00001000000000000000000000000000
+            800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+            333333333333333333FF33333333333330003333333333333777333333333333
+            300033FFFFFF3333377739999993333333333777777F3333333F399999933333
+            3300377777733333337733333333333333003333333333333377333333333333
+            3333333333333333333F333333333333330033333F33333333773333C3333333
+            330033337F3333333377333CC3333333333333F77FFFFFFF3FF33CCCCCCCCCC3
+            993337777777777F77F33CCCCCCCCCC399333777777777737733333CC3333333
+            333333377F33333333FF3333C333333330003333733333333777333333333333
+            3000333333333333377733333333333333333333333333333333}
+          NumGlyphs = 2
+        end
+      end
+      object DBGrid1: TDBGrid
+        Left = 0
+        Top = 0
+        Width = 692
+        Height = 372
+        Align = alClient
+        DataSource = DataSource2
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'Korpus'
+            ReadOnly = True
+            Title.Caption = 'ID'
+            Width = 50
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Familiya'
+            Title.Caption = #1060#1072#1084#1080#1083#1080#1103
+            Width = 100
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Imya'
+            Title.Caption = #1048#1084#1103
+            Width = 70
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Otchestvo'
+            Title.Caption = #1054#1090#1095#1077#1089#1090#1074#1086
+            Width = 80
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Dom'
+            ReadOnly = True
+            Title.Caption = #1042#1099#1079'.'
+            Width = 30
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Rabochii_telefon'
+            Title.Caption = #1058#1077#1083#1077#1092#1086#1085
+            Width = 80
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Ulica'
+            Title.Caption = #1040#1076#1088#1077#1089
+            Width = 155
+            Visible = True
+          end>
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = #1056#1072#1081#1086#1085#1099
+      Enabled = False
+      ImageIndex = 2
+      object Panel9: TPanel
+        Left = 0
+        Top = 392
+        Width = 692
+        Height = 46
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 0
+        object DBNavigator1: TDBNavigator
+          Left = 8
+          Top = 16
+          Width = 408
+          Height = 25
+          DataSource = ADOConnectDM.DistrictsADOTDS
+          VisibleButtons = [nbInsert, nbDelete, nbPost]
+          TabOrder = 0
+        end
+      end
+      object DBGrid3: TDBGrid
+        Left = 0
+        Top = 0
+        Width = 692
+        Height = 392
+        Align = alClient
+        DataSource = ADOConnectDM.DistrictsADOTDS
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'name'
+            Title.Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077
+            Width = 120
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'address'
+            Title.Caption = #1040#1076#1088#1077#1089' '#1076#1083#1103' '#1075#1077#1086#1082#1086#1076#1080#1088#1086#1074#1072#1085#1080#1103
+            Width = 200
+            Visible = True
+          end
+          item
+            Expanded = False
+            Visible = True
+          end
+          item
+            Expanded = False
+            Visible = True
+          end>
+      end
+    end
+    object TabSheet6: TTabSheet
+      Caption = #1040#1074#1090#1086#1087#1072#1088#1082
+      Enabled = False
+      ImageIndex = 5
+    end
+    object TabSheet7: TTabSheet
+      Caption = #1063#1077#1088#1085#1099#1081' '#1089#1087#1080#1089#1086#1082
+      Enabled = False
+      ImageIndex = 6
+      object Panel1: TPanel
+        Left = 0
+        Top = 0
+        Width = 692
+        Height = 438
+        Align = alClient
+        BevelOuter = bvNone
+        TabOrder = 0
+        object Panel2: TPanel
+          Left = 0
+          Top = 397
+          Width = 692
+          Height = 41
+          Align = alBottom
+          BevelOuter = bvNone
+          Ctl3D = False
+          ParentCtl3D = False
+          TabOrder = 0
+          object BitBtn2: TBitBtn
+            Left = 544
+            Top = 8
+            Width = 131
+            Height = 25
+            Action = DataSetDelete2
+            Caption = #1059#1076#1072#1083#1080#1090#1100
+            TabOrder = 0
+            Glyph.Data = {
+              76010000424D7601000000000000760000002800000020000000100000000100
+              04000000000000010000130B0000130B00001000000000000000000000000000
+              800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+              FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+              333333333333333333FF33333333333330003333333333333777333333333333
+              300033FFFFFF3333377739999993333333333777777F3333333F399999933333
+              3300377777733333337733333333333333003333333333333377333333333333
+              3333333333333333333F333333333333330033333F33333333773333C3333333
+              330033337F3333333377333CC3333333333333F77FFFFFFF3FF33CCCCCCCCCC3
+              993337777777777F77F33CCCCCCCCCC399333777777777737733333CC3333333
+              333333377F33333333FF3333C333333330003333733333333777333333333333
+              3000333333333333377733333333333333333333333333333333}
+            NumGlyphs = 2
+          end
+          object BitBtn1: TBitBtn
+            Left = 392
+            Top = 8
+            Width = 137
+            Height = 25
+            Action = DataSetPost1
+            Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+            TabOrder = 1
+            NumGlyphs = 2
+          end
+        end
+        object DBGrid2: TDBGrid
+          Left = 0
+          Top = 0
+          Width = 692
+          Height = 397
+          Align = alClient
+          Ctl3D = False
+          DataSource = DataSource3
+          ParentCtl3D = False
+          TabOrder = 1
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -11
+          TitleFont.Name = 'Tahoma'
+          TitleFont.Style = []
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'Telefon_klienta'
+              Title.Caption = #1058#1077#1083#1077#1092#1086#1085
+              Width = 140
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Nachalo'
+              Title.Caption = #1053#1072#1095#1072#1083#1086' '#1079#1072#1082#1072#1079#1072
+              Width = 100
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Adres_vyzova_vvodim'
+              Title.Caption = #1040#1076#1088#1077#1089' '#1079#1072#1103#1074#1082#1080
+              Width = 260
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Pozyvnoi'
+              Title.Caption = #1055#1086#1079#1099#1074#1085#1086#1081
+              Visible = True
+            end>
+        end
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Left = 456
+    Top = 48
+    object BoldListHandleAddNewAction1: TBoldListHandleAddNewAction
+      Category = 'Bold Actions'
+      Caption = #1044#1086#1073#1072#1074#1080#1090#1100
+      Enabled = False
+    end
+    object BoldListHandleDeleteAction1: TBoldListHandleDeleteAction
+      Category = 'Bold Actions'
+      Caption = #1059#1076#1072#1083#1080#1090#1100
+      Enabled = False
+    end
+  end
+  object ActionList2: TActionList
+    Left = 424
+    Top = 336
+    object DataSetInsert1: TDataSetInsert
+      Category = 'Dataset'
+      Caption = #1044#1086#1073#1072#1074#1080#1090#1100
+      Enabled = False
+      DataSource = DataSource1
+    end
+    object DataSetDelete1: TDataSetDelete
+      Category = 'Dataset'
+      Caption = #1059#1076#1072#1083#1080#1090#1100
+      Enabled = False
+      DataSource = DataSource1
+    end
+    object DataSetDelete2: TDataSetDelete
+      Category = 'Dataset'
+      Caption = #1059#1076#1072#1083#1080#1090#1100
+      Enabled = False
+      DataSource = DataSource3
+    end
+    object DataSetPost1: TDataSetPost
+      Category = 'Dataset'
+      Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+      Enabled = False
+      DataSource = DataSource3
+    end
+  end
+  object DataSource1: TDataSource
+    DataSet = BoldModelDM.AdrPhoneRelatingADOTable
+    Left = 392
+    Top = 336
+  end
+  object DataSource2: TDataSource
+    DataSet = BoldModelDM.IndividPersonsADOQuery
+    Left = 456
+    Top = 248
+  end
+  object ActionList3: TActionList
+    Images = ImageListsDM.MainBoldGridPopUpImageList
+    Left = 424
+    Top = 248
+    object INDelete: TDataSetDelete
+      Category = 'Dataset'
+      Caption = #1059#1076#1072#1083#1080#1090#1100'...'
+      Enabled = False
+      ImageIndex = 0
+      DataSource = DataSource2
+    end
+  end
+  object DataSource3: TDataSource
+    DataSet = BoldModelDM.BadPhoneRelADOTable
+    Left = 64
+    Top = 32
+  end
+end

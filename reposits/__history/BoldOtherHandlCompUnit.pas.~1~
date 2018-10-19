@@ -1,0 +1,289 @@
+unit BoldOtherHandlCompUnit;
+
+interface
+
+uses
+  SysUtils, Classes, BoldOclVariables, BoldReferenceHandle,
+  BoldAbstractListHandle, BoldCursorHandle, BoldVariableHandle,
+  BoldDerivedHandle, BoldSubscription, BoldHandles, BoldRootedHandles,
+  BoldExpressionHandle, Graphics, BoldElements, BoldControlPack, BoldStringControlPack,
+  BoldListHandle, BoldSQLHandle, BoldPropertiesController, DB, DBClient,
+  BoldDataSet, Provider, ADODB,  PrSettingsFormUnit;
+
+type
+  TBoldOthHandleCompDM = class(TDataModule)
+    bpcEnabledAdmin: TBoldPropertiesController;
+    bpcEnablkedPrSettings: TBoldPropertiesController;
+    bpcEnabledLogView: TBoldPropertiesController;
+    basrTreeSectionNode: TBoldAsStringRenderer;
+    basrSectNum: TBoldAsStringRenderer;
+    bpcEnableBaseActions: TBoldPropertiesController;
+    bpcEnCaseAccess: TBoldPropertiesController;
+    procedure DataModuleCreate(Sender: TObject);
+    procedure basrSectNumSetAsString(Element: TBoldElement; NewValue: string;
+      Representation: Integer; Expression: string);
+    procedure basrTreeSectionNodeSetFont(Element: TBoldElement; AFont: TFont;
+      Representation: Integer; Expression: string);
+    function basrRSTRUCTGetAsString(Element: TBoldElement;
+      Representation: Integer; Expression: string): string;
+    procedure SetCurrLabel;
+    procedure SetCustCount;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  BoldOthHandleCompDM: TBoldOthHandleCompDM;
+
+implementation
+
+{$R *.dfm}
+
+uses ModelDM, DateUtils, AnnonceArhiveFormUnit, ADODMUnit,
+     Dialogs, MainForm, HandlesDM, ReleaseStructUnit,
+     BusinessClasses, SystemEnumsUnit;
+
+procedure TBoldOthHandleCompDM.SetCustCount;
+var tm, stdt, enddt: TDateTime;
+begin
+if (IniFile.ReadString('BUSINESS_DATA','calc_disp_count','NO')='YES') then
+ begin
+   try
+    StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov);
+  except
+    ShowMessage('Неверное значение времени смены диспетчеров, по умолчанию будет установлено 08:00:00.');
+    (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov:=
+     '08:00:00';
+  end;
+  tm:=
+      StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov);
+  if (tm<Time) and (Time<IncHour(tm,12)) then
+    begin
+      stdt:=StartOfTheDay(Today)+tm;
+      enddt:=IncHour(stdt,12);
+    end
+  else if (tm<Time) and (Time>=IncHour(tm,12)) then
+    begin
+      stdt:=IncHour(StartOfTheDay(Today)+tm,12);
+      enddt:=IncHour(stdt,12);
+    end
+  else
+    begin
+      stdt:=IncHour(IncDay(StartOfTheDay(Today),-1)+tm,12);
+      enddt:=IncHour(stdt,12);
+    end;
+ end
+else
+ begin
+  try
+    StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Cvet_nachavshihsya);
+  except
+    ShowMessage('Неверное значение времени снятия отчётности, по умолчанию будет установлено 08:00:00.');
+    (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Cvet_nachavshihsya:=
+     '08:00:00';
+  end;
+  tm:=
+      StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Cvet_nachavshihsya);
+  if tm<Time then
+    begin
+      stdt:=StartOfTheDay(Today)+tm;
+      enddt:=IncDay(StartOfTheDay(Today),1)+tm;
+    end
+  else
+    begin
+      stdt:=IncDay(StartOfTheDay(Today),-1)+tm;
+      enddt:=StartOfTheDay(Today)+tm;
+    end;
+ end;
+  ADOConnectDM.CustAggregateADOQuery.Parameters.ParamByName(
+    'stdt').Value:=stdt;
+  ADOConnectDM.CustAggregateADOQuery.Parameters.ParamByName(
+    'enddt').Value:=enddt;
+  try
+    ADOConnectDM.CustAggregateADOQuery.Active:=
+      False;
+    ADOConnectDM.CustAggregateADOQuery.Active:=
+      True;
+    FirstForm.StatusBar.Panels[2].Text:=
+      'Подсч. заявок смена - '+
+        IntToStr(ADOConnectDM.CustAggregateADOQuery.FindField
+          ('ccount').AsInteger);
+  except
+    ShowMessage('Неудачное выполнение запроса на суммарное количество заявок!');
+  end;
+  if (IniFile.ReadString('BUSINESS_DATA','подсчитывать_за_сутки','NO')='YES') then
+ begin
+   try
+    StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov);
+   except
+    ShowMessage('Неверное значение времени смены диспетчеров, по умолчанию будет установлено 08:00:00.');
+    (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov:=
+     '08:00:00';
+  end;
+    tm:=
+      StrToTime((BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).vr_smeny_dispetcherov);
+    if tm<Time then
+      begin
+        stdt:=StartOfTheDay(Today)+tm;
+        enddt:=IncHour(stdt, 24);
+      end
+    else
+      begin
+        stdt:=IncDay(StartOfTheDay(Today),-1)+tm;
+        enddt:=IncHour(stdt, 24);
+      end;
+      ADOConnectDM.CustAggregateADOQuery.Parameters.ParamByName(
+        'stdt').Value:=stdt;
+      ADOConnectDM.CustAggregateADOQuery.Parameters.ParamByName(
+        'enddt').Value:=enddt;
+      try
+        ADOConnectDM.CustAggregateADOQuery.Active:=
+            False;
+        ADOConnectDM.CustAggregateADOQuery.Active:=
+          True;
+        FirstForm.StatusBar.Panels[2].Text:=
+          FirstForm.StatusBar.Panels[2].Text+', сутки - '+
+            IntToStr(ADOConnectDM.CustAggregateADOQuery.FindField
+              ('ccount').AsInteger);
+        except
+          ShowMessage('Неудачное выполнение запроса на суммарное количество заявок!');
+        end;
+  end;
+end;
+
+procedure TBoldOthHandleCompDM.SetCurrLabel;
+ var label1: string;
+ begin
+ try
+  if ADOConnectDM.ActiveCustADOQuery.RecordCount>0 then
+   begin
+
+  if (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).Avtozapoln_sektorov then
+  begin
+   ADOConnectDM.CurrCustValuesADOQuery.Parameters[0].Value:=
+     ADOConnectDM.ActiveCustADOQuery.FindField('BOLD_ID').AsInteger;
+   ADOConnectDM.CurrCustValuesADOQuery.Active:=false;
+   ADOConnectDM.CurrCustValuesADOQuery.Active:=true;
+
+
+   if ADOConnectDM.CurrCustValuesADOQuery.RecordCount>0 then
+     begin
+       ReleaseStructForm.StatusBar2.Panels[2].Text:=
+         ADOConnectDM.CurrCustValuesADOQuery.
+         FindField('StartSector').AsString+
+         ' -> '+
+         ADOConnectDM.CurrCustValuesADOQuery.
+         FindField('EndSector').AsString;
+     end;
+   end;  
+
+   label1:='';
+   if ADOConnectDM.ActiveCustADOQuery.
+     FindField('Slugebnyi').asInteger=1 then
+       label1:=label1+' СЛУЖЕБНЫЙ ';
+   if ADOConnectDM.ActiveCustADOQuery.
+     FindField('Predvariteljnyi').asInteger=1 then
+       label1:=label1+' ПРЕДВ.: '+
+         DateTimeToStr(ADOConnectDM.ActiveCustADOQuery.
+           FindField('Data_predvariteljnaya').AsDateTime);
+    if ADOConnectDM.ActiveCustADOQuery.
+     FindField('Nomer_skidki').asInteger=-100 then
+       label1:=label1+' , ОБЩЕПРИЗОВОЙ ';
+    if ADOConnectDM.ActiveCustADOQuery.
+     FindField('Nomer_skidki').asInteger=-3000 then
+       label1:=label1+' ЗАКАЗ-УСЛУГА ';
+    if ADOConnectDM.ActiveCustADOQuery.
+     FindField('Nomer_skidki').asInteger=-1000 then
+       label1:=label1+' ПОДОЗРИТЕЛЬНЫЙ ';
+    if ADOConnectDM.ActiveCustADOQuery.
+     FindField('Nomer_skidki').asInteger>0 then
+       label1:=label1+' , ИНДИВИД. ПРИЗ тип '+IntToStr(ADOConnectDM.ActiveCustADOQuery.
+     FindField('Nomer_skidki').asInteger);
+    
+   if label1='' then
+     label1:=
+       'СТАНДАРТНАЯ ЗАЯВКА';
+   end
+  else
+   label1:='НЕТ ЗАЯВКИ';
+  ReleaseStructForm.StatusBar2.Panels[1].Text:=
+    label1;
+ except
+   FirstForm.StatusBar.Panels[4].Text:=
+     'Ошибка обновл. описания заявки!';
+   if (IniFile.ReadString('BUSINESS_DATA','refresh_after_err_label_set','NO')='YES') then
+     ADOConnectDM.RefreshMainGrid(-1);
+ end;
+
+end;
+
+function TBoldOthHandleCompDM.basrRSTRUCTGetAsString(Element: TBoldElement;
+  Representation: Integer; Expression: string): string;
+begin
+  Result := '';
+  if Assigned(Element) then
+  begin
+
+  end;
+end;
+
+procedure TBoldOthHandleCompDM.basrTreeSectionNodeSetFont(Element: TBoldElement;
+  AFont: TFont; Representation: Integer; Expression: string);
+begin
+  if Element<>nil then
+    begin
+      AFont.Color:=clRed;
+    end;
+end;
+
+procedure TBoldOthHandleCompDM.basrSectNumSetAsString(Element: TBoldElement;
+  NewValue: string; Representation: Integer; Expression: string);
+begin
+  if Element<>nil then
+    begin
+      try
+        StrToInt(NewValue);
+        if (Element as TSektor_raboty).Nomer_sektora=0 then
+          begin
+            BoldHandlesDM.bvhSectByNum.Value.SetAsVariant(StrToInt(NewValue));
+            if BoldHandlesDM.blhSectByNum.List.Count>0 then
+              begin
+                ShowMessage('Сектор с таким номером уже существует!');
+              end
+            else
+              begin
+               if ((StrToInt(NewValue)>=0)and(StrToInt(NewValue)<=15)) then
+                begin
+                 (Element as TSektor_raboty).Nomer_sektora:=
+                    StrToInt(NewValue);
+                 (Element as TSektor_raboty).Kod_sektora:=
+                    NewValue;
+                end
+               else
+                 ShowMessage('Секторов может быть не более 16-ти, номера 0-15!');     
+              end;
+          end
+        else
+          ShowMessage('Нельзя менять номер и код сектора!');  
+      except
+        ShowMessage('Некорректное числовое значение!');
+      end;
+    end;
+end;
+
+procedure TBoldOthHandleCompDM.DataModuleCreate(Sender: TObject);
+begin
+{if IniFile.ReadString('BUSINESS_DATA','enable_for_allXML_DEMO','NO')='YES' then
+    begin
+    end
+  else
+   begin
+    if IniFile.ReadString('BUSINESS_DATA','hybrid_SQLLEV_mode','NO')='YES' then
+     begin
+     end;
+   end; }
+end;
+
+end.

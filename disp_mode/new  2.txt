@@ -1,0 +1,17 @@
+if WaitOrdersOperation then
+begin
+try
+
+finally
+  OrdersOperationInActive:=False;
+end;
+end
+else
+  begin
+    //Нужно ли отменять?????
+    ActiveCustADOQuery.CancelUpdates;
+    ShowMessage('Операция отменена, повторите попытку заново!');
+  end;
+  
+  select * from Persona where (korpus=:inum) and 
+ (Elektronnyi_adres='Индивидуальный клиент') 

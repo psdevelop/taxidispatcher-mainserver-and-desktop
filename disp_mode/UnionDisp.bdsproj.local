@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2006.04.30 22:37:47.562.pas,D:\Documents and Settings\Администратор\Мои документы\Borland Studio Projects\Unit1.pas=C:\MyBDSProjects\05042006\UnionDisp\MainUnit.pas</Transaction>
+    <Transaction>2006.04.30 22:37:47.562.dfm,D:\Documents and Settings\Администратор\Мои документы\Borland Studio Projects\Unit1.dfm=C:\MyBDSProjects\05042006\UnionDisp\MainUnit.dfm</Transaction>
+    <Transaction>2006.04.30 22:44:36.625.pas,C:\MyBDSProjects\05042006\UnionDisp\Unit1.pas=C:\MyBDSProjects\05042006\UnionDisp\ADODMUnit.pas</Transaction>
+    <Transaction>2006.04.30 22:44:36.625.dfm,C:\MyBDSProjects\05042006\UnionDisp\Unit1.dfm=C:\MyBDSProjects\05042006\UnionDisp\ADODMUnit.dfm</Transaction>
+  </Transactions>
+</BorlandProject>

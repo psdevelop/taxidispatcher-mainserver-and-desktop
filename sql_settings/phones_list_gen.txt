@@ -1,0 +1,13 @@
+SELECT TOP 4000 ('8'+Telefon_klienta) as phone FROM Sootvetstvie_parametrov_zakaza
+WHERE Telefon_klienta not in (SELECT [Rabochii_telefon]
+  FROM [TD5R1].[dbo].[Persona]
+  WHERE Elektronnyi_adres='Индивидуальный клиент')
+  AND LEN(Telefon_klienta)=10 
+  and Summarn_chislo_vyzovov>6
+  order by Summarn_chislo_vyzovov desc
+
+/****** Сценарий для команды SelectTopNRows среды SSMS  ******/
+SELECT '8'+[Rabochii_telefon] as phone
+  FROM [TD5R1].[dbo].[Persona]
+  WHERE Elektronnyi_adres='Индивидуальный клиент'
+  AND LEN([Rabochii_telefon])=10
