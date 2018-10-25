@@ -72,7 +72,7 @@ procedure TSectorEnumForm.Button1Click(Sender: TObject);
 begin
   if ADOConnectDM.SectorsADODS.Active then
   begin
-    if ADOConnectDM.SectorsADODS.RecordCount <=20 then
+    if ADOConnectDM.SectorsADODS.RecordCount <75 then
     begin
       BoldHandlesDM.BoldListHandleAddNewActionAllWorkSector.Execute;
       BoldModelDM.BoldUpdateDBAction1.Execute;
@@ -84,7 +84,7 @@ begin
     end
     else begin
       ShowMessage('¬ данной версии программы разрешено' +
-        ' не более 20 секторов!');
+        ' не более 75 секторов!');
     end;
   end;
 end;

@@ -6394,6 +6394,21 @@ object BoldModelDM: TBoldModelDM
     object HasAllBonusADOQueryaass_driver_max_radius: TIntegerField
       FieldName = 'aass_driver_max_radius'
     end
+    object HasAllBonusADOQueryaddr_actualization_time: TIntegerField
+      FieldName = 'addr_actualization_time'
+    end
+    object HasAllBonusADOQueryauto_for_all_tender: TSmallintField
+      FieldName = 'auto_for_all_tender'
+    end
+    object HasAllBonusADOQueryauto_for_all_longtime: TIntegerField
+      FieldName = 'auto_for_all_longtime'
+    end
+    object HasAllBonusADOQueryauto_for_all_empty_sector: TSmallintField
+      FieldName = 'auto_for_all_empty_sector'
+    end
+    object HasAllBonusADOQueryshow_region_in_addr: TSmallintField
+      FieldName = 'show_region_in_addr'
+    end
   end
   object AdrPhoneRelatingADOTable: TADOTable
     Connection = ADOConnectDM.MainADOConnection

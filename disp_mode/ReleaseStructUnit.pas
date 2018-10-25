@@ -996,22 +996,6 @@ ISMScroll:=False;
       end;
       end;
   end
-  else if (Integer(Key)=40)
-   and (IniFile.ReadString('BUSINESS_DATA',
-   'enable_key_cust_adding','NO')='YES') then
-  begin
-   if ADOConnectDM.MainADOConnection.Connected then
-    if ADOConnectDM.ActiveCustADOQuery.RecordCount>0 then
-      begin
-         if ADOConnectDM.dsActiveCust.DataSet.RecNo=
-             (ADOConnectDM.ActiveCustADOQuery.RecordCount) then
-          begin
-           ADOConnectDM.AddDISPCust;
-           ADOConnectDM.dsActiveCust.DataSet.Last;
-           ADOConnectDM.dsActiveCust.DataSet.Prior;
-         end;
-      end;
-  end
   //Нажатие F2 (старый режим ----
   // нов. реж. - быстрое удаление в архив
   else if (Integer(Key)=113) then
@@ -1187,44 +1171,13 @@ begin
 
   StartTabSheet.Show;
   SectorsTabSheet.Show;
-  
 
-  if IniFile.ReadString('BUSINESS_DATA','live_combo_adr_input','NO')='YES' then
-    begin
-    end;
-
-  if IniFile.ReadString('BUSINESS_DATA','simple_program_view','NO')='YES' then
-    begin
-      LeftPageControl.Width:=1;
-      AdditDispPageControl.Height:=1;
-      DispDBGrid.Columns.Items[4].Width:=
-        DispDBGrid.Columns.Items[4].Width+160;
-    end;
   if IniFile.ReadString('BUSINESS_DATA','view_groups_stacks','NO')='NO' then
      begin
        StacksPanel.Visible:=
          False;
      end;
-  {if IniFile.ReadString('BUSINESS_DATA','show_top_aggregate_text','NO')='YES' then
-     begin
-       TopAggregatePanel.Visible:=
-         True;
-       TopAggregatePanel.Height:=
-         73;  
-     end; }
-   {if IniFile.ReadString('BUSINESS_DATA','show_top_all_stack','NO')='YES' then
-     begin
-       TopAggregatePanel.Visible:=
-         True;
-     end; }
-   {if IniFile.ReadString('BUSINESS_DATA','endtime_at_end','NO')='YES' then
-     begin
-       
-     end;
-   if IniFile.ReadString('BUSINESS_DATA','show_region_field','NO')='YES' then
-     begin
-       
-     end;  }
+
    if IniFile.ReadString('BUSINESS_DATA','show_symbol_grid_stack','NO')='YES' then
     begin
       ReleaseStructForm.DrStackStringGrid.Visible:=
@@ -1251,8 +1204,6 @@ begin
 
   try
     StrToInt(IniFile.ReadString('BUSINESS_DATA','main_disp_grid_font_size','12'));
-    //ReleaseStructForm.DispDBGrid.Font.Size:=
-    //  StrToInt(IniFile.ReadString('BUSINESS_DATA','stack_col_width','12'));
   except
     ReleaseStructForm.DispDBGrid.Font.Size:=
       12;
@@ -1267,16 +1218,8 @@ begin
       25;
   end;
 
-  if (IniFile.ReadString('BUSINESS_DATA','use_1c_design','NO')='YES') then
-    begin
-      DispDBGrid.Columns.Items[6].Color:=clYellow;
-      DispDBGrid.Columns.Items[7].Color:=clYellow;
-    end
-  else
-    begin
-      DispDBGrid.Columns.Items[2].Font.Color:=clRed;
-      DispDBGrid.Columns.Items[4].Font.Color:=clBlue;
-    end;
+  DispDBGrid.Columns.Items[7].Color:=clYellow;
+  DispDBGrid.Columns.Items[8].Color:=clYellow;
 
   ConstrCount:=1;
   EndedCustBitmap:=TBitmap.Create;
@@ -1557,11 +1500,11 @@ begin
          'показывать_тарифы_и_опции','NO')='YES') then
            begin
              DispDBGrid.Columns[10].Visible:=True;
-             DispDBGrid.Columns[10].Width:=45;
+             //DispDBGrid.Columns[10].Width:=45;
              DispDBGrid.Columns[11].Visible:=True;
-             DispDBGrid.Columns[11].Width:=45;
+             //DispDBGrid.Columns[11].Width:=45;
              DispDBGrid.Columns[12].Visible:=True;
-             DispDBGrid.Columns[12].Width:=45;
+             //DispDBGrid.Columns[12].Width:=45;
            end
    else
       begin
@@ -1574,7 +1517,7 @@ begin
          'показывать_REMOTE_COMMENT','NO')='YES') then
            begin
              DispDBGrid.Columns[13].Visible:=True;
-             DispDBGrid.Columns[13].Width:=300;
+             //DispDBGrid.Columns[13].Width:=300;
            end
    else
      DispDBGrid.Columns[13].Visible:=False;
@@ -1583,7 +1526,7 @@ begin
          'показывать_информацию_об_отправке_SMS','NO')='YES') then
            begin
              DispDBGrid.Columns[14].Visible:=True;
-             DispDBGrid.Columns[14].Width:=300;
+             //DispDBGrid.Columns[14].Width:=300;
            end
    else
      DispDBGrid.Columns[14].Visible:=False;
@@ -2029,6 +1972,19 @@ begin
       DispDBGrid.Canvas.Brush.Color := holdColor;
       DispDBGrid.Canvas.Font := holdFont;
     end;
+
+    if Column.FieldName = 'adr_manual_set' then
+    begin
+
+      DispDBGrid.Canvas.Brush.Color := clRed;
+      DispDBGrid.Canvas.Font.Color := clWhite;
+      if (ADOConnectDM.dsActiveCust.DataSet.
+        FieldByName('adr_manual_set').AsInteger = 0) then
+                 DispDBGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+
+      DispDBGrid.Canvas.Brush.Color := holdColor;
+      DispDBGrid.Canvas.Font := holdFont;
+    end;
  except
    FirstForm.StatusBar.Panels[4].Text:=
      'Ошибка отрисовки таблицы заявок!';
@@ -2183,7 +2139,7 @@ begin
       StrToInt((Sender as TStringGrid).Cells[ACol,ARow]));
     if BoldHandlesDM.blhDrSearch.List.Count>0 then
       begin
-        if IniFile.ReadString('BUSINESS_DATA','use_1c_design','NO')='YES' then
+        if true then
           begin
             (Sender as TStringGrid).Canvas.Font.Color:=
                   clOlive;
@@ -2224,7 +2180,7 @@ begin
                 as TVoditelj).S_klass then
                  (Sender as TStringGrid).Canvas.Font.Color:=
                     TColor(rgb(230,230,230));
-          end;          
+          end;
       end;
   end
   else
@@ -2323,11 +2279,22 @@ end;
 
 procedure TReleaseStructForm.DispDBGridDblClick(Sender: TObject);
 begin
-  //if (IniFile.ReadString('BUSINESS_DATA','set_label_by_dblclick','NO')='YES') then
   BoldOthHandleCompDM.SetCurrLabel;
-  //if DispDBGrid.SelectedField.FieldName='REMOTE_INSTR' then
-  //  PopUpDM.RemStatPopupMenu.Popup(MSOb.CursorPos.X,
-  //       MSOb.CursorPos.Y);  
+  if ADOConnectDM.ActiveCustADOQuery.RecordCount > 0 then begin
+    if  ReleaseStructForm.DispDBGrid.SelectedField.FieldName =
+      'adr_manual_set' then begin
+      ADOConnectDM.ActiveCustADOQuery.Edit;
+      if ADOConnectDM.ActiveCustADOQuery.
+        FindField('adr_manual_set').AsInteger = 0 then begin
+        ADOConnectDM.ActiveCustADOQuery.
+        FindField('adr_manual_set').Value := 1;
+      end else begin
+        ADOConnectDM.ActiveCustADOQuery.
+        FindField('adr_manual_set').Value := 0;
+      end;
+      ADOConnectDM.ActiveCustADOQuery.Post;
+    end;
+  end;
 end;
 
 procedure TReleaseStructForm.EndedCustDBGridTitleClick(Column: TColumn);

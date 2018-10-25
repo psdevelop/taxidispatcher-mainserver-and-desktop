@@ -346,6 +346,12 @@ type
     Label105: TLabel;
     DBEdit70: TDBEdit;
     Label106: TLabel;
+    BitBtn15: TBitBtn;
+    DBEdit71: TDBEdit;
+    DBCheckBox45: TDBCheckBox;
+    Label107: TLabel;
+    DBCheckBox46: TDBCheckBox;
+    DBCheckBox47: TDBCheckBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BitBtn12Click(Sender: TObject);
     procedure BitBtn11Click(Sender: TObject);

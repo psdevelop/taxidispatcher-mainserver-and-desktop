@@ -499,6 +499,8 @@ type
     SectorsADODSKommentarii: TStringField;
     SectorsADODSCOMPANY_LOOK: TStringField;
     SectorsADODSDISTRICT_LOOK: TStringField;
+    procedure ActiveCustADOQueryadr_manual_setGetText(Sender: TField;
+      var Text: string; DisplayText: Boolean);
     procedure N21Click(Sender: TObject);
     procedure N20Click(Sender: TObject);
     procedure N19Click(Sender: TObject);
@@ -2258,12 +2260,6 @@ else
         RefreshMainGridSys(
           ADOConnectDM.ActiveCustADOQuery.
           FieldByName('Nomer_zakaza').AsInteger);
-
-        if (IniFile.ReadString('BUSINESS_DATA','show_refresh_attention','NO')='YES') then
-          if (BoldHandlesDM.blhCurrUser.CurrentElement as TPersonal).Rolj_dispetchera then
-            FirstForm.ShowAttention('Диспетчером получено '+IntToStr(ADOConnectDM.ActiveCustADOQuery.RecordCount)+' заявок!')
-          else
-            FirstForm.ShowAttention('Обновление данных!');
 
         end;
 
@@ -5444,6 +5440,15 @@ begin
       self.proceedOpRequest('dr_order_late', ActiveCustADOQuery
         .FindField('vypolnyaetsya_voditelem').AsInteger);
     end;
+end;
+
+procedure TADOConnectDM.ActiveCustADOQueryadr_manual_setGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  if ActiveCustADOQueryadr_manual_set.AsInteger>0 then
+    Text:='да, адрес верный'
+  else
+    Text:='?кликните или введите адрес для его подтверждения ';
 end;
 
 end.

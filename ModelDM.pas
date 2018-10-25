@@ -289,6 +289,11 @@ type
     HasAllBonusADOQuerystart_free_time: TIntegerField;
     HasAllBonusADOQueryauto_assign_driver_by_coords: TSmallintField;
     HasAllBonusADOQueryaass_driver_max_radius: TIntegerField;
+    HasAllBonusADOQueryaddr_actualization_time: TIntegerField;
+    HasAllBonusADOQueryauto_for_all_tender: TSmallintField;
+    HasAllBonusADOQueryauto_for_all_longtime: TIntegerField;
+    HasAllBonusADOQueryauto_for_all_empty_sector: TSmallintField;
+    HasAllBonusADOQueryshow_region_in_addr: TSmallintField;
     procedure CustCheckTimerTimer(Sender: TObject);
     procedure BoldActivateSystemAction1SystemClosed(Sender: TObject);
     procedure BoldActivateSystemAction1SystemOpened(Sender: TObject);

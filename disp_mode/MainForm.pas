@@ -50,7 +50,6 @@ type
     StatusBar: TStatusBar;
     Bevel1: TBevel;
     EnumsMenu: TMenuItem;
-    AdminPanelMenu: TMenuItem;
     N13: TMenuItem;
     BaseCorrectRepMenu: TMenuItem;
     N17: TMenuItem;
@@ -70,12 +69,10 @@ type
     N2: TMenuItem;
     N8: TMenuItem;
     N9: TMenuItem;
-    N15: TMenuItem;
     bpcArhEnabled: TBoldPropertiesController;
     basrDrList: TBoldAsStringRenderer;
     ToolButton2: TToolButton;
     BoldPropertiesController1: TBoldPropertiesController;
-    RTF1: TMenuItem;
     N14: TMenuItem;
     N16: TMenuItem;
     N21: TMenuItem;
@@ -104,7 +101,6 @@ type
     N34: TMenuItem;
     N10: TMenuItem;
     N35: TMenuItem;
-    N36: TMenuItem;
     N38: TMenuItem;
     N37: TMenuItem;
     N39: TMenuItem;
@@ -128,7 +124,6 @@ type
     N48: TMenuItem;
     N49: TMenuItem;
     bairDrIcon: TBoldAsIntegerRenderer;
-    N12: TMenuItem;
     N50: TMenuItem;
     N51: TMenuItem;
     N52: TMenuItem;
@@ -207,7 +202,6 @@ type
     procedure BoldAsStringRenderer2SetColor(Element: TBoldElement;
       var AColor: TColor; Representation: Integer; Expression: string);
     procedure ProgrammSettingsToolButtonClick(Sender: TObject);
-    procedure N15Click(Sender: TObject);
     procedure N8Click(Sender: TObject);
     procedure N2Click(Sender: TObject);
     function BoldAsStringRenderer2GetAsString(Element: TBoldElement; Representation: Integer; Expression: string): string;
@@ -1084,11 +1078,6 @@ begin
   OneDaysOnRepSettForm.ShowModal;
 end;
 
-procedure TFirstForm.N15Click(Sender: TObject);
-begin
-  //ReportDM.RvProject.DesignReport('MainReport');
-end;
-
 procedure TFirstForm.ProgrammSettingsToolButtonClick(Sender: TObject);
 begin
    PrSettForm.ShowModal;
@@ -1116,33 +1105,7 @@ begin
 if (Element<>nil) and (Element is TVoditelj) then
  begin
  AColor:=clMoneyGreen;
-if not (IniFile.ReadString('BUSINESS_DATA','use_1c_design','NO')='YES') then
- begin
-  if (IniFile.ReadString('BUSINESS_DATA','подсвечивать_водителей_после_отмены_другим_цветом','NO')='YES') and
-  (BoldModelDM.GetLocalDrLastOrd(
-  (Element as TVoditelj).Pozyvnoi)<
-     IncDay((Today+Time),-9)) then
-     begin
-       AColor:=clLime;
-       AColor:=TColor(StrToInt(IniFile.ReadString('BUSINESS_DATA','цвет_подсветки_водителя_после_отмены','59848')));
-     end
-  else if BoldModelDM.GetLocalDrBusy(
-  (Element as TVoditelj).Pozyvnoi)
-     then
-    begin
-      AColor:=clSkyBlue;
-    end
-  else if (Element as TVoditelj).Na_pereryve then
-    begin
-      AColor:=clInfoBk;
-    end
-  else
-    begin
-      AColor:=clMoneyGreen;
-    end;
- end
-else
- begin
+
   if (IniFile.ReadString('BUSINESS_DATA','подсвечивать_водителей_после_отмены_другим_цветом','NO')='YES') and
   (BoldModelDM.GetLocalDrLastOrd(
   (Element as TVoditelj).Pozyvnoi)<
@@ -1165,7 +1128,6 @@ else
     begin
       AColor:=clMoneyGreen;
     end;
- end;
 
  end;
 end;
