@@ -2653,14 +2653,9 @@ object RemoteControlForm: TRemoteControlForm
   end
   object GetTOListADOQ: TADOQuery
     Connection = ServerMainForm.MainBASEADOC
-    Parameters = <
-      item
-        Name = 'driver_id'
-        Size = -1
-        Value = Null
-      end>
+    Parameters = <>
     SQL.Strings = (
-      'select dbo.GetJSONTarifAndOptionsList(:driver_id) as to_list')
+      'select dbo.GetJSONTarifAndOptionsList() as to_list')
     Left = 264
     Top = 224
   end

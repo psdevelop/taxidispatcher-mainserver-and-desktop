@@ -405,7 +405,7 @@ type
       DRIVER_ID, SECTOR_ID: Integer; EDATE: TDateTime;
       DESCRIPTION: Widestring; ADRES, PHONE: String;
       DR_NUM: Integer; LATITUDE, LONGITUDE: String): Integer;
-    function GetJSONTOList(driverID: Integer): Widestring;
+    function GetJSONTOList: Widestring;
     procedure setOrderTarif(orderId, tarifId: Integer);
     procedure setOrderOptComb(orderId: Integer; optComb: String);
     procedure ManualSetCurrOrderRemoteStatus(orderId,
@@ -3800,12 +3800,10 @@ else
                         if SocketCoord.TCPClientCollection.
                           Items[clientIndex].useUTF8 then
                             NewMSWCollectItem.SetDirectJSONString(
-                              GetJSONTOList(SocketCoord.TCPClientCollection.
-                    Items[clientIndex].DriverDBID))
+                              GetJSONTOList)
                         else
                           NewMSWCollectItem.SetDirectJSONString(
-                            TranslitRus2Lat(GetJSONTOList(SocketCoord.TCPClientCollection.
-                    Items[clientIndex].DriverDBID), False));
+                            TranslitRus2Lat(GetJSONTOList, False));
 
                         NewMSWCollectItem.ClientID:=
                           InputJSONMessages.Items[i].ClientID;
@@ -4852,12 +4850,10 @@ else
               if SocketCoord.TCPClientCollection.
                     Items[clientIndex].useUTF8 then
                 NewMSWCollectItem.SetDirectJSONString(
-                  GetJSONTOList(SocketCoord.TCPClientCollection.
-                    Items[clientIndex].DriverDBID))
+                  GetJSONTOList)
               else
                 NewMSWCollectItem.SetDirectJSONString(
-                  TranslitRus2Lat(GetJSONTOList(SocketCoord.TCPClientCollection.
-                    Items[clientIndex].DriverDBID), False));
+                  TranslitRus2Lat(GetJSONTOList, False));
 
                 NewMSWCollectItem.ClientID:=
                   InputJSONMessages.Items[i].ClientID;
@@ -5330,24 +5326,17 @@ begin
   Result:=res;
 end;
 
-function TRemoteControlForm.GetJSONTOList(driverID: Integer): Widestring;
+function TRemoteControlForm.GetJSONTOList: Widestring;
 var res: Widestring;
 begin
   res:='{"command":"to_lst","t_cnt":"0","op_cnt":"0","msg_end":"ok"}';
   try
-      GetTOListADOQ.Parameters.ParamByName(
-        'driver_id').Value:=driverID;
       GetTOListADOQ.Active:=False;
       GetTOListADOQ.Active:=True;
       if GetTOListADOQ.RecordCount>0 then
       begin
         res:=GetTOListADOQ.
           FieldByName('to_list').AsString;
-          if (IniFile.ReadString(
-                'BUSINESS_DATA',
-                'testlog2',
-                'NO')='YES') then
-        Test2Memo.Lines.Add('TOList: '+res);
       end;
   except on E:Exception do
     SocketLogMemo.Lines.Add(

@@ -187,7 +187,7 @@ object RemoteControlForm: TRemoteControlForm
           Width = 577
           Height = 21
           Ctl3D = False
-          ItemHeight = 13
+          ItemHeight = 0
           ParentCtl3D = False
           TabOrder = 1
           Text = 
@@ -204,7 +204,7 @@ object RemoteControlForm: TRemoteControlForm
           Width = 577
           Height = 21
           Ctl3D = False
-          ItemHeight = 13
+          ItemHeight = 0
           ParentCtl3D = False
           TabOrder = 2
           Text = 
@@ -283,7 +283,7 @@ object RemoteControlForm: TRemoteControlForm
           Left = 0
           Top = 33
           Width = 676
-          Height = 289
+          Height = 308
           Align = alClient
           Ctl3D = False
           Lines.Strings = (
@@ -2653,14 +2653,9 @@ object RemoteControlForm: TRemoteControlForm
   end
   object GetTOListADOQ: TADOQuery
     Connection = ServerMainForm.MainBASEADOC
-    Parameters = <
-      item
-        Name = 'driver_id'
-        Size = -1
-        Value = Null
-      end>
+    Parameters = <>
     SQL.Strings = (
-      'select dbo.GetJSONTarifAndOptionsList(:driver_id) as to_list')
+      'select dbo.GetJSONTarifAndOptionsList() as to_list')
     Left = 264
     Top = 224
   end
