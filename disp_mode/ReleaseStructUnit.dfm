@@ -1447,7 +1447,7 @@ object ReleaseStructForm: TReleaseStructForm
         Top = 0
         Width = 185
         Height = 461
-        ActivePage = TabSheet1
+        ActivePage = SectorsTabSheet
         Align = alLeft
         Constraints.MinWidth = 1
         Font.Charset = DEFAULT_CHARSET

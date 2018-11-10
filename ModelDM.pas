@@ -366,15 +366,15 @@ var
   BadAdr: string;
   BonusPercent, IndBonusPercent, BonusPercent1, BonusPercent2, BonusPercent3, BonusPercentAll: Double;
   CallCount, BonusCount, IndCallCount, IndBonusCount: Integer;
-  DrSumms: array[1..9999] of Double;
-  DrDynBals: array[1..9999] of Double;
-  DrUseDBals:  array[1..9999] of Boolean;
-  DrHasActEvs:  array[1..9999] of Boolean;
-  DrRemoteCl:  array[1..9999] of Boolean;
-  DrRSets: array[1..9999] of Integer;
-  DrLastOrders: array[1..9999] of TDateTime;
-  DrLastStatTime: array[1..9999] of TDateTime;
-  DrBusy:  array[1..9999] of Boolean;
+  DrSumms: array[1..99999] of Double;
+  DrDynBals: array[1..99999] of Double;
+  DrUseDBals:  array[1..99999] of Boolean;
+  DrHasActEvs:  array[1..99999] of Boolean;
+  DrRemoteCl:  array[1..99999] of Boolean;
+  DrRSets: array[1..99999] of Integer;
+  DrLastOrders: array[1..99999] of TDateTime;
+  DrLastStatTime: array[1..99999] of TDateTime;
+  DrBusy:  array[1..99999] of Boolean;
   ActiveCount, BusyCount, OnLaunchCount: Integer;
 implementation
 
@@ -1386,7 +1386,7 @@ begin
   bsh.PersistenceHandle:=bph;
   // end;
 
-   for i:=0 to 9999 do
+   for i:=0 to 99999 do
    begin
       DrSumms[i]:=0;
       DrRemoteCl[i]:=false;
@@ -1400,14 +1400,14 @@ end;
 
 function TBoldModelDM.SetLocalDrSumm(DrNum: Integer; DrSumm: Double): Integer;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     DrSumms[DrNum]:=DrSumm;
   Result:=0;
 end;
 
 function TBoldModelDM.GetLocalDrSumm(DrNum: Integer): Double;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrSumms[DrNum]
   else
     Result:=0;
@@ -1415,14 +1415,14 @@ end;
 
 function TBoldModelDM.SetLocalDrDynBal(DrNum: Integer; DrSumm: Double): Integer;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     DrDynBals[DrNum]:=DrSumm;
   Result:=0;
 end;
 
 function TBoldModelDM.GetLocalDrDynBal(DrNum: Integer): Double;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrDynBals[DrNum]
   else
     Result:=0;
@@ -1430,7 +1430,7 @@ end;
 
 function TBoldModelDM.SetLocalDrUseDynBal(DrNum, IRC: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     if IRC<>0 then
       DrUseDBals[DrNum]:=True
     else
@@ -1440,7 +1440,7 @@ end;
 
 function TBoldModelDM.GetLocalDrUseDynBal(DrNum: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrUseDBals[DrNum]
   else
     Result:=false;
@@ -1448,7 +1448,7 @@ end;
 
 function TBoldModelDM.SetLocalDrHasAEvs(DrNum, IRC: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     if IRC<>0 then
       DrHasActEvs[DrNum]:=True
     else
@@ -1458,7 +1458,7 @@ end;
 
 function TBoldModelDM.GetLocalDrHasAEvs(DrNum: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrHasActEvs[DrNum]
   else
     Result:=false;
@@ -1466,7 +1466,7 @@ end;
 
 function TBoldModelDM.SetLocalDrRemoteCl(DrNum, IRC: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     if IRC<>0 then
       DrRemoteCl[DrNum]:=True
     else
@@ -1476,7 +1476,7 @@ end;
 
 function TBoldModelDM.GetLocalDrRemoteCl(DrNum: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrRemoteCl[DrNum]
   else
     Result:=false;
@@ -1484,14 +1484,14 @@ end;
 
 function TBoldModelDM.SetLocalDrRemoteSet(DrNum, IRC: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
       DrRSets[DrNum]:=IRC;
     Result:=True;
 end;
 
 function TBoldModelDM.GetLocalDrRemoteSet(DrNum: Integer): Integer;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrRSets[DrNum]
   else
     Result:=0;
@@ -1499,14 +1499,14 @@ end;
 
 function TBoldModelDM.SetLocalDrLastOrd(DrNum: Integer; LastOrd: TDateTime): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
       DrLastOrders[DrNum]:=LastOrd;
   Result:=True;
 end;
 
 function TBoldModelDM.GetLocalDrLastOrd(DrNum: Integer): TDateTime;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrLastOrders[DrNum]
   else
     Result:=Today+Time;
@@ -1514,14 +1514,14 @@ end;
 
 function TBoldModelDM.SetLocalDrLastStatTime(DrNum: Integer; LastStatTime: TDateTime): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
       DrLastStatTime[DrNum]:=LastStatTime;
   Result:=True;
 end;
 
 function TBoldModelDM.GetLocalDrLastStatTime(DrNum: Integer): TDateTime;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrLastStatTime[DrNum]
   else
     Result:=Today+Time;
@@ -1529,7 +1529,7 @@ end;
 
 function TBoldModelDM.SetLocalDrBusy(DrNum, DrBusyVal: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     if DrBusyVal<>0 then
       DrBusy[DrNum]:=True
     else
@@ -1539,7 +1539,7 @@ end;
 
 function TBoldModelDM.GetLocalDrBusy(DrNum: Integer): Boolean;
 begin
-  if (DrNum>0) and (DrNum<=9999) then
+  if (DrNum>0) and (DrNum<=99999) then
     Result:=DrBusy[DrNum]
   else
     Result:=false;
