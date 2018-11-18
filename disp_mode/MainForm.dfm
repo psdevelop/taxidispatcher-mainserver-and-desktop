@@ -3,7 +3,7 @@ object FirstForm: TFirstForm
   Top = 0
   AutoScroll = False
   Caption = '"'#1044#1080#1089#1087#1077#1090#1095#1077#1088'-'#1086#1087#1077#1088#1072#1090#1086#1088' '#1090#1072#1082#1089#1086#1087#1072#1088#1082#1072'" (v7.1.4.5 21/10/2018)'
-  ClientHeight = 137
+  ClientHeight = 118
   ClientWidth = 754
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -970,7 +970,7 @@ object FirstForm: TFirstForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 118
+    Top = 99
     Width = 754
     Height = 19
     Font.Charset = DEFAULT_CHARSET

@@ -294,6 +294,11 @@ type
     HasAllBonusADOQueryauto_for_all_longtime: TIntegerField;
     HasAllBonusADOQueryauto_for_all_empty_sector: TSmallintField;
     HasAllBonusADOQueryshow_region_in_addr: TSmallintField;
+    HasAllBonusADOQuerydont_auto_wtout_adr_appr: TSmallintField;
+    HasAllBonusADOQueryauto_assign_wait_orders: TSmallintField;
+    HasAllBonusADOQueryearly_orders_started_time: TIntegerField;
+    HasAllBonusADOQueryautoasg_drby_coord_by_rating: TSmallintField;
+    HasAllBonusADOQueryprev_orders_started_time: TIntegerField;
     procedure CustCheckTimerTimer(Sender: TObject);
     procedure BoldActivateSystemAction1SystemClosed(Sender: TObject);
     procedure BoldActivateSystemAction1SystemOpened(Sender: TObject);

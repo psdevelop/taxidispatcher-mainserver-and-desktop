@@ -6409,6 +6409,21 @@ object BoldModelDM: TBoldModelDM
     object HasAllBonusADOQueryshow_region_in_addr: TSmallintField
       FieldName = 'show_region_in_addr'
     end
+    object HasAllBonusADOQuerydont_auto_wtout_adr_appr: TSmallintField
+      FieldName = 'dont_auto_wtout_adr_appr'
+    end
+    object HasAllBonusADOQueryauto_assign_wait_orders: TSmallintField
+      FieldName = 'auto_assign_wait_orders'
+    end
+    object HasAllBonusADOQueryearly_orders_started_time: TIntegerField
+      FieldName = 'early_orders_started_time'
+    end
+    object HasAllBonusADOQueryautoasg_drby_coord_by_rating: TSmallintField
+      FieldName = 'autoasg_drby_coord_by_rating'
+    end
+    object HasAllBonusADOQueryprev_orders_started_time: TIntegerField
+      FieldName = 'prev_orders_started_time'
+    end
   end
   object AdrPhoneRelatingADOTable: TADOTable
     Connection = ADOConnectDM.MainADOConnection
