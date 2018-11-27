@@ -299,6 +299,9 @@ type
     HasAllBonusADOQueryearly_orders_started_time: TIntegerField;
     HasAllBonusADOQueryautoasg_drby_coord_by_rating: TSmallintField;
     HasAllBonusADOQueryprev_orders_started_time: TIntegerField;
+    HasAllBonusADOQueryshow_phone_in_orders: TSmallintField;
+    HasAllBonusADOQueryset_manual_addr_change: TSmallintField;
+    HasAllBonusADOQueryset_addr_manual_enter: TSmallintField;
     procedure CustCheckTimerTimer(Sender: TObject);
     procedure BoldActivateSystemAction1SystemClosed(Sender: TObject);
     procedure BoldActivateSystemAction1SystemOpened(Sender: TObject);

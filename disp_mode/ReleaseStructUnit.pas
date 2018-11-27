@@ -2415,6 +2415,23 @@ begin
                 ReleaseStructForm.DispDBGrid.Fields[
                   ADOConnectDM.GetFieldNumByName('Adres_vyzova_vvodim')] then
          begin
+            if not BoldModelDM.HasAllBonusADOQuery.Active then
+              BoldModelDM.HasAllBonusADOQuery.Active := True;
+            if (BoldModelDM.HasAllBonusADOQuery.FieldByName(
+                'set_addr_manual_enter').AsInteger > 0) then
+            begin
+                      //ShowMessage('111');
+              if ADOConnectDM.ActiveCustADOQuery.
+              FindField('adr_manual_set').AsInteger = 0 then
+              begin
+              //ShowMessage('222');
+                if not (ADOConnectDM.ActiveCustADOQuery.State in [dsEdit]) then
+                  ADOConnectDM.ActiveCustADOQuery.Edit;
+                ADOConnectDM.ActiveCustADOQuery.
+                  FindField('adr_manual_set').Value := 1;
+                ADOConnectDM.ActiveCustADOQuery.Post;
+              end;
+            end;
            ReleaseStructForm.DispDBGrid.SelectedField:=
                 ReleaseStructForm.DispDBGrid.Fields[
                   ADOConnectDM.GetFieldNumByName('Pozyvnoi_ustan')];
@@ -2672,6 +2689,23 @@ begin
     if enterCounter>=2 then
     begin
       ReleaseStructForm.DispDBGrid.SetFocus;
+      if not BoldModelDM.HasAllBonusADOQuery.Active then
+              BoldModelDM.HasAllBonusADOQuery.Active := True;
+      if (BoldModelDM.HasAllBonusADOQuery.FieldByName(
+        'set_addr_manual_enter').AsInteger > 0) then
+          begin
+                      //ShowMessage('111');
+              if ADOConnectDM.ActiveCustADOQuery.
+              FindField('adr_manual_set').AsInteger = 0 then
+              begin
+              //ShowMessage('222');
+                if not (ADOConnectDM.ActiveCustADOQuery.State in [dsEdit]) then
+                  ADOConnectDM.ActiveCustADOQuery.Edit;
+                ADOConnectDM.ActiveCustADOQuery.
+                  FindField('adr_manual_set').Value := 1;
+                ADOConnectDM.ActiveCustADOQuery.Post;
+              end;
+          end;
     ReleaseStructForm.DispDBGrid.SelectedField:=
                 ReleaseStructForm.DispDBGrid.Fields[
                   ADOConnectDM.GetFieldNumByName('Pozyvnoi_ustan')];

@@ -6424,6 +6424,15 @@ object BoldModelDM: TBoldModelDM
     object HasAllBonusADOQueryprev_orders_started_time: TIntegerField
       FieldName = 'prev_orders_started_time'
     end
+    object HasAllBonusADOQueryshow_phone_in_orders: TSmallintField
+      FieldName = 'show_phone_in_orders'
+    end
+    object HasAllBonusADOQueryset_manual_addr_change: TSmallintField
+      FieldName = 'set_manual_addr_change'
+    end
+    object HasAllBonusADOQueryset_addr_manual_enter: TSmallintField
+      FieldName = 'set_addr_manual_enter'
+    end
   end
   object AdrPhoneRelatingADOTable: TADOTable
     Connection = ADOConnectDM.MainADOConnection

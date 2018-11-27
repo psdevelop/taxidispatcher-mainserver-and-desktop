@@ -2332,6 +2332,7 @@ object PrSettForm: TPrSettForm
         Ctl3D = False
         DataField = 'peak_one_start'
         DataSource = BoldModelDM.HasAllBonusDS
+        MaxLength = 5
         ParentCtl3D = False
         TabOrder = 22
       end
@@ -2376,6 +2377,7 @@ object PrSettForm: TPrSettForm
         Ctl3D = False
         DataField = 'peak_two_start'
         DataSource = BoldModelDM.HasAllBonusDS
+        MaxLength = 5
         ParentCtl3D = False
         TabOrder = 26
       end
@@ -2420,6 +2422,7 @@ object PrSettForm: TPrSettForm
         Ctl3D = False
         DataField = 'peak_three_start'
         DataSource = BoldModelDM.HasAllBonusDS
+        MaxLength = 5
         ParentCtl3D = False
         TabOrder = 30
       end
@@ -4112,6 +4115,42 @@ object PrSettForm: TPrSettForm
         DataField = 'taxm_block_wtout_onplace'
         DataSource = BoldModelDM.HasAllBonusDS
         TabOrder = 15
+        ValueChecked = '1'
+        ValueUnchecked = '0'
+      end
+      object DBCheckBox52: TDBCheckBox
+        Left = 16
+        Top = 248
+        Width = 281
+        Height = 17
+        Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1090#1077#1083#1077#1092#1086#1085' '#1079#1072#1082#1072#1079#1072' '#1074' '#1087#1088#1080#1083#1086#1078#1077#1085#1080#1080' '
+        DataField = 'show_phone_in_orders'
+        DataSource = BoldModelDM.HasAllBonusDS
+        TabOrder = 16
+        ValueChecked = '1'
+        ValueUnchecked = '0'
+      end
+      object DBCheckBox53: TDBCheckBox
+        Left = 16
+        Top = 272
+        Width = 289
+        Height = 17
+        Caption = #1055#1086#1076#1090#1074#1077#1088#1078#1076#1072#1090#1100' '#1072#1076#1088#1077#1089' '#1077#1075#1086' '#1088#1091#1095#1085'. '#1080#1079#1084#1077#1085#1077#1085#1080#1077#1084
+        DataField = 'set_manual_addr_change'
+        DataSource = BoldModelDM.HasAllBonusDS
+        TabOrder = 17
+        ValueChecked = '1'
+        ValueUnchecked = '0'
+      end
+      object DBCheckBox54: TDBCheckBox
+        Left = 16
+        Top = 296
+        Width = 265
+        Height = 17
+        Caption = #1055#1086#1076#1090#1074#1077#1088#1078#1076#1072#1090#1100' '#1072#1076#1088#1077#1089' '#1095#1077#1088#1077#1079' Enter'
+        DataField = 'set_addr_manual_enter'
+        DataSource = BoldModelDM.HasAllBonusDS
+        TabOrder = 18
         ValueChecked = '1'
         ValueUnchecked = '0'
       end

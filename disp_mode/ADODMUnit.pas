@@ -1674,7 +1674,14 @@ try
 try
 
 FindSectorNum:=-1;
-sql_text:='UPDATE Zakaz SET adr_manual_set=1, otpuskaetsya_dostepcherom='+
+if not BoldModelDM.HasAllBonusADOQuery.Active then
+  BoldModelDM.HasAllBonusADOQuery.Active := True;
+if (BoldModelDM.HasAllBonusADOQuery.FieldByName(
+    'set_manual_addr_change').AsInteger > 0) then
+  sql_text:='UPDATE Zakaz SET adr_manual_set=1, otpuskaetsya_dostepcherom='+
+    IntToStr(CurrUserADOQuery.FindField('BOLD_ID').AsInteger)
+else
+  sql_text:='UPDATE Zakaz SET otpuskaetsya_dostepcherom='+
   IntToStr(CurrUserADOQuery.FindField('BOLD_ID').AsInteger);
 
   if True
