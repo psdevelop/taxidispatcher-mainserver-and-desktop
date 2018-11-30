@@ -187,7 +187,7 @@ object RemoteControlForm: TRemoteControlForm
           Width = 577
           Height = 21
           Ctl3D = False
-          ItemHeight = 13
+          ItemHeight = 0
           ParentCtl3D = False
           TabOrder = 1
           Text = 
@@ -204,7 +204,7 @@ object RemoteControlForm: TRemoteControlForm
           Width = 577
           Height = 21
           Ctl3D = False
-          ItemHeight = 13
+          ItemHeight = 0
           ParentCtl3D = False
           TabOrder = 2
           Text = 
@@ -283,7 +283,7 @@ object RemoteControlForm: TRemoteControlForm
           Left = 0
           Top = 33
           Width = 676
-          Height = 289
+          Height = 308
           Align = alClient
           Ctl3D = False
           Lines.Strings = (
@@ -2863,5 +2863,18 @@ object RemoteControlForm: TRemoteControlForm
     HTTPOptions = [hoForceEncodeParams]
     Left = 464
     Top = 40
+  end
+  object GetEarlyListADOQuery: TADOQuery
+    Connection = ServerMainForm.MainBASEADOC
+    Parameters = <
+      item
+        Name = 'driver_id'
+        Size = -1
+        Value = Null
+      end>
+    SQL.Strings = (
+      'select dbo.GetJSONDriverEarlyOrders(:driver_id) as orders_list')
+    Left = 304
+    Top = 288
   end
 end

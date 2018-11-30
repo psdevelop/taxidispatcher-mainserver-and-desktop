@@ -2196,7 +2196,9 @@ object ServerMainForm: TServerMainForm
   end
   object MainBASEADOC: TADOConnection
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 
+      'C:\DEVELOP\TDDesktop\TaxiManager\ServerModules\TDAppServer2005\T' +
+      'axiDispatcherServer.udl'
     AfterConnect = MainBASEADOCAfterConnect
     Left = 608
     Top = 16

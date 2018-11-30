@@ -314,6 +314,7 @@ type
     SettingsADODSprize_reward_summ: TBCDField;
     SettingsADODSlock_reserv_on_limit: TSmallintField;
     SputnikApiHTTP: TIdHTTP;
+    GetEarlyListADOQuery: TADOQuery;
     procedure Timer10SecTimer(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure AutoArhivedTimerTimer(Sender: TObject);
@@ -406,6 +407,7 @@ type
       DESCRIPTION: Widestring; ADRES, PHONE: String;
       DR_NUM: Integer; LATITUDE, LONGITUDE: String): Integer;
     function GetJSONTOList(driverID: Integer): Widestring;
+    function GetJSONEarlyOrdersList(driverID: Integer): Widestring;
     procedure setOrderTarif(orderId, tarifId: Integer);
     procedure setOrderOptComb(orderId: Integer; optComb: String);
     procedure ManualSetCurrOrderRemoteStatus(orderId,
@@ -2366,7 +2368,21 @@ begin
                     (DriversADOT.FieldByName('BOLD_ID').
                     AsInteger), False), CurrClientID);
 
+                if SocketCoord.TCPClientCollection.
+                    Items[ClientCollectionIndex].useUTF8 then
+                  addDirectJSONMessageToClient(
+                  Self.GetJSONEarlyOrdersList
+                    (DriversADOT.FieldByName('BOLD_ID').
+                    AsInteger), CurrClientID)
+                else
+                  addDirectJSONMessageToClient(
+                  TranslitRus2Lat(Self.GetJSONEarlyOrdersList
+                    (DriversADOT.FieldByName('BOLD_ID').
+                    AsInteger), False), CurrClientID);
+
                 end;
+
+
 
                 DriversADOT.Next;
                 Continue;
@@ -3560,6 +3576,22 @@ begin
     msg.ClientID;
   NewMSWCollectItem.GetMessage().ClientID:=
     msg.ClientID;
+
+  NewMSWCollectItem:=SendMsgCollection.Add;
+  if SocketCoord.TCPClientCollection.
+      Items[clientIndex].useUTF8 then begin
+    NewMSWCollectItem.SetDirectJSONString(
+      Self.GetJSONEarlyOrdersList(msg.DriverDBID));
+  end
+  else begin
+    NewMSWCollectItem.SetDirectJSONString(
+      TranslitRus2Lat(Self.GetJSONEarlyOrdersList
+      (msg.DriverDBID), False));
+  end;
+  NewMSWCollectItem.ClientID:=
+    msg.ClientID;
+  NewMSWCollectItem.GetMessage().ClientID:=
+    msg.ClientID;
 end;
 
 function TRemoteControlForm.proceedInputJSONMessages
@@ -3816,16 +3848,37 @@ else
 
                   NewMSWCollectItem:=SendMsgCollection.Add;
                   if SocketCoord.TCPClientCollection.
-                    Items[clientIndex].useUTF8 then
+                    Items[clientIndex].useUTF8 then begin
                     NewMSWCollectItem.SetDirectJSONString(
                       Self.getDriverStatusJSON
                       (AutorizedVerifyADODS.
-                        FieldByName('BOLD_ID').AsInteger))
-                  else
+                        FieldByName('BOLD_ID').AsInteger));
+                    end
+                  else begin
                     NewMSWCollectItem.SetDirectJSONString(
                       TranslitRus2Lat(Self.getDriverStatusJSON
                       (AutorizedVerifyADODS.
                         FieldByName('BOLD_ID').AsInteger), False));
+                    end;
+                  NewMSWCollectItem.ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+                  NewMSWCollectItem.GetMessage().ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+
+                  NewMSWCollectItem:=SendMsgCollection.Add;
+                  if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then begin
+                    NewMSWCollectItem.SetDirectJSONString(
+                      Self.GetJSONEarlyOrdersList(
+                      AutorizedVerifyADODS.
+                        FieldByName('BOLD_ID').AsInteger));
+                    end
+                  else begin
+                    NewMSWCollectItem.SetDirectJSONString(
+                      TranslitRus2Lat(Self.GetJSONEarlyOrdersList
+                      (AutorizedVerifyADODS.
+                        FieldByName('BOLD_ID').AsInteger), False));
+                    end;
                   NewMSWCollectItem.ClientID:=
                     InputJSONMessages.Items[i].ClientID;
                   NewMSWCollectItem.GetMessage().ClientID:=
@@ -5001,6 +5054,23 @@ else
             InputJSONMessages.Items[i].ClientID;
           NewMSWCollectItem.GetMessage().ClientID:=
             InputJSONMessages.Items[i].ClientID;
+
+          NewMSWCollectItem:=SendMsgCollection.Add;
+          if SocketCoord.TCPClientCollection.
+              Items[clientIndex].useUTF8 then begin
+            NewMSWCollectItem.SetDirectJSONString(
+              Self.GetJSONEarlyOrdersList(
+              InputJSONMessages.Items[i].DriverDBID));
+          end
+          else begin
+            NewMSWCollectItem.SetDirectJSONString(
+              TranslitRus2Lat(Self.GetJSONEarlyOrdersList
+              (InputJSONMessages.Items[i].DriverDBID), False));
+            end;
+          NewMSWCollectItem.ClientID:=
+            InputJSONMessages.Items[i].ClientID;
+          NewMSWCollectItem.GetMessage().ClientID:=
+            InputJSONMessages.Items[i].ClientID;
         end
         else if (commandName='ss') then
         begin
@@ -5353,6 +5423,33 @@ begin
     SocketLogMemo.Lines.Add(
       'Неудачный запрос '+
       'списка тарифов и опций! '+E.Message);
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.GetJSONEarlyOrdersList(driverID: Integer): Widestring;
+var res: Widestring;
+begin
+  res:='{"command":"erlo","cn":"0","msg_end":"ok"}';
+  try
+      GetEarlyListADOQuery.Parameters.ParamByName(
+        'driver_id').Value:=driverID;
+      GetEarlyListADOQuery.Active:=False;
+      GetEarlyListADOQuery.Active:=True;
+      if GetEarlyListADOQuery.RecordCount>0 then
+      begin
+        res:=GetEarlyListADOQuery.
+          FieldByName('orders_list').AsString;
+          if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'testlog2',
+                'NO')='YES') then
+        Test2Memo.Lines.Add('EarlyList: '+res);
+      end;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачный запрос '+
+      'списка запланированных заказов водителя! '+E.Message);
   end;
   Result:=res;
 end;
