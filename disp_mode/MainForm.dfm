@@ -2,8 +2,8 @@ object FirstForm: TFirstForm
   Left = 0
   Top = 0
   AutoScroll = False
-  Caption = '"'#1044#1080#1089#1087#1077#1090#1095#1077#1088'-'#1086#1087#1077#1088#1072#1090#1086#1088' '#1090#1072#1082#1089#1086#1087#1072#1088#1082#1072'" (v7.1.4.5 21/10/2018)'
-  ClientHeight = 118
+  Caption = '"'#1044#1080#1089#1087#1077#1090#1095#1077#1088'-'#1086#1087#1077#1088#1072#1090#1086#1088' '#1090#1072#1082#1089#1086#1087#1072#1088#1082#1072'" (v7.2.0.2 01/12/2018)'
+  ClientHeight = 359
   ClientWidth = 754
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -970,7 +970,7 @@ object FirstForm: TFirstForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 99
+    Top = 340
     Width = 754
     Height = 19
     Font.Charset = DEFAULT_CHARSET
@@ -1503,10 +1503,10 @@ object FirstForm: TFirstForm
         3333333333333333333333333333333333333333333333333333}
       Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082#1080
       ImageIndex = 5
-      OnClick = EnumsMenuClick
       object N13: TMenuItem
-        Caption = #1052#1072#1096#1080#1085#1099'...'
+        Caption = #1042#1086#1076#1080#1090#1077#1083#1080'...'
         Enabled = False
+        OnClick = N13Click
       end
       object N22: TMenuItem
         Caption = #1058#1077#1083'. '#1085#1086#1084#1077#1088#1072'...'
@@ -1525,6 +1525,7 @@ object FirstForm: TFirstForm
       end
       object N17: TMenuItem
         Caption = #1056#1072#1081#1086#1085#1099'...'
+        Enabled = False
         OnClick = N17Click
       end
     end
@@ -1834,7 +1835,15 @@ object FirstForm: TFirstForm
         PropertyName = 'Enabled'
       end
       item
+        VCLComponent = N13
+        PropertyName = 'Enabled'
+      end
+      item
         VCLComponent = N34
+        PropertyName = 'Enabled'
+      end
+      item
+        VCLComponent = N17
         PropertyName = 'Enabled'
       end>
     Left = 88

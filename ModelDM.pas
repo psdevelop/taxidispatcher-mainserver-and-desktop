@@ -302,6 +302,10 @@ type
     HasAllBonusADOQueryshow_phone_in_orders: TSmallintField;
     HasAllBonusADOQueryset_manual_addr_change: TSmallintField;
     HasAllBonusADOQueryset_addr_manual_enter: TSmallintField;
+    HasAllBonusADOQueryprise_only_online: TSmallintField;
+    HasAllBonusADOQueryuse_rating_levels: TSmallintField;
+    HasAllBonusADOQuerydont_reset_que_early_complete: TSmallintField;
+    HasAllBonusADOQueryauto_set_bonus_value: TBCDField;
     procedure CustCheckTimerTimer(Sender: TObject);
     procedure BoldActivateSystemAction1SystemClosed(Sender: TObject);
     procedure BoldActivateSystemAction1SystemOpened(Sender: TObject);

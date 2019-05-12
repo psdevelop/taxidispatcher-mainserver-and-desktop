@@ -1,7 +1,7 @@
 object ADOConnectDM: TADOConnectDM
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 576
+  Height = 605
   Width = 696
   object MainADOConnection: TADOConnection
     LoginPrompt = False
@@ -187,6 +187,7 @@ object ADOConnectDM: TADOConnectDM
     object ActiveCustADOQuerystart_dt: TStringField
       FieldName = 'start_dt'
       ReadOnly = True
+      OnGetText = ActiveCustADOQuerystart_dtGetText
       Size = 5
     end
     object ActiveCustADOQueryend_dt: TStringField
@@ -531,6 +532,15 @@ object ADOConnectDM: TADOConnectDM
       KeyFields = 'district_id'
       Size = 255
       Lookup = True
+    end
+    object ActiveCustADOQueryis_early: TSmallintField
+      FieldName = 'is_early'
+    end
+    object ActiveCustADOQueryis_started_early: TSmallintField
+      FieldName = 'is_started_early'
+    end
+    object ActiveCustADOQueryearly_date: TDateTimeField
+      FieldName = 'early_date'
     end
   end
   object dsActiveCust: TDataSource
@@ -2229,6 +2239,18 @@ object ADOConnectDM: TADOConnectDM
       FieldName = 'referral_set_date'
       EditMask = '!99/99/00;1;_'
     end
+    object RemoteCtrlAdmADOTcc_monitoring_upd: TSmallintField
+      FieldName = 'cc_monitoring_upd'
+    end
+    object RemoteCtrlAdmADOTdaily_payment_expire: TSmallintField
+      FieldName = 'daily_payment_expire'
+    end
+    object RemoteCtrlAdmADOTrating_level: TSmallintField
+      FieldName = 'rating_level'
+    end
+    object RemoteCtrlAdmADOTdont_auto_asgn_by_radius: TSmallintField
+      FieldName = 'dont_auto_asgn_by_radius'
+    end
   end
   object DrRemOrdCountADODS: TADODataSet
     Connection = MainADOConnection
@@ -2746,6 +2768,19 @@ object ADOConnectDM: TADOConnectDM
     end
     object TarifPlansADODSIF_DEF: TSmallintField
       FieldName = 'IF_DEF'
+    end
+    object TarifPlansADODScompany_id: TIntegerField
+      FieldName = 'company_id'
+    end
+    object TarifPlansADODSdrgroup: TStringField
+      FieldKind = fkLookup
+      FieldName = 'drgroup'
+      LookupDataSet = DrGroupsADODS
+      LookupKeyFields = 'BOLD_ID'
+      LookupResultField = 'Naimenovanie'
+      KeyFields = 'company_id'
+      Size = 255
+      Lookup = True
     end
   end
   object TarifPlansTblADODS: TADODataSet
@@ -3269,5 +3304,89 @@ object ADOConnectDM: TADOConnectDM
       FieldName = 'Naimenovanie'
       Size = 255
     end
+  end
+  object RatingLevelsADOT: TADOTable
+    Connection = MainADOConnection
+    CursorType = ctStatic
+    TableName = 'RATING_LEVELS'
+    Left = 600
+    Top = 488
+  end
+  object RatingLevelsDS: TDataSource
+    DataSet = RatingLevelsADOT
+    Left = 600
+    Top = 536
+  end
+  object WaitTimesADOT: TADOTable
+    Connection = MainADOConnection
+    CursorType = ctStatic
+    TableName = 'WAIT_TIMES'
+    Left = 24
+    Top = 536
+    object WaitTimesADOTid: TAutoIncField
+      FieldName = 'id'
+      ReadOnly = True
+    end
+    object WaitTimesADOTtval: TSmallintField
+      FieldName = 'tval'
+    end
+    object WaitTimesADOTsound: TStringField
+      FieldName = 'sound'
+      Size = 10
+    end
+  end
+  object DailyParamsADOT: TADOTable
+    Connection = MainADOConnection
+    CursorType = ctStatic
+    TableName = 'DAILY_PARAMS'
+    Left = 120
+    Top = 536
+    object DailyParamsADOTid: TAutoIncField
+      FieldName = 'id'
+      ReadOnly = True
+    end
+    object DailyParamsADOTstart_time: TWideStringField
+      FieldName = 'start_time'
+      EditMask = '!90:00;1;_'
+      Size = 16
+    end
+    object DailyParamsADOTend_time: TWideStringField
+      FieldName = 'end_time'
+      EditMask = '!90:00;1;_'
+      Size = 16
+    end
+    object DailyParamsADOTits_tax_percent: TSmallintField
+      FieldName = 'its_tax_percent'
+    end
+    object DailyParamsADOTtax_percent: TBCDField
+      FieldName = 'tax_percent'
+      Precision = 18
+      Size = 5
+    end
+    object DailyParamsADOTfix_payment: TBCDField
+      FieldName = 'fix_payment'
+      Precision = 18
+      Size = 5
+    end
+    object DailyParamsADOTno_percent_max_summ: TBCDField
+      FieldName = 'no_percent_max_summ'
+      Precision = 18
+      Size = 5
+    end
+    object DailyParamsADOTno_percent_ms_payment: TBCDField
+      FieldName = 'no_percent_ms_payment'
+      Precision = 18
+      Size = 5
+    end
+  end
+  object WaitTimesDS: TDataSource
+    DataSet = WaitTimesADOT
+    Left = 72
+    Top = 536
+  end
+  object DailyParamsDS: TDataSource
+    DataSet = DailyParamsADOT
+    Left = 168
+    Top = 536
   end
 end

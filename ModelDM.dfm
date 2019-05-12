@@ -6433,6 +6433,20 @@ object BoldModelDM: TBoldModelDM
     object HasAllBonusADOQueryset_addr_manual_enter: TSmallintField
       FieldName = 'set_addr_manual_enter'
     end
+    object HasAllBonusADOQueryprise_only_online: TSmallintField
+      FieldName = 'prise_only_online'
+    end
+    object HasAllBonusADOQueryuse_rating_levels: TSmallintField
+      FieldName = 'use_rating_levels'
+    end
+    object HasAllBonusADOQuerydont_reset_que_early_complete: TSmallintField
+      FieldName = 'dont_reset_que_early_complete'
+    end
+    object HasAllBonusADOQueryauto_set_bonus_value: TBCDField
+      FieldName = 'auto_set_bonus_value'
+      Precision = 18
+      Size = 5
+    end
   end
   object AdrPhoneRelatingADOTable: TADOTable
     Connection = ADOConnectDM.MainADOConnection

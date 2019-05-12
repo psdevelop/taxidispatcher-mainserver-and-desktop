@@ -23,7 +23,7 @@ object PrSettForm: TPrSettForm
     Top = 0
     Width = 792
     Height = 423
-    ActivePage = TabSheet20
+    ActivePage = TabSheet3
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
@@ -73,9 +73,9 @@ object PrSettForm: TPrSettForm
       object Label68: TLabel
         Left = 6
         Top = 156
-        Width = 269
+        Width = 261
         Height = 16
-        Caption = #1060#1080#1082#1089'.'#1086#1090#1095#1080#1089#1083'.'#1087#1088#1080' '#1085#1072#1083#1080#1095'.'#1084#1072#1082#1089'.'#1094#1077#1085#1099' '#1073#1077#1079' '#1074#1099#1095'.%'
+        Caption = #1060#1080#1082#1089'.'#1086#1090#1095#1080#1089#1083'. ('#1086#1090#1095#1077#1090'<'#1084#1072#1082#1089'.'#1094#1077#1085#1099' '#1073#1077#1079' '#1074#1099#1095'.%)'
       end
       object BoldEdit1: TBoldEdit
         Left = 6
@@ -689,9 +689,9 @@ object PrSettForm: TPrSettForm
           object Label69: TLabel
             Left = 264
             Top = 8
-            Width = 215
+            Width = 240
             Height = 16
-            Caption = #1042#1086#1079#1074#1088#1072#1090' '#1085#1072' '#1089#1095#1077#1090' '#1089' '#1087#1088#1080#1079#1086#1074#1086#1081' '#1087#1086#1077#1079#1076#1082#1080
+            Caption = #1042#1086#1079#1074#1088#1072#1090' '#1085#1072' '#1089#1095#1077#1090' '#1089' '#1087#1088#1080#1079'. '#1087#1086#1077#1079#1076#1082#1080' ('#1089#1091#1084#1084#1072')'
           end
           object Label70: TLabel
             Left = 264
@@ -727,6 +727,55 @@ object PrSettForm: TPrSettForm
             Width = 191
             Height = 16
             Caption = #1042#1077#1083#1080#1095#1080#1085#1072' % '#1073#1086#1085#1091#1089#1072' (0,1 = 10%)'
+          end
+          object Label110: TLabel
+            Left = 512
+            Top = 192
+            Width = 246
+            Height = 16
+            Caption = #1040#1074#1090#1086#1089#1085#1080#1084#1072#1077#1084#1099#1081' '#1073#1086#1085#1091#1089' '#1076#1083#1103' '#1085#1086#1074#1086#1081' '#1087#1086#1077#1079#1076#1082#1080
+          end
+          object Label111: TLabel
+            Left = 512
+            Top = 232
+            Width = 247
+            Height = 16
+            Caption = #1080#1089#1087#1086#1083#1100#1079#1091#1077#1090#1089#1103' '#1085#1072' '#1079#1072#1082#1072#1079#1077', '#1077#1089#1083#1080' '#1091' '#1090#1077#1083#1077#1092#1086#1085#1072
+          end
+          object Label112: TLabel
+            Left = 512
+            Top = 248
+            Width = 260
+            Height = 16
+            Caption = #1091#1089#1090#1072#1085#1086#1074#1083#1077#1085#1085#1086#1075#1086' '#1074' '#1079#1072#1082#1072#1079#1077', '#1085#1077' '#1084#1077#1085#1077#1077' '#1076#1072#1085#1085#1086#1075#1086
+          end
+          object Label113: TLabel
+            Left = 516
+            Top = 264
+            Width = 118
+            Height = 16
+            Caption = #1082#1086#1083#1080#1095#1077#1089#1090#1074#1072' '#1073#1086#1085#1091#1089#1086#1074
+          end
+          object Label114: TLabel
+            Left = 508
+            Top = 288
+            Width = 204
+            Height = 16
+            Caption = #1041#1086#1085#1091#1089#1099', '#1080#1089#1087#1086#1083#1100#1079#1091#1077#1084#1099#1077' '#1085#1072' '#1079#1072#1082#1072#1079#1077', '
+          end
+          object Label115: TLabel
+            Left = 508
+            Top = 304
+            Width = 214
+            Height = 16
+            Caption = #1074#1086#1079#1074#1088#1072#1097#1072#1102#1090#1089#1103' '#1085#1072' '#1073#1072#1083#1072#1085#1089' '#1074#1086#1076#1080#1090#1077#1083#1103' '
+          end
+          object Label116: TLabel
+            Left = 508
+            Top = 320
+            Width = 153
+            Height = 16
+            Caption = #1087#1086#1089#1083#1077' '#1074#1099#1087#1086#1083#1085#1077#1085#1080#1103' '#1079#1072#1082#1072#1079#1072
           end
           object BoldEdit8: TBoldEdit
             Left = 432
@@ -917,8 +966,8 @@ object PrSettForm: TPrSettForm
             TabOrder = 9
           end
           object DBCheckBox1: TDBCheckBox
-            Left = 496
-            Top = 16
+            Left = 504
+            Top = 24
             Width = 249
             Height = 17
             Caption = #1057#1095#1080#1090#1072#1090#1100' '#1087#1088#1080#1079#1099' '#1087#1086' '#1085#1086#1084#1077#1088#1091' '#1090#1077#1083#1077#1092#1086#1085#1072
@@ -929,8 +978,8 @@ object PrSettForm: TPrSettForm
             ValueUnchecked = '0'
           end
           object DBCheckBox2: TDBCheckBox
-            Left = 496
-            Top = 40
+            Left = 504
+            Top = 48
             Width = 217
             Height = 17
             Caption = #1057#1095#1080#1090#1072#1090#1100' '#1087#1088#1080#1079#1099' '#1087#1086' '#1072#1073'. '#1085#1086#1084#1077#1088#1072#1084
@@ -941,8 +990,8 @@ object PrSettForm: TPrSettForm
             ValueUnchecked = '0'
           end
           object DBCheckBox3: TDBCheckBox
-            Left = 496
-            Top = 64
+            Left = 504
+            Top = 72
             Width = 217
             Height = 17
             Caption = #1042#1077#1089#1090#1080' '#1091#1095'. '#1087#1086' '#1072#1073'. '#1085#1086#1084#1077#1088#1072#1084
@@ -1096,6 +1145,17 @@ object PrSettForm: TPrSettForm
             DataSource = BoldModelDM.HasAllBonusDS
             ParentCtl3D = False
             TabOrder = 23
+          end
+          object DBEdit74: TDBEdit
+            Left = 512
+            Top = 208
+            Width = 225
+            Height = 22
+            Ctl3D = False
+            DataField = 'auto_set_bonus_value'
+            DataSource = BoldModelDM.HasAllBonusDS
+            ParentCtl3D = False
+            TabOrder = 24
           end
         end
       end
@@ -2572,11 +2632,6 @@ object PrSettForm: TPrSettForm
               Font.Style = []
               Title.Caption = #1048#1085#1076#1077#1082#1089
               Title.Color = clWindow
-              Title.Font.Charset = DEFAULT_CHARSET
-              Title.Font.Color = clWindowText
-              Title.Font.Height = -11
-              Title.Font.Name = 'Tahoma'
-              Title.Font.Style = []
             end
             item
               BoldProperties.Expression = 'naimenovanie'
@@ -2587,11 +2642,6 @@ object PrSettForm: TPrSettForm
               Font.Style = []
               Title.Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077
               Title.Color = clWindow
-              Title.Font.Charset = DEFAULT_CHARSET
-              Title.Font.Color = clWindowText
-              Title.Font.Height = -11
-              Title.Font.Name = 'Tahoma'
-              Title.Font.Style = []
             end
             item
               BoldProperties.Expression = 'kommentarii'
@@ -2602,11 +2652,6 @@ object PrSettForm: TPrSettForm
               Font.Style = []
               Title.Caption = #1050#1086#1084#1084#1077#1085#1090#1072#1088#1080#1081
               Title.Color = clWindow
-              Title.Font.Charset = DEFAULT_CHARSET
-              Title.Font.Color = clWindowText
-              Title.Font.Height = -11
-              Title.Font.Name = 'Tahoma'
-              Title.Font.Style = []
             end>
           Ctl3d = False
           DefaultRowHeight = 17
@@ -3033,13 +3078,14 @@ object PrSettForm: TPrSettForm
               Color = clScrollBar
               Expanded = False
               FieldName = 'ID'
+              Width = 44
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'POLICY_NAME'
               Title.Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077' '#1087#1083#1072#1085#1072
-              Width = 400
+              Width = 343
               Visible = True
             end
             item
@@ -3047,6 +3093,13 @@ object PrSettForm: TPrSettForm
               FieldName = 'SHORT_NAME'
               Title.Caption = #1057#1086#1082#1088#1072#1097#1077#1085#1080#1077
               Width = 100
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'drgroup'
+              Title.Caption = #1060#1080#1088#1084#1072
+              Width = 200
               Visible = True
             end>
         end
@@ -3087,8 +3140,8 @@ object PrSettForm: TPrSettForm
               item
                 Expanded = False
                 FieldName = 'GRTP_LOOK'
-                Title.Caption = #1058#1072#1088'. '#1087#1083#1072#1085
-                Width = 200
+                Title.Caption = #1058#1072#1088'. '#1087#1083#1072#1085' '#1087#1086' '#1091#1084#1086#1083#1095#1072#1085#1080#1102
+                Width = 280
                 Visible = True
               end>
           end
@@ -3100,7 +3153,7 @@ object PrSettForm: TPrSettForm
             Left = 0
             Top = 0
             Width = 776
-            Height = 124
+            Height = 128
             Align = alClient
             Ctl3D = False
             DataSource = ADOConnectDM.DrWithTPDS
@@ -3116,13 +3169,14 @@ object PrSettForm: TPrSettForm
                 Expanded = False
                 FieldName = 'Pozyvnoi'
                 Title.Caption = #1055#1086#1079#1099#1074#1085#1086#1081
+                Width = 133
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DRTP_LOOK'
-                Title.Caption = #1058#1072#1088'. '#1087#1083#1072#1085
-                Width = 200
+                Title.Caption = #1058#1072#1088'. '#1087#1083#1072#1085' '#1087#1086' '#1091#1084#1086#1083#1095#1072#1085#1080#1102
+                Width = 283
                 Visible = True
               end>
           end
@@ -4153,6 +4207,261 @@ object PrSettForm: TPrSettForm
         TabOrder = 18
         ValueChecked = '1'
         ValueUnchecked = '0'
+      end
+    end
+    object TabSheet21: TTabSheet
+      Caption = #1056#1077#1078#1080#1084#1099' '#1088#1072#1073#1086#1090#1099
+      ImageIndex = 17
+      object DBCheckBox55: TDBCheckBox
+        Left = 15
+        Top = 24
+        Width = 274
+        Height = 17
+        Caption = #1055#1088#1080#1079#1086#1074#1099#1077' '#1090#1086#1083#1100#1082#1086' '#1076#1083#1103' '#1086#1085#1083#1072#1081#1085'-'#1079#1072#1082#1072#1079#1086#1074
+        Ctl3D = False
+        DataField = 'prise_only_online'
+        DataSource = BoldModelDM.HasAllBonusDS
+        ParentCtl3D = False
+        TabOrder = 0
+        ValueChecked = '1'
+        ValueUnchecked = '0'
+      end
+      object DBCheckBox56: TDBCheckBox
+        Left = 15
+        Top = 56
+        Width = 274
+        Height = 17
+        Caption = #1048#1089#1087#1086#1083#1100#1079#1086#1074#1072#1090#1100' '#1089#1090#1091#1087#1077#1085#1080' ('#1091#1088#1086#1074#1085#1080') '#1088#1077#1081#1090#1080#1085#1075#1072
+        Ctl3D = False
+        DataField = 'use_rating_levels'
+        DataSource = BoldModelDM.HasAllBonusDS
+        ParentCtl3D = False
+        TabOrder = 1
+        ValueChecked = '1'
+        ValueUnchecked = '0'
+      end
+      object BitBtn16: TBitBtn
+        Left = 16
+        Top = 328
+        Width = 241
+        Height = 33
+        Action = BoldModelDM.DriversPrmDSP
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+        TabOrder = 2
+      end
+    end
+    object TabSheet22: TTabSheet
+      Caption = #1057#1090#1091#1087#1077#1085#1080' ('#1091#1088#1086#1074#1085#1080') '#1088#1077#1081#1090#1080#1085#1075#1086#1074
+      ImageIndex = 18
+      object TPanel
+        Left = 0
+        Top = 351
+        Width = 784
+        Height = 41
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 0
+        object DBNavigator3: TDBNavigator
+          Left = 8
+          Top = 8
+          Width = 320
+          Height = 25
+          DataSource = ADOConnectDM.RatingLevelsDS
+          TabOrder = 0
+        end
+        object DBCheckBox57: TDBCheckBox
+          Left = 400
+          Top = 16
+          Width = 217
+          Height = 17
+          Caption = #1048#1089#1087#1086#1083#1100#1079#1086#1074#1072#1090#1100' '#1091#1088#1086#1074#1085#1080' '#1088#1077#1081#1090#1080#1085#1075#1072
+          DataField = 'use_rating_levels'
+          DataSource = BoldModelDM.HasAllBonusDS
+          TabOrder = 1
+          ValueChecked = '1'
+          ValueUnchecked = '0'
+        end
+        object BitBtn17: TBitBtn
+          Left = 624
+          Top = 8
+          Width = 153
+          Height = 33
+          Action = BoldModelDM.DriversPrmDSP
+          Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+          TabOrder = 2
+        end
+      end
+      object DBGrid8: TDBGrid
+        Left = 0
+        Top = 0
+        Width = 784
+        Height = 351
+        Align = alClient
+        DataSource = ADOConnectDM.RatingLevelsDS
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -13
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'rating_start'
+            Title.Caption = #1056#1077#1081#1090#1080#1085#1075', '#1086#1090
+            Width = 156
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'rating_end'
+            Title.Caption = #1056#1077#1081#1090#1080#1085#1075', '#1076#1086
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'rating_level'
+            Title.Caption = #1059#1088#1086#1074#1077#1085#1100' '#1088#1077#1081#1090#1080#1085#1075#1072', '#1079#1085#1072#1095#1077#1085#1080#1077
+            Width = 197
+            Visible = True
+          end>
+      end
+    end
+    object TabSheet23: TTabSheet
+      Caption = #1042#1088#1077#1084#1103' '#1086#1078#1080#1076#1072#1085#1080#1103
+      ImageIndex = 19
+      object Panel9: TPanel
+        Left = 0
+        Top = 351
+        Width = 784
+        Height = 41
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 0
+        object DBNavigator4: TDBNavigator
+          Left = 8
+          Top = 8
+          Width = 240
+          Height = 25
+          DataSource = ADOConnectDM.WaitTimesDS
+          TabOrder = 0
+        end
+      end
+      object DBGrid10: TDBGrid
+        Left = 0
+        Top = 0
+        Width = 784
+        Height = 351
+        Align = alClient
+        Ctl3D = False
+        DataSource = ADOConnectDM.WaitTimesDS
+        ParentCtl3D = False
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -13
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'tval'
+            Title.Caption = #1052#1080#1085#1091#1090' '#1086#1078#1080#1076#1072#1085#1080#1103
+            Width = 187
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'sound'
+            Title.Caption = #1050#1086#1076' '#1079#1074#1091#1082#1086#1074#1086#1075#1086' '#1092#1072#1081#1083#1072' '#1088#1086#1073#1086#1090#1072
+            Width = 261
+            Visible = True
+          end>
+      end
+    end
+    object TabSheet24: TTabSheet
+      Caption = #1057#1091#1090#1086#1095#1085#1099#1077' '#1080#1079#1084#1077#1085#1103#1077#1084#1099#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080
+      ImageIndex = 20
+      object Panel10: TPanel
+        Left = 0
+        Top = 351
+        Width = 784
+        Height = 41
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 0
+        object DBNavigator5: TDBNavigator
+          Left = 8
+          Top = 8
+          Width = 240
+          Height = 25
+          DataSource = ADOConnectDM.DailyParamsDS
+          TabOrder = 0
+        end
+      end
+      object DBGrid9: TDBGrid
+        Left = 0
+        Top = 0
+        Width = 784
+        Height = 351
+        Align = alClient
+        Ctl3D = False
+        DataSource = ADOConnectDM.DailyParamsDS
+        ParentCtl3D = False
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -13
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'start_time'
+            Title.Caption = #1053#1072#1095#1072#1083#1086
+            Width = 56
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'end_time'
+            Title.Caption = #1054#1082#1086#1085#1095#1072#1085#1080#1077
+            Width = 72
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'its_tax_percent'
+            Title.Caption = #1069#1090#1086' '#1086#1090#1095#1080#1089#1083#1077#1085#1080#1077' '#1089' '#1079#1072#1082#1072#1079#1072
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'tax_percent'
+            Title.Caption = '% '#1086#1090#1095#1080#1089#1083#1077#1085#1080#1103
+            Width = 92
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'fix_payment'
+            Title.Caption = #1060#1080#1082#1089'. '#1086#1090#1095#1080#1089#1083'.'
+            Width = 88
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'no_percent_max_summ'
+            Title.Caption = #1052#1072#1082#1089'. '#1089#1091#1084#1084#1072
+            Width = 81
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'no_percent_ms_payment'
+            Title.Caption = #1060#1080#1082#1089'. '#1086#1090#1095'. (<= '#1084#1072#1082#1089'. '#1089#1091#1084#1084#1099')'
+            Visible = True
+          end>
       end
     end
   end

@@ -499,6 +499,34 @@ type
     SectorsADODSKommentarii: TStringField;
     SectorsADODSCOMPANY_LOOK: TStringField;
     SectorsADODSDISTRICT_LOOK: TStringField;
+    ActiveCustADOQueryis_early: TSmallintField;
+    ActiveCustADOQueryis_started_early: TSmallintField;
+    ActiveCustADOQueryearly_date: TDateTimeField;
+    RemoteCtrlAdmADOTcc_monitoring_upd: TSmallintField;
+    RemoteCtrlAdmADOTdaily_payment_expire: TSmallintField;
+    RemoteCtrlAdmADOTrating_level: TSmallintField;
+    RemoteCtrlAdmADOTdont_auto_asgn_by_radius: TSmallintField;
+    RatingLevelsADOT: TADOTable;
+    RatingLevelsDS: TDataSource;
+    WaitTimesADOT: TADOTable;
+    WaitTimesADOTid: TAutoIncField;
+    WaitTimesADOTtval: TSmallintField;
+    WaitTimesADOTsound: TStringField;
+    DailyParamsADOT: TADOTable;
+    DailyParamsADOTid: TAutoIncField;
+    DailyParamsADOTstart_time: TWideStringField;
+    DailyParamsADOTend_time: TWideStringField;
+    DailyParamsADOTits_tax_percent: TSmallintField;
+    DailyParamsADOTtax_percent: TBCDField;
+    DailyParamsADOTfix_payment: TBCDField;
+    DailyParamsADOTno_percent_max_summ: TBCDField;
+    DailyParamsADOTno_percent_ms_payment: TBCDField;
+    WaitTimesDS: TDataSource;
+    DailyParamsDS: TDataSource;
+    TarifPlansADODScompany_id: TIntegerField;
+    TarifPlansADODSdrgroup: TStringField;
+    procedure ActiveCustADOQuerystart_dtGetText(Sender: TField;
+      var Text: string; DisplayText: Boolean);
     procedure ActiveCustADOQueryadr_manual_setGetText(Sender: TField;
       var Text: string; DisplayText: Boolean);
     procedure N21Click(Sender: TObject);
@@ -2254,6 +2282,8 @@ if (IniFile.ReadString('BUSINESS_DATA','enable_for_allXML_DEMO','NO')='YES') the
 else
  begin
 
+  try
+
   if MainADOConnection.Connected and not RefreshOnTime
     and not OrdersOperationInActive then
     begin
@@ -2275,6 +2305,9 @@ else
             OrdersOperationInActive:=False;
      end;
 
+  end;
+  finally
+    //FirstForm.ShowAttention('Обрыв соединения при обновлении!');
   end;
 
  end;
@@ -2654,7 +2687,7 @@ if DrNum>0 then
          DenyRemoteOrder:=True;
 
       if not DenyRemoteOrder then
-      if ((RemoteActDrCount<0) or (RemoteActDrCount>1)) then
+      if ((RemoteActDrCount<0) or (RemoteActDrCount>50)) then
       begin
         DenyRemoteOrder:=True;
         if (IniFile.ReadString('удаленный_контроль',
@@ -2662,7 +2695,7 @@ if DrNum>0 then
           (DrInfoADOQuery.FindField('ITS_REMOTE_CLIENT').AsInteger=1)
 			  then
           ShowMessage('Число интернет-заявок водителя'+
-            ' более 2-х, заявка будет оформлена как '+
+            ' более 50, заявка будет оформлена как '+
             'обычная учетная!');
       end
       else
@@ -3294,6 +3327,12 @@ begin
   ADOIniFile:=TIniFile.Create(GetCurrentDir+'\UnionDisp.ini');
 
   ActiveCustADOQuery.Connection:=nil;
+
+  if IniFile.ReadString('BUSINESS_DATA',
+    'скрывать_старый_тип_предварительных','NO')='YES' then
+   begin
+    N2.Visible := False;
+   end;
 
   if IniFile.ReadString('BUSINESS_DATA',
     'вести_контроль_оплаты_водителем','NO')='YES' then
@@ -5456,6 +5495,21 @@ begin
     Text:='да, адрес верный'
   else
     Text:='?кликните или введите адрес для его подтверждения ';
+end;
+
+
+procedure TADOConnectDM.ActiveCustADOQuerystart_dtGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  Text:= ActiveCustADOQuerystart_dt.AsString;
+  if ActiveCustADOQueryis_early.AsInteger > 0 then
+  begin
+    if ActiveCustADOQueryis_started_early.AsInteger = 0 then
+        Text:='отложен('+ActiveCustADOQueryearly_date.AsString+') '+
+            Text
+    else
+        Text:= Text + '(начат отложенный)';
+  end;
 end;
 
 end.

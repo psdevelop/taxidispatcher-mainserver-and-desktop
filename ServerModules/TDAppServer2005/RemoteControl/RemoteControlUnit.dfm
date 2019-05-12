@@ -2,7 +2,7 @@ object RemoteControlForm: TRemoteControlForm
   Left = 0
   Top = 0
   Width = 696
-  Height = 612
+  Height = 631
   Caption = #1052#1086#1076#1091#1083#1100' '#1089#1074#1103#1079#1080' '#1089' '#1074#1086#1076#1080#1090#1077#1083#1103#1084#1080' '#1095#1077#1088#1077#1079' Internet'
   Color = clBtnFace
   Constraints.MaxHeight = 650
@@ -25,13 +25,12 @@ object RemoteControlForm: TRemoteControlForm
     Left = 0
     Top = 0
     Width = 688
-    Height = 525
+    Height = 544
     Align = alClient
-    Caption = #1057#1086#1089#1090#1086#1103#1085#1080#1077' '#1086#1087#1086#1074#1077#1097#1077#1085#1080#1081' '#1074#1086#1076#1080#1090#1077#1083#1077#1081
     TabOrder = 0
     object Splitter1: TSplitter
       Left = 2
-      Top = 169
+      Top = 73
       Width = 684
       Height = 4
       Cursor = crVSplit
@@ -41,20 +40,21 @@ object RemoteControlForm: TRemoteControlForm
     end
     object PageControl1: TPageControl
       Left = 2
-      Top = 173
+      Top = 77
       Width = 684
-      Height = 350
+      Height = 465
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
       object TabSheet2: TTabSheet
         Caption = #1057#1086#1093#1088#1072#1085#1077#1085#1085#1099#1077' '#1076#1072#1085#1085#1099#1077
         ImageIndex = 1
+        TabVisible = False
         object DBGrid2: TDBGrid
           Left = 0
           Top = 0
           Width = 676
-          Height = 346
+          Height = 437
           Align = alClient
           Ctl3D = False
           DataSource = LocalMSGDS
@@ -161,7 +161,7 @@ object RemoteControlForm: TRemoteControlForm
           Left = 0
           Top = 0
           Width = 676
-          Height = 322
+          Height = 437
           Align = alClient
           Ctl3D = False
           ParentCtl3D = False
@@ -172,6 +172,7 @@ object RemoteControlForm: TRemoteControlForm
       object TabSheet3: TTabSheet
         Caption = #1058#1077#1089#1090#1080#1088#1086#1074#1072#1085#1080#1077
         ImageIndex = 2
+        TabVisible = False
         object BitBtn1: TBitBtn
           Left = 384
           Top = 30
@@ -187,7 +188,7 @@ object RemoteControlForm: TRemoteControlForm
           Width = 577
           Height = 21
           Ctl3D = False
-          ItemHeight = 0
+          ItemHeight = 13
           ParentCtl3D = False
           TabOrder = 1
           Text = 
@@ -204,7 +205,7 @@ object RemoteControlForm: TRemoteControlForm
           Width = 577
           Height = 21
           Ctl3D = False
-          ItemHeight = 0
+          ItemHeight = 13
           ParentCtl3D = False
           TabOrder = 2
           Text = 
@@ -236,26 +237,17 @@ object RemoteControlForm: TRemoteControlForm
         end
       end
       object TabSheet8: TTabSheet
-        Caption = #1058#1077#1089#1090' 2'
+        Caption = #1048#1085#1092#1086
         ImageIndex = 3
-        object Panel2: TPanel
-          Left = 0
-          Top = 281
-          Width = 676
-          Height = 41
-          Align = alBottom
-          BevelOuter = bvNone
-          TabOrder = 0
-        end
         object Test2Memo: TMemo
           Left = 0
           Top = 0
           Width = 676
-          Height = 281
+          Height = 437
           Align = alClient
           Ctl3D = False
           ParentCtl3D = False
-          TabOrder = 1
+          TabOrder = 0
         end
       end
       object TabSheet9: TTabSheet
@@ -283,7 +275,7 @@ object RemoteControlForm: TRemoteControlForm
           Left = 0
           Top = 33
           Width = 676
-          Height = 308
+          Height = 404
           Align = alClient
           Ctl3D = False
           Lines.Strings = (
@@ -297,17 +289,18 @@ object RemoteControlForm: TRemoteControlForm
       Left = 2
       Top = 15
       Width = 684
-      Height = 154
+      Height = 58
       ActivePage = TabSheet7
       Align = alTop
       TabOrder = 1
       object TabSheet4: TTabSheet
         Caption = #1054#1073#1088#1072#1073#1072#1090#1099#1074#1072#1077#1084#1099#1077' '#1079#1072#1103#1074#1082#1080' '#1073#1072#1079#1099
+        TabVisible = False
         object RemoteOrdersDBGrid: TDBGrid
           Left = 0
           Top = 0
           Width = 676
-          Height = 126
+          Height = 48
           Align = alClient
           Ctl3D = False
           DataSource = RemoteProcessedOrdersDS
@@ -390,11 +383,12 @@ object RemoteControlForm: TRemoteControlForm
       object TabSheet5: TTabSheet
         Caption = 'HTTP-'#1088#1077#1078#1080#1084' ('#1085#1077' '#1080#1089#1087#1086#1083#1100#1079#1091#1077#1090#1089#1103')'
         ImageIndex = 1
+        TabVisible = False
         object DBGrid1: TDBGrid
           Left = 0
           Top = 0
           Width = 676
-          Height = 126
+          Height = 48
           Align = alClient
           Ctl3D = False
           DataSource = TDMessagesDS
@@ -513,11 +507,12 @@ object RemoteControlForm: TRemoteControlForm
       object TabSheet6: TTabSheet
         Caption = #1042#1086#1076#1080#1090#1077#1083#1080', '#1088#1072#1073#1086#1090#1072#1097#1080#1077' '#1095'-'#1079' '#1087#1088#1080#1083#1086#1078#1077#1085#1080#1077
         ImageIndex = 2
+        TabVisible = False
         object DBGrid3: TDBGrid
           Left = 0
           Top = 0
           Width = 676
-          Height = 126
+          Height = 48
           Align = alClient
           DataSource = DriversDS
           TabOrder = 0
@@ -598,6 +593,7 @@ object RemoteControlForm: TRemoteControlForm
       object TabSheet7: TTabSheet
         Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080' (DBV>3)'
         ImageIndex = 3
+        TabVisible = False
         OnShow = TabSheet7Show
         object Label6: TLabel
           Left = 8
@@ -608,16 +604,16 @@ object RemoteControlForm: TRemoteControlForm
           Enabled = False
         end
         object Label13: TLabel
-          Left = 8
-          Top = 40
+          Left = 216
+          Top = 0
           Width = 85
           Height = 13
           Caption = #1058#1077#1082'. '#1084#1086#1073'. '#1074#1077#1088#1089#1080#1103
           Enabled = False
         end
         object Label14: TLabel
-          Left = 8
-          Top = 80
+          Left = 416
+          Top = 0
           Width = 83
           Height = 13
           Caption = #1052#1080#1085'. '#1084#1086#1073' '#1074#1077#1088#1089#1080#1103
@@ -636,8 +632,8 @@ object RemoteControlForm: TRemoteControlForm
           TabOrder = 0
         end
         object DBEdit12: TDBEdit
-          Left = 8
-          Top = 56
+          Left = 216
+          Top = 16
           Width = 185
           Height = 19
           Ctl3D = False
@@ -648,9 +644,9 @@ object RemoteControlForm: TRemoteControlForm
           TabOrder = 1
         end
         object DBEdit13: TDBEdit
-          Left = 8
-          Top = 96
-          Width = 265
+          Left = 416
+          Top = 16
+          Width = 249
           Height = 19
           Ctl3D = False
           DataField = 'min_mob_version'
@@ -664,7 +660,7 @@ object RemoteControlForm: TRemoteControlForm
   end
   object Panel1: TPanel
     Left = 0
-    Top = 525
+    Top = 544
     Width = 688
     Height = 41
     Align = alBottom
@@ -703,9 +699,9 @@ object RemoteControlForm: TRemoteControlForm
       Text = '1'
     end
     object MSGText: TEdit
-      Left = 400
+      Left = 392
       Top = 8
-      Width = 201
+      Width = 113
       Height = 19
       Ctl3D = False
       MaxLength = 255
@@ -713,12 +709,22 @@ object RemoteControlForm: TRemoteControlForm
       TabOrder = 2
       Text = #1058#1077#1089#1090#1086#1074#1086#1077' '#1089#1086#1086#1073#1097#1077#1085#1080#1077
     end
+    object BitBtn3: TBitBtn
+      Left = 536
+      Top = 8
+      Width = 121
+      Height = 25
+      Caption = #1042' '#1080#1085#1092#1086
+      TabOrder = 3
+      OnClick = BitBtn3Click
+    end
   end
   object MainMenu1: TMainMenu
     Left = 256
     Top = 8
     object N1: TMenuItem
       Caption = #1056#1072#1073#1086#1090#1072
+      Visible = False
       object N2: TMenuItem
         Caption = #1040#1082#1090#1080#1074#1085#1086#1089#1090#1100' '#1088#1072#1073#1086#1090#1099
       end
@@ -731,6 +737,7 @@ object RemoteControlForm: TRemoteControlForm
     end
     object N5: TMenuItem
       Caption = #1040#1082#1090#1080#1074#1080#1088#1086#1074#1072#1090#1100' '#1089#1086#1082#1077#1090'-'#1089#1077#1088#1074#1077#1088
+      Visible = False
       OnClick = N5Click
     end
   end
@@ -1008,6 +1015,7 @@ object RemoteControlForm: TRemoteControlForm
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
     HTTPOptions = [hoForceEncodeParams]
+    OnRedirect = SMSServiceIdHTTPRedirect
     Left = 432
     Top = 8
   end
@@ -1066,8 +1074,8 @@ object RemoteControlForm: TRemoteControlForm
         Precision = 10
         Value = Null
       end>
-    Left = 24
-    Top = 160
+    Left = 352
+    Top = 64
   end
   object AllActiveDriversADODS: TADODataSet
     Connection = ServerMainForm.MainBASEADOC
@@ -1299,8 +1307,8 @@ object RemoteControlForm: TRemoteControlForm
         Precision = 10
         Value = Null
       end>
-    Left = 64
-    Top = 160
+    Left = 392
+    Top = 64
   end
   object AllowOrdDispCancelADOSP: TADOStoredProc
     Connection = ServerMainForm.MainBASEADOC
@@ -1369,8 +1377,8 @@ object RemoteControlForm: TRemoteControlForm
     Connection = ServerMainForm.MainBASEADOC
     ProcedureName = 'SetDriverRemoteStatus;1'
     Parameters = <>
-    Left = 104
-    Top = 160
+    Left = 432
+    Top = 64
   end
   object InsOrdWithStatusADOSP: TADOStoredProc
     Connection = ServerMainForm.MainBASEADOC
@@ -1484,8 +1492,8 @@ object RemoteControlForm: TRemoteControlForm
     CursorType = ctStatic
     CommandText = 'select *  from Voditelj '#13#10'where ITS_REMOTE_CLIENT=1'
     Parameters = <>
-    Left = 144
-    Top = 160
+    Left = 472
+    Top = 64
   end
   object DriversDS: TDataSource
     DataSet = DriversADOT
@@ -2122,13 +2130,13 @@ object RemoteControlForm: TRemoteControlForm
   end
   object RemoteModIdAntiFreeze: TIdAntiFreeze
     OnlyWhenIdle = False
-    Left = 400
+    Left = 504
     Top = 8
   end
   object IdTCPServer1: TIdTCPServer
     Bindings = <>
     DefaultPort = 0
-    Left = 400
+    Left = 504
     Top = 40
   end
   object GetJSONDriversListADOQ: TADOQuery
@@ -2163,8 +2171,8 @@ object RemoteControlForm: TRemoteControlForm
     Connection = ServerMainForm.MainBASEADOC
     ProcedureName = 'MoveOrdPortionToArhived2V;1'
     Parameters = <>
-    Left = 184
-    Top = 160
+    Left = 512
+    Top = 64
   end
   object AutoArhivedTimer: TTimer
     Interval = 20000
@@ -2336,8 +2344,8 @@ object RemoteControlForm: TRemoteControlForm
         Precision = 10
         Value = Null
       end>
-    Left = 224
-    Top = 160
+    Left = 552
+    Top = 64
   end
   object SetSectDirectionADOC: TADOCommand
     CommandText = 
@@ -2641,8 +2649,8 @@ object RemoteControlForm: TRemoteControlForm
         Size = 4
         Value = Null
       end>
-    Left = 264
-    Top = 160
+    Left = 592
+    Top = 64
   end
   object AttOrdCompleteADOSP3: TADOStoredProc
     Connection = ServerMainForm.MainBASEADOC
@@ -2734,8 +2742,8 @@ object RemoteControlForm: TRemoteControlForm
         Size = 4
         Value = Null
       end>
-    Left = 304
-    Top = 160
+    Left = 632
+    Top = 64
   end
   object SetDrDailyPStatusADOSP: TADOStoredProc
     Connection = ServerMainForm.MainBASEADOC

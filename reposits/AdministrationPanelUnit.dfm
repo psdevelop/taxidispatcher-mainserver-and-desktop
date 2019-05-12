@@ -16,7 +16,7 @@ object AdminPanelForm: TAdminPanelForm
   TextHeight = 16
   object Splitter1: TSplitter
     Left = 0
-    Top = 308
+    Top = 312
     Width = 627
     Height = 8
     Cursor = crVSplit
@@ -28,7 +28,7 @@ object AdminPanelForm: TAdminPanelForm
     Left = 0
     Top = 0
     Width = 627
-    Height = 308
+    Height = 312
     AddNewAtEnd = False
     Align = alClient
     BoldAutoColumns = False
@@ -43,6 +43,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
       end
       item
         BoldProperties.Expression = 'familiya'
@@ -52,6 +57,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1060#1072#1084#1080#1083#1080#1103
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
       end
       item
         BoldProperties.Expression = 'imya'
@@ -61,6 +71,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1048#1084#1103
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
       end
       item
         BoldProperties.Expression = 'otchestvo'
@@ -70,6 +85,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1054#1090#1095#1077#1089#1090#1074#1086
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
       end
       item
         BoldProperties.Expression = 'login'
@@ -79,6 +99,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1051#1086#1075#1080#1085
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
       end
       item
         BoldProperties.Expression = 'ident_dispetchera.asString+'#39' : '#39'+imya_dispetchera'
@@ -88,6 +113,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1044#1080#1089#1087#1077#1090#1095#1077#1088
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
         LookUpProperties.Expression = 'polnoe_imya'
         LookupHandle = BoldHandlesDM.blhUsersList
         OnLookupChange = BoldGrid7Columns5LookupChange
@@ -100,11 +130,6 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = 'IP-'#1082#1072#1085#1072#1083
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
-        Title.Font.Height = -11
-        Title.Font.Name = 'Tahoma'
-        Title.Font.Style = []
       end
       item
         BoldProperties.Expression = 'razresh_administr'
@@ -114,6 +139,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1056#1072#1079#1088#1077#1096' '#1072#1076#1084#1080#1085#1080#1089#1090#1088
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
         AllowCheckBox = True
       end
       item
@@ -124,6 +154,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1056#1072#1079#1088#1077#1096' '#1085#1072#1089#1090#1088#1086#1081#1082#1091' '#1088#1072#1073#1086#1090#1099
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
         AllowCheckBox = True
       end
       item
@@ -134,6 +169,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1056#1072#1079#1088#1077#1096#1080#1090#1100' '#1087#1088#1086#1089#1084#1086#1090#1088' '#1083#1086#1075#1086#1074
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
         AllowCheckBox = True
       end
       item
@@ -144,6 +184,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1056#1072#1079#1088'. '#1088#1072#1073#1086#1090#1091' '#1089' '#1072#1088#1093#1080#1074#1086#1084
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
         AllowCheckBox = True
       end
       item
@@ -154,11 +199,6 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1056#1086#1083#1100' '#1076#1080#1089#1087#1077#1090#1095#1077#1088#1072
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
-        Title.Font.Height = -11
-        Title.Font.Name = 'Tahoma'
-        Title.Font.Style = []
         AllowCheckBox = True
       end
       item
@@ -169,6 +209,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1042#1080#1076#1080#1090' '#1074#1089#1077#1093
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
         AllowCheckBox = True
       end
       item
@@ -178,12 +223,7 @@ object AdminPanelForm: TAdminPanelForm
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Title.Caption = #1056#1072#1079#1088#1077#1096#1080#1090#1100' '#1074#1089#1105
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
-        Title.Font.Height = -11
-        Title.Font.Name = 'Tahoma'
-        Title.Font.Style = []
+        Title.Caption = #1056#1072#1079#1088#1077#1096#1080#1090#1100' '#1087#1088#1086#1095#1077#1077' ('#1089#1087#1088#1072#1074#1086#1095#1085#1080#1082#1080' '#1080' '#1090#1076')'
         AllowCheckBox = True
       end
       item
@@ -194,6 +234,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1044#1086#1087#1091#1089#1082#1072#1090#1100' '#1082' '#1086#1089#1085'. '#1087#1072#1085#1077#1083#1103#1084
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
         AllowCheckBox = True
       end
       item
@@ -204,6 +249,11 @@ object AdminPanelForm: TAdminPanelForm
         Font.Name = 'Tahoma'
         Font.Style = []
         Title.Caption = #1056#1072#1079#1088#1077#1096#1080#1090#1100' '#1088#1072#1073#1086#1090#1091' '#1089' '#1082#1072#1089#1089#1086#1081
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -11
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
         AllowCheckBox = True
       end>
     Ctl3d = False
@@ -242,7 +292,7 @@ object AdminPanelForm: TAdminPanelForm
   end
   object PageControl1: TPageControl
     Left = 0
-    Top = 316
+    Top = 320
     Width = 627
     Height = 210
     ActivePage = TabSheet1
@@ -610,11 +660,6 @@ object AdminPanelForm: TAdminPanelForm
             Font.Height = -10
             Font.Name = 'Tahoma'
             Font.Style = []
-            Title.Font.Charset = DEFAULT_CHARSET
-            Title.Font.Color = clWindowText
-            Title.Font.Height = -11
-            Title.Font.Name = 'Tahoma'
-            Title.Font.Style = []
           end
           item
             BoldProperties.Expression = 'data'
@@ -625,11 +670,6 @@ object AdminPanelForm: TAdminPanelForm
             Font.Name = 'Tahoma'
             Font.Style = []
             Title.Caption = #1044#1072#1090#1072
-            Title.Font.Charset = DEFAULT_CHARSET
-            Title.Font.Color = clWindowText
-            Title.Font.Height = -11
-            Title.Font.Name = 'Tahoma'
-            Title.Font.Style = []
           end
           item
             BoldProperties.Expression = 'vhod'
@@ -640,11 +680,6 @@ object AdminPanelForm: TAdminPanelForm
             Font.Name = 'Tahoma'
             Font.Style = []
             Title.Caption = #1042#1093#1086#1076
-            Title.Font.Charset = DEFAULT_CHARSET
-            Title.Font.Color = clWindowText
-            Title.Font.Height = -11
-            Title.Font.Name = 'Tahoma'
-            Title.Font.Style = []
             AllowCheckBox = True
           end
           item
@@ -656,11 +691,6 @@ object AdminPanelForm: TAdminPanelForm
             Font.Name = 'Tahoma'
             Font.Style = []
             Title.Caption = #1042#1099#1093#1086#1076
-            Title.Font.Charset = DEFAULT_CHARSET
-            Title.Font.Color = clWindowText
-            Title.Font.Height = -11
-            Title.Font.Name = 'Tahoma'
-            Title.Font.Style = []
             AllowCheckBox = True
           end
           item
@@ -672,11 +702,6 @@ object AdminPanelForm: TAdminPanelForm
             Font.Name = 'Tahoma'
             Font.Style = []
             Title.Caption = #1042' '#1088#1086#1083#1080' '#1086#1087#1077#1088#1072#1090#1086#1088#1072
-            Title.Font.Charset = DEFAULT_CHARSET
-            Title.Font.Color = clWindowText
-            Title.Font.Height = -11
-            Title.Font.Name = 'Tahoma'
-            Title.Font.Style = []
             AllowCheckBox = True
           end
           item
@@ -688,11 +713,6 @@ object AdminPanelForm: TAdminPanelForm
             Font.Name = 'Tahoma'
             Font.Style = []
             Title.Caption = #1042' '#1088#1086#1083#1080' '#1076#1080#1089#1087#1077#1090#1095#1077#1088#1072
-            Title.Font.Charset = DEFAULT_CHARSET
-            Title.Font.Color = clWindowText
-            Title.Font.Height = -11
-            Title.Font.Name = 'Tahoma'
-            Title.Font.Style = []
             AllowCheckBox = True
           end
           item
@@ -703,11 +723,6 @@ object AdminPanelForm: TAdminPanelForm
             Font.Name = 'Tahoma'
             Font.Style = []
             Title.Caption = #1063#1072#1089#1086#1074
-            Title.Font.Charset = DEFAULT_CHARSET
-            Title.Font.Color = clWindowText
-            Title.Font.Height = -11
-            Title.Font.Name = 'Tahoma'
-            Title.Font.Style = []
           end>
         Ctl3d = False
         DefaultRowHeight = 17

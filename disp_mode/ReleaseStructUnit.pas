@@ -121,6 +121,11 @@ type
     Label13: TLabel;
     DBText9: TDBText;
     DBEdit7: TDBEdit;
+    TabSheet6: TTabSheet;
+    DBCheckBox1: TDBCheckBox;
+    DBEdit8: TDBEdit;
+    Label14: TLabel;
+    DBNavigator2: TDBNavigator;
     procedure FEditorKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure DispDBGridColEnter(Sender: TObject);
@@ -1011,10 +1016,11 @@ ISMScroll:=False;
      //end
      //else
      //begin
-     
-     if ADOConnectDM.ActiveCustADOQuery.FieldByName('Predvariteljnyi').AsInteger<>0 then
+
+     if (ADOConnectDM.ActiveCustADOQuery.FieldByName('Predvariteljnyi').AsInteger<>0) or
+        (ADOConnectDM.ActiveCustADOQuery.FieldByName('is_early').AsInteger<>0)  then
       begin
-        ShowMessage('ƒанна€ за€вка €вл€етс€ предварительной!');
+        ShowMessage('ƒанна€ за€вка €вл€етс€ запланированной и/или предварительной!');
       end
      else
       begin
@@ -1726,6 +1732,11 @@ begin
       if ADOConnectDM.dsActiveCust.DataSet.FieldByName('Predvariteljnyi').AsInteger=1 then
         DispDBGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
 
+      DispDBGrid.Canvas.Brush.Color := clSkyBlue;
+      DispDBGrid.Canvas.Font.Color := clBlack;
+      if ADOConnectDM.dsActiveCust.DataSet.FieldByName('is_early').AsInteger=1 then
+        DispDBGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+
       DispDBGrid.Canvas.Brush.Color := clRed;
       DispDBGrid.Canvas.Font.Color := clWhite;
       if (ADOConnectDM.dsActiveCust.DataSet.FieldByName('Nomer_skidki').AsInteger>0)
@@ -1801,6 +1812,11 @@ begin
       DispDBGrid.Canvas.Brush.Color := clMoneyGreen;
       DispDBGrid.Canvas.Font.Color := clBlack;
       if ADOConnectDM.dsActiveCust.DataSet.FieldByName('Predvariteljnyi').AsInteger=1 then
+        DispDBGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+
+      DispDBGrid.Canvas.Brush.Color := clSkyBlue;
+      DispDBGrid.Canvas.Font.Color := clBlack;
+      if ADOConnectDM.dsActiveCust.DataSet.FieldByName('is_early').AsInteger=1 then
         DispDBGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
 
       DispDBGrid.Canvas.Brush.Color := clRed;

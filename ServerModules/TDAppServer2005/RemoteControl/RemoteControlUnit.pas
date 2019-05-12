@@ -177,7 +177,6 @@ type
     RemoteModIdAntiFreeze: TIdAntiFreeze;
     IdTCPServer1: TIdTCPServer;
     TabSheet8: TTabSheet;
-    Panel2: TPanel;
     Test2Memo: TMemo;
     GetJSONDriversListADOQ: TADOQuery;
     SettingsADODSuse_dr_priority: TIntegerField;
@@ -315,6 +314,11 @@ type
     SettingsADODSlock_reserv_on_limit: TSmallintField;
     SputnikApiHTTP: TIdHTTP;
     GetEarlyListADOQuery: TADOQuery;
+    BitBtn3: TBitBtn;
+    procedure BitBtn3Click(Sender: TObject);
+    procedure SMSServiceIdHTTPRedirect(Sender: TObject; var dest: string;
+      var NumRedirect: Integer; var Handled: Boolean;
+      var VMethod: TIdHTTPMethod);
     procedure Timer10SecTimer(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure AutoArhivedTimerTimer(Sender: TObject);
@@ -737,7 +741,9 @@ begin
       begin
 
       s:=StringReplace(s,
-        '***___dest_number','7'+
+        '***___dest_number',IniFile.ReadString('BUSINESS_DATA',
+          'префикс_номера_для_смс_интернет_сервиса',
+          '')+
         //'9184652120',
         CLIENT_PHONE,
         [rfReplaceAll]);
@@ -762,7 +768,13 @@ begin
       ServerMainForm.WriteEvent(
             'Encode: '+TIdURI.URLEncode(s)+'.');
 
+      if IniFile.ReadString('BUSINESS_DATA',
+          'обрабатывать_редиректы_посыл_SMS_HTTP',
+          'NO')='YES'   then begin
+          SMSServiceIdHTTP.HandleRedirects := True;
+      end;
       s := SMSServiceIdHTTP.Get(TIdURI.URLEncode(AnsiToUTF8(s)));
+
       ServerMainForm.WriteEvent(
             'Ответ: '+StringReplace
             (s,#13,#13#10, [rfReplaceAll]));
@@ -860,7 +872,9 @@ begin
 
       has_repl:=False;
 	    templ_str:='***___dest_number';
-	    repl_str:='7'+CLIENT_PHONE;
+	    repl_str:=IniFile.ReadString('BUSINESS_DATA',
+          'префикс_номера_для_смс_интернет_сервиса',
+          '')+CLIENT_PHONE;
 	    for i:=0 to post.Count-1 do
 	    begin
 		    if post.Strings[i]<>StringReplace(
@@ -933,6 +947,12 @@ begin
       for i:=0 to post.Count-1 do
          ServerMainForm.EventsList.Items.Add(post.Strings[i]);
       //SMSServiceIdHTTPPOST.URL.Params
+
+      if IniFile.ReadString('BUSINESS_DATA',
+          'обрабатывать_редиректы_посыл_SMS_HTTP',
+          'NO')='YES'   then begin
+          SMSServiceIdHTTPPOST.HandleRedirects := True;
+      end;
 
       s := SMSServiceIdHTTPPOST.Post(post_http_base, post);
         //TIdURI.URLEncode(AnsiToUTF8(s)));
@@ -5700,6 +5720,19 @@ begin
 
   end;
 
+end;
+
+procedure TRemoteControlForm.SMSServiceIdHTTPRedirect(Sender: TObject;
+  var dest: string; var NumRedirect: Integer; var Handled: Boolean;
+  var VMethod: TIdHTTPMethod);
+begin
+  ServerMainForm.WriteEvent('Увидел редирект ' + dest);
+end;
+
+procedure TRemoteControlForm.BitBtn3Click(Sender: TObject);
+begin
+  Test2Memo.Clear;
+  Test2Memo.Lines.AddStrings(SocketLogMemo.Lines);
 end;
 
 end.

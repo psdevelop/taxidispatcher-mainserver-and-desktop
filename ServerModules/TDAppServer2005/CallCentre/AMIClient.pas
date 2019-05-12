@@ -31,6 +31,12 @@ type
     StreamAnalyseMemo: TMemo;
     ComboBox1: TComboBox;
     BitBtn1: TBitBtn;
+    Button2: TButton;
+    BitBtn2: TBitBtn;
+    BitBtn3: TBitBtn;
+    procedure BitBtn3Click(Sender: TObject);
+    procedure BitBtn2Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
     procedure BitBtn1Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ComboBox1Change(Sender: TObject);
@@ -839,6 +845,27 @@ end;
 procedure TAMIClientForm.BitBtn1Click(Sender: TObject);
 begin
   AMIOutputMemo.Lines.SaveToFile('AMIOutputMemo.txt');
+end;
+
+procedure TAMIClientForm.Button2Click(Sender: TObject);
+begin
+  RemoteControlForm.Test2Memo.Clear;
+  RemoteControlForm.Test2Memo.Lines.AddStrings(
+    AMIOutputMemo.Lines);
+end;
+
+procedure TAMIClientForm.BitBtn2Click(Sender: TObject);
+begin
+  RemoteControlForm.Test2Memo.Clear;
+  RemoteControlForm.Test2Memo.Lines.AddStrings(
+    AMIInputMemo.Lines);
+end;
+
+procedure TAMIClientForm.BitBtn3Click(Sender: TObject);
+begin
+  RemoteControlForm.Test2Memo.Clear;
+  RemoteControlForm.Test2Memo.Lines.AddStrings(
+    StreamAnalyseMemo.Lines);
 end;
 
 end.

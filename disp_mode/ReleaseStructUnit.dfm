@@ -174,7 +174,7 @@ object ReleaseStructForm: TReleaseStructForm
                   BevelOuter = bvNone
                   TabOrder = 0
                   object Label5: TLabel
-                    Left = 576
+                    Left = 584
                     Top = 16
                     Width = 37
                     Height = 16
@@ -667,7 +667,6 @@ object ReleaseStructForm: TReleaseStructForm
                     Visible = True
                   end
                   item
-                    Alignment = taCenter
                     Color = clInfoBk
                     Expanded = False
                     FieldName = 'start_dt'
@@ -1005,6 +1004,51 @@ object ReleaseStructForm: TReleaseStructForm
                   DataSource = ADOConnectDM.dsActiveCust
                   ParentCtl3D = False
                   TabOrder = 7
+                end
+              end
+              object TabSheet6: TTabSheet
+                Caption = #1045#1097#1077' '#1093#1072#1088#1072#1082#1090#1077#1088#1080#1089#1090#1080#1082#1080
+                ImageIndex = 11
+                object Label14: TLabel
+                  Left = 8
+                  Top = 32
+                  Width = 273
+                  Height = 16
+                  Caption = #1044#1072#1090#1072' '#1086#1090#1083#1086#1078#1077#1085#1085#1086#1075#1086' '#1089#1090#1072#1088#1090#1072' - '#1090#1077#1089#1090#1086#1074#1072#1103' '#1092#1091#1085#1082#1094#1080#1103
+                end
+                object DBCheckBox1: TDBCheckBox
+                  Left = 8
+                  Top = 8
+                  Width = 465
+                  Height = 17
+                  Caption = 
+                    #1047#1072#1087#1083#1072#1085#1080#1088#1086#1074#1072#1085#1085#1099#1081' ('#1086#1090#1083#1086#1078#1077#1085#1085#1099#1081' '#1089#1090#1072#1088#1090' '#1085#1072#1079#1085#1072#1095#1077#1085#1085#1086#1075#1086') - '#1090#1077#1089#1090#1086#1074#1072#1103' '#1092#1091#1085#1082#1094 +
+                    #1080#1103
+                  DataField = 'is_early'
+                  DataSource = ADOConnectDM.dsActiveCust
+                  TabOrder = 0
+                  ValueChecked = '1'
+                  ValueUnchecked = '0'
+                end
+                object DBEdit8: TDBEdit
+                  Left = 8
+                  Top = 48
+                  Width = 193
+                  Height = 22
+                  Ctl3D = False
+                  DataField = 'early_date'
+                  DataSource = ADOConnectDM.dsActiveCust
+                  ParentCtl3D = False
+                  TabOrder = 1
+                end
+                object DBNavigator2: TDBNavigator
+                  Left = 360
+                  Top = 48
+                  Width = 97
+                  Height = 25
+                  DataSource = ADOConnectDM.dsActiveCust
+                  VisibleButtons = [nbPost]
+                  TabOrder = 2
                 end
               end
               object sTabSheet6: TTabSheet

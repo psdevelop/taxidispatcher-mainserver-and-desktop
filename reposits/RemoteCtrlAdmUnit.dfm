@@ -417,6 +417,26 @@ object RemoteCtrlAdmForm: TRemoteCtrlAdmForm
         FieldName = 'rating'
         Title.Caption = #1055#1086#1089#1090#1086#1103#1085#1085#1099#1081' '#1088#1077#1081#1090#1080#1085#1075
         Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'daily_payment_expire'
+        Title.Caption = #1057#1088#1086#1082' '#1076#1077#1081#1089#1090#1074'. '#1077#1078#1077#1076#1085'. '#1087#1083#1072#1090#1077#1078#1072', '#1095'. (0 - 24'#1095')'
+        Visible = True
+      end
+      item
+        Color = clMenuBar
+        Expanded = False
+        FieldName = 'rating_level'
+        ReadOnly = True
+        Title.Caption = #1057#1090#1091#1087#1077#1085#1100' '#1088#1077#1081#1090#1080#1085#1075#1072
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'dont_auto_asgn_by_radius'
+        Title.Caption = #1053#1077' '#1085#1072#1079#1085'. '#1087#1086' '#1088#1072#1076#1080#1091#1089#1091' (1-'#1076#1072')'
+        Visible = True
       end>
   end
 end

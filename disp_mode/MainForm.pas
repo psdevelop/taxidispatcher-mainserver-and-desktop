@@ -137,6 +137,7 @@ type
     CIDSearchTimer: TTimer;
     N60: TMenuItem;
     N61: TMenuItem;
+    procedure N13Click(Sender: TObject);
     procedure N17Click(Sender: TObject);
     procedure N61Click(Sender: TObject);
     procedure N60Click(Sender: TObject);
@@ -171,7 +172,6 @@ type
     procedure N5Click(Sender: TObject);
     procedure N35Click(Sender: TObject);
     procedure N10Click(Sender: TObject);
-    procedure EnumsMenuClick(Sender: TObject);
     procedure N34Click(Sender: TObject);
     procedure N33Click(Sender: TObject);
     procedure N32Click(Sender: TObject);
@@ -1566,18 +1566,6 @@ begin
   SystemEnumsForm.TabSheet2.Show;
 end;
 
-procedure TFirstForm.EnumsMenuClick(Sender: TObject);
-begin
-  if BoldModelDM.ADOConnection.Connected then
-    begin
-      N34.Enabled:=True;
-    end
-  else
-    begin
-      N34.Enabled:=False;
-    end;  
-end;
-
 procedure TFirstForm.N10Click(Sender: TObject);
 begin
   ShellExecute(Application.Handle, 'Open', PChar('evolution/comments.txt'), nil, PChar(CDP), SW_SHOWNORMAL);
@@ -2181,6 +2169,11 @@ procedure TFirstForm.N17Click(Sender: TObject);
 begin
   SystemEnumsForm.ShowModal;
   SystemEnumsForm.TabSheet3.Show;
+end;
+
+procedure TFirstForm.N13Click(Sender: TObject);
+begin
+  RemoteCtrlAdmForm.ShowModal;
 end;
 
 end.

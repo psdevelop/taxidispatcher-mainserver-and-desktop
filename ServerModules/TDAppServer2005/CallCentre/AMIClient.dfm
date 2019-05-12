@@ -61,9 +61,9 @@ object AMIClientForm: TAMIClientForm
         OnClick = SpeedButton1Click
       end
       object Edit1: TEdit
-        Left = 8
+        Left = 96
         Top = 32
-        Width = 529
+        Width = 441
         Height = 19
         Ctl3D = False
         ParentCtl3D = False
@@ -79,9 +79,9 @@ object AMIClientForm: TAMIClientForm
         OnClick = Button1Click
       end
       object ComboBox1: TComboBox
-        Left = 8
+        Left = 96
         Top = 8
-        Width = 529
+        Width = 353
         Height = 21
         Ctl3D = False
         ItemHeight = 13
@@ -90,13 +90,40 @@ object AMIClientForm: TAMIClientForm
         OnChange = ComboBox1Change
       end
       object BitBtn1: TBitBtn
-        Left = 544
+        Left = 456
         Top = 8
         Width = 75
         Height = 17
         Caption = 'Save'
         TabOrder = 3
         OnClick = BitBtn1Click
+      end
+      object Button2: TButton
+        Left = 8
+        Top = 32
+        Width = 75
+        Height = 25
+        Caption = #1042' '#1080#1085#1092#1086
+        TabOrder = 4
+        OnClick = Button2Click
+      end
+      object BitBtn2: TBitBtn
+        Left = 8
+        Top = 8
+        Width = 75
+        Height = 25
+        Caption = #1042' '#1080#1085#1092#1086
+        TabOrder = 5
+        OnClick = BitBtn2Click
+      end
+      object BitBtn3: TBitBtn
+        Left = 544
+        Top = 8
+        Width = 75
+        Height = 25
+        Caption = #1042' '#1080#1085#1092#1086
+        TabOrder = 6
+        OnClick = BitBtn3Click
       end
     end
     object AMIInputMemo: TMemo
@@ -134,7 +161,7 @@ object AMIClientForm: TAMIClientForm
     Left = 0
     Top = 169
     Width = 619
-    Height = 150
+    Height = 154
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
@@ -142,7 +169,7 @@ object AMIClientForm: TAMIClientForm
       Left = 0
       Top = 0
       Width = 619
-      Height = 131
+      Height = 135
       Align = alClient
       Ctl3D = False
       ParentCtl3D = False
@@ -150,7 +177,7 @@ object AMIClientForm: TAMIClientForm
     end
     object StatusBar1: TStatusBar
       Left = 0
-      Top = 131
+      Top = 135
       Width = 619
       Height = 19
       Panels = <
