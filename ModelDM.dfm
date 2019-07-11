@@ -145,6 +145,9 @@ object BoldModelDM: TBoldModelDM
     Top = 104
   end
   object ADOConnection: TADOConnection
+    ConnectionString = 
+      'FILE NAME=C:\Documents and Settings\ADMIN\YandexDisk\Operate\TD\' +
+      'TDDesktop\TaxiManager\TaxiDispatcher.udl'
     LoginPrompt = False
     Provider = 'SQLOLEDB.1'
     Left = 320
@@ -6454,6 +6457,44 @@ object BoldModelDM: TBoldModelDM
     TableName = 'Sootvetstvie_parametrov_zakaza'
     Left = 120
     Top = 248
+    object AdrPhoneRelatingADOTableBOLD_ID: TIntegerField
+      FieldName = 'BOLD_ID'
+    end
+    object AdrPhoneRelatingADOTableBOLD_TYPE: TSmallintField
+      FieldName = 'BOLD_TYPE'
+    end
+    object AdrPhoneRelatingADOTableTelefon_klienta: TStringField
+      FieldName = 'Telefon_klienta'
+      Size = 255
+    end
+    object AdrPhoneRelatingADOTableAdres_vyzova_vvodim: TStringField
+      FieldName = 'Adres_vyzova_vvodim'
+      Size = 255
+    end
+    object AdrPhoneRelatingADOTableotnositsya_k_sektoru: TIntegerField
+      FieldName = 'otnositsya_k_sektoru'
+    end
+    object AdrPhoneRelatingADOTableSummarn_chislo_vyzovov: TIntegerField
+      FieldName = 'Summarn_chislo_vyzovov'
+    end
+    object AdrPhoneRelatingADOTablebonus_summ: TBCDField
+      FieldName = 'bonus_summ'
+      Precision = 28
+      Size = 10
+    end
+    object AdrPhoneRelatingADOTableoption_id: TIntegerField
+      FieldName = 'option_id'
+    end
+    object AdrPhoneRelatingADOTableOPTION_LOOK: TStringField
+      FieldKind = fkLookup
+      FieldName = 'OPTION_LOOK'
+      LookupDataSet = ADOConnectDM.LookOptionsADOT
+      LookupKeyFields = 'ID'
+      LookupResultField = 'OPTION_NAME'
+      KeyFields = 'option_id'
+      Size = 255
+      Lookup = True
+    end
   end
   object IndividPersonsADOQuery: TADOQuery
     Connection = ADOConnection
@@ -6465,6 +6506,69 @@ object BoldModelDM: TBoldModelDM
         #1080#1077#1085#1090#39)
     Left = 216
     Top = 200
+    object IndividPersonsADOQueryBOLD_ID: TIntegerField
+      FieldName = 'BOLD_ID'
+    end
+    object IndividPersonsADOQueryBOLD_TYPE: TSmallintField
+      FieldName = 'BOLD_TYPE'
+    end
+    object IndividPersonsADOQueryFamiliya: TStringField
+      FieldName = 'Familiya'
+      Size = 255
+    end
+    object IndividPersonsADOQueryImya: TStringField
+      FieldName = 'Imya'
+      Size = 255
+    end
+    object IndividPersonsADOQueryOtchestvo: TStringField
+      FieldName = 'Otchestvo'
+      Size = 255
+    end
+    object IndividPersonsADOQueryUlica: TStringField
+      FieldName = 'Ulica'
+      Size = 255
+    end
+    object IndividPersonsADOQueryDom: TIntegerField
+      FieldName = 'Dom'
+    end
+    object IndividPersonsADOQueryKvartira: TIntegerField
+      FieldName = 'Kvartira'
+    end
+    object IndividPersonsADOQueryKorpus: TIntegerField
+      FieldName = 'Korpus'
+    end
+    object IndividPersonsADOQueryMobiljnyi_telefon: TStringField
+      FieldName = 'Mobiljnyi_telefon'
+      Size = 255
+    end
+    object IndividPersonsADOQueryRabochii_telefon: TStringField
+      FieldName = 'Rabochii_telefon'
+      Size = 255
+    end
+    object IndividPersonsADOQueryDomashnii_telefon: TStringField
+      FieldName = 'Domashnii_telefon'
+      Size = 255
+    end
+    object IndividPersonsADOQueryElektronnyi_adres: TStringField
+      FieldName = 'Elektronnyi_adres'
+      Size = 255
+    end
+    object IndividPersonsADOQueryRESERVED_PRESENTS: TIntegerField
+      FieldName = 'RESERVED_PRESENTS'
+    end
+    object IndividPersonsADOQueryoption_id: TIntegerField
+      FieldName = 'option_id'
+    end
+    object IndividPersonsADOQueryOPTION_LOOK: TStringField
+      FieldKind = fkLookup
+      FieldName = 'OPTION_LOOK'
+      LookupDataSet = ADOConnectDM.LookOptionsADOT
+      LookupKeyFields = 'ID'
+      LookupResultField = 'OPTION_NAME'
+      KeyFields = 'option_id'
+      Size = 255
+      Lookup = True
+    end
   end
   object IPersPerINumADOQuery: TADOQuery
     Connection = ADOConnection

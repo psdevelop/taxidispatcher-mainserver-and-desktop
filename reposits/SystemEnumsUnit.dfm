@@ -21,7 +21,7 @@ object SystemEnumsForm: TSystemEnumsForm
     Top = 0
     Width = 700
     Height = 466
-    ActivePage = TabSheet7
+    ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
@@ -53,7 +53,7 @@ object SystemEnumsForm: TSystemEnumsForm
               Expanded = False
               FieldName = 'Adres_vyzova_vvodim'
               Title.Caption = #1040#1076#1088#1077#1089
-              Width = 238
+              Width = 138
               Visible = True
             end
             item
@@ -74,7 +74,14 @@ object SystemEnumsForm: TSystemEnumsForm
               Expanded = False
               FieldName = 'bonus_summ'
               Title.Caption = #1041#1086#1085#1091#1089#1085#1099#1081' '#1089#1095#1077#1090
-              Width = 150
+              Width = 93
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'OPTION_LOOK'
+              Title.Caption = #1054#1087#1094#1080#1103' '#1087#1086' '#1091#1084#1086#1083#1095#1072#1085#1080#1102
+              Width = 115
               Visible = True
             end>
         end
@@ -310,28 +317,28 @@ object SystemEnumsForm: TSystemEnumsForm
             FieldName = 'Korpus'
             ReadOnly = True
             Title.Caption = 'ID'
-            Width = 50
+            Width = 30
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'Familiya'
             Title.Caption = #1060#1072#1084#1080#1083#1080#1103
-            Width = 100
+            Width = 92
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'Imya'
             Title.Caption = #1048#1084#1103
-            Width = 70
+            Width = 71
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'Otchestvo'
             Title.Caption = #1054#1090#1095#1077#1089#1090#1074#1086
-            Width = 80
+            Width = 59
             Visible = True
           end
           item
@@ -353,7 +360,14 @@ object SystemEnumsForm: TSystemEnumsForm
             Expanded = False
             FieldName = 'Ulica'
             Title.Caption = #1040#1076#1088#1077#1089
-            Width = 155
+            Width = 122
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'OPTION_LOOK'
+            Title.Caption = #1054#1087#1094#1080#1103' '#1087#1086' '#1091#1084#1086#1083#1095#1072#1085#1080#1102
+            Width = 121
             Visible = True
           end>
       end

@@ -23,7 +23,7 @@ object PrSettForm: TPrSettForm
     Top = 0
     Width = 792
     Height = 423
-    ActivePage = TabSheet3
+    ActivePage = TabSheet12
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
@@ -2632,6 +2632,11 @@ object PrSettForm: TPrSettForm
               Font.Style = []
               Title.Caption = #1048#1085#1076#1077#1082#1089
               Title.Color = clWindow
+              Title.Font.Charset = DEFAULT_CHARSET
+              Title.Font.Color = clWindowText
+              Title.Font.Height = -11
+              Title.Font.Name = 'Tahoma'
+              Title.Font.Style = []
             end
             item
               BoldProperties.Expression = 'naimenovanie'
@@ -2642,6 +2647,11 @@ object PrSettForm: TPrSettForm
               Font.Style = []
               Title.Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077
               Title.Color = clWindow
+              Title.Font.Charset = DEFAULT_CHARSET
+              Title.Font.Color = clWindowText
+              Title.Font.Height = -11
+              Title.Font.Name = 'Tahoma'
+              Title.Font.Style = []
             end
             item
               BoldProperties.Expression = 'kommentarii'
@@ -2652,6 +2662,11 @@ object PrSettForm: TPrSettForm
               Font.Style = []
               Title.Caption = #1050#1086#1084#1084#1077#1085#1090#1072#1088#1080#1081
               Title.Color = clWindow
+              Title.Font.Charset = DEFAULT_CHARSET
+              Title.Font.Color = clWindowText
+              Title.Font.Height = -11
+              Title.Font.Name = 'Tahoma'
+              Title.Font.Style = []
             end>
           Ctl3d = False
           DefaultRowHeight = 17
@@ -2973,14 +2988,14 @@ object PrSettForm: TPrSettForm
             Expanded = False
             FieldName = 'ID'
             Title.Caption = '#'
-            Width = 45
+            Width = 30
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'OPTION_NAME'
             Title.Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077' '#1086#1087#1094#1080#1080
-            Width = 189
+            Width = 134
             Visible = True
           end
           item
@@ -2994,27 +3009,41 @@ object PrSettForm: TPrSettForm
             Expanded = False
             FieldName = 'OS_COMPOSED'
             Title.Caption = #1057#1083#1072#1075#1072#1077#1084#1086#1077' '#1089#1091#1084#1084#1099
-            Width = 113
+            Width = 110
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'TPLAN_LOOK'
             Title.Caption = #1058#1072#1088'. '#1087#1083#1072#1085
-            Width = 118
+            Width = 90
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'SHORT_NAME'
             Title.Caption = #1057#1086#1082#1088#1072#1097#1077#1085#1080#1077
-            Width = 91
+            Width = 79
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'IF_DEF'
             Title.Caption = #1059#1084#1086#1083#1095'.'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'start_time'
+            Title.Caption = #1053#1072#1095#1072#1083#1086
+            Width = 53
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'end_time'
+            Title.Caption = #1054#1082#1086#1085#1095'.'
+            Width = 54
             Visible = True
           end>
       end

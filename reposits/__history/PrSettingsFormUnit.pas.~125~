@@ -1,0 +1,516 @@
+unit PrSettingsFormUnit;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ComCtrls, BoldEdit, Buttons, BoldCheckBox,
+  BoldSubscription, BoldElements, BoldControlPack, BoldStringControlPack,
+  ExtCtrls, Grids, BoldGrid, DBCtrls, Mask, DBGrids, ShellAPI, BoldComboBox;
+
+type
+  TPrSettForm = class(TForm)
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    Label1: TLabel;
+    BoldEdit1: TBoldEdit;
+    BoldEdit2: TBoldEdit;
+    Label2: TLabel;
+    BoldCheckBox1: TBoldCheckBox;
+    BoldCheckBox2: TBoldCheckBox;
+    BoldCheckBox3: TBoldCheckBox;
+    BoldCheckBox4: TBoldCheckBox;
+    TabSheet3: TTabSheet;
+    BoldCheckBox8: TBoldCheckBox;
+    BoldCheckBox9: TBoldCheckBox;
+    TabSheet4: TTabSheet;
+    BoldEdit12: TBoldEdit;
+    BoldEdit13: TBoldEdit;
+    BoldEdit14: TBoldEdit;
+    BoldEdit15: TBoldEdit;
+    BoldEdit16: TBoldEdit;
+    BoldEdit17: TBoldEdit;
+    Label12: TLabel;
+    Label13: TLabel;
+    Label14: TLabel;
+    Label15: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
+    TabSheet5: TTabSheet;
+    Label18: TLabel;
+    BoldEdit18: TBoldEdit;
+    TabSheet6: TTabSheet;
+    Label19: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    BoldEdit19: TBoldEdit;
+    BoldEdit20: TBoldEdit;
+    BoldEdit21: TBoldEdit;
+    Label22: TLabel;
+    BoldEdit22: TBoldEdit;
+    TabSheet7: TTabSheet;
+    BoldEdit23: TBoldEdit;
+    BoldEdit24: TBoldEdit;
+    BoldEdit25: TBoldEdit;
+    Label23: TLabel;
+    Label24: TLabel;
+    Label25: TLabel;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    BoldEdit26: TBoldEdit;
+    BoldEdit27: TBoldEdit;
+    BoldEdit28: TBoldEdit;
+    cd: TColorDialog;
+    BoldCheckBox10: TBoldCheckBox;
+    BoldEdit29: TBoldEdit;
+    BoldEdit30: TBoldEdit;
+    SpeedButton4: TSpeedButton;
+    Label26: TLabel;
+    CtrlTabSheet: TTabSheet;
+    Label30: TLabel;
+    BoldCheckBox11: TBoldCheckBox;
+    PageControl2: TPageControl;
+    TabSheet9: TTabSheet;
+    TabSheet10: TTabSheet;
+    BoldEdit33: TBoldEdit;
+    BoldEdit32: TBoldEdit;
+    BoldEdit31: TBoldEdit;
+    Label29: TLabel;
+    Label28: TLabel;
+    Label27: TLabel;
+    BoldEdit8: TBoldEdit;
+    BoldEdit7: TBoldEdit;
+    BoldCheckBox6: TBoldCheckBox;
+    BoldEdit5: TBoldEdit;
+    BoldEdit4: TBoldEdit;
+    BoldCheckBox5: TBoldCheckBox;
+    Label8: TLabel;
+    Label7: TLabel;
+    Label6: TLabel;
+    Label5: TLabel;
+    Label4: TLabel;
+    Label3: TLabel;
+    TabSheet11: TTabSheet;
+    BoldCheckBox7: TBoldCheckBox;
+    BoldCheckBox12: TBoldCheckBox;
+    BoldCheckBox13: TBoldCheckBox;
+    BoldEdit9: TBoldEdit;
+    Label9: TLabel;
+    BoldEdit10: TBoldEdit;
+    Label10: TLabel;
+    BoldCheckBox14: TBoldCheckBox;
+    BoldEdit11: TBoldEdit;
+    BoldEdit34: TBoldEdit;
+    Label31: TLabel;
+    BoldEdit36: TBoldEdit;
+    BoldEdit37: TBoldEdit;
+    Label32: TLabel;
+    Label33: TLabel;
+    Label34: TLabel;
+    Label11: TLabel;
+    DBEdit3: TDBEdit;
+    GroupBox1: TGroupBox;
+    DBEdit5: TDBEdit;
+    Label35: TLabel;
+    Label36: TLabel;
+    BitBtn4: TBitBtn;
+    BitBtn5: TBitBtn;
+    DBEdit9: TDBEdit;
+    Label41: TLabel;
+    Label43: TLabel;
+    DBEdit11: TDBEdit;
+    TabSheet8: TTabSheet;
+    Panel2: TPanel;
+    DBGrid1: TDBGrid;
+    BitBtn6: TBitBtn;
+    TabSheet12: TTabSheet;
+    Panel3: TPanel;
+    BitBtn7: TBitBtn;
+    DBGrid2: TDBGrid;
+    TabSheet13: TTabSheet;
+    Panel4: TPanel;
+    Splitter1: TSplitter;
+    PageControl3: TPageControl;
+    TabSheet14: TTabSheet;
+    TabSheet15: TTabSheet;
+    Panel5: TPanel;
+    DBGrid3: TDBGrid;
+    BitBtn8: TBitBtn;
+    DBGrid4: TDBGrid;
+    DBGrid5: TDBGrid;
+    DBEdit12: TDBEdit;
+    TabSheet16: TTabSheet;
+    DBEdit13: TDBEdit;
+    DBEdit14: TDBEdit;
+    DBEdit15: TDBEdit;
+    DBEdit16: TDBEdit;
+    DBEdit17: TDBEdit;
+    DBEdit18: TDBEdit;
+    DBEdit19: TDBEdit;
+    DBEdit20: TDBEdit;
+    DBEdit21: TDBEdit;
+    DBEdit22: TDBEdit;
+    BitBtn9: TBitBtn;
+    Label44: TLabel;
+    Label45: TLabel;
+    Label46: TLabel;
+    Label47: TLabel;
+    Label48: TLabel;
+    Label49: TLabel;
+    Label50: TLabel;
+    Label51: TLabel;
+    Label52: TLabel;
+    Label53: TLabel;
+    TabSheet17: TTabSheet;
+    GroupBox2: TGroupBox;
+    Panel6: TPanel;
+    DBGrid6: TDBGrid;
+    DBNavigator1: TDBNavigator;
+    GroupBox3: TGroupBox;
+    Splitter2: TSplitter;
+    DBGrid7: TDBGrid;
+    DBNavigator2: TDBNavigator;
+    DBEdit23: TDBEdit;
+    Label54: TLabel;
+    BitBtn10: TBitBtn;
+    Label61: TLabel;
+    DBLookupComboBox1: TDBLookupComboBox;
+    BitBtn11: TBitBtn;
+    BitBtn12: TBitBtn;
+    DBCheckBox1: TDBCheckBox;
+    DBCheckBox2: TDBCheckBox;
+    DBCheckBox3: TDBCheckBox;
+    DBCheckBox4: TDBCheckBox;
+    DBCheckBox5: TDBCheckBox;
+    DBCheckBox6: TDBCheckBox;
+    DBCheckBox7: TDBCheckBox;
+    DBCheckBox8: TDBCheckBox;
+    DBCheckBox10: TDBCheckBox;
+    DBCheckBox11: TDBCheckBox;
+    DBCheckBox12: TDBCheckBox;
+    DBCheckBox13: TDBCheckBox;
+    DBCheckBox14: TDBCheckBox;
+    DBEdit1: TDBEdit;
+    Label37: TLabel;
+    DBCheckBox15: TDBCheckBox;
+    DBCheckBox16: TDBCheckBox;
+    DBCheckBox9: TDBCheckBox;
+    TabSheet18: TTabSheet;
+    DBEdit2: TDBEdit;
+    Label38: TLabel;
+    BitBtn3: TBitBtn;
+    TabSheet19: TTabSheet;
+    TabSheet20: TTabSheet;
+    Label39: TLabel;
+    DBEdit4: TDBEdit;
+    DBEdit6: TDBEdit;
+    Label40: TLabel;
+    DBCheckBox17: TDBCheckBox;
+    DBCheckBox18: TDBCheckBox;
+    DBCheckBox19: TDBCheckBox;
+    DBCheckBox20: TDBCheckBox;
+    DBCheckBox21: TDBCheckBox;
+    DBCheckBox22: TDBCheckBox;
+    Label42: TLabel;
+    DBEdit7: TDBEdit;
+    DBEdit8: TDBEdit;
+    Label55: TLabel;
+    DBEdit10: TDBEdit;
+    Label56: TLabel;
+    BitBtn13: TBitBtn;
+    Label57: TLabel;
+    DBEdit24: TDBEdit;
+    Panel7: TPanel;
+    BoldGrid1: TBoldGrid;
+    Panel1: TPanel;
+    BitBtn2: TBitBtn;
+    BoldAsStringRenderer1: TBoldAsStringRenderer;
+    DBCheckBox23: TDBCheckBox;
+    DBEdit25: TDBEdit;
+    Label58: TLabel;
+    DBCheckBox24: TDBCheckBox;
+    DBCheckBox25: TDBCheckBox;
+    DBCheckBox26: TDBCheckBox;
+    DBCheckBox27: TDBCheckBox;
+    DBEdit26: TDBEdit;
+    Label59: TLabel;
+    DBCheckBox28: TDBCheckBox;
+    DBEdit27: TDBEdit;
+    Label60: TLabel;
+    DBCheckBox29: TDBCheckBox;
+    Label62: TLabel;
+    DBEdit28: TDBEdit;
+    Label63: TLabel;
+    Label64: TLabel;
+    Panel8: TPanel;
+    BitBtn1: TBitBtn;
+    Label67: TLabel;
+    DBEdit29: TDBEdit;
+    Label68: TLabel;
+    DBEdit30: TDBEdit;
+    Label69: TLabel;
+    DBEdit32: TDBEdit;
+    DBEdit31: TDBEdit;
+    DBEdit33: TDBEdit;
+    DBEdit34: TDBEdit;
+    Label70: TLabel;
+    DBEdit35: TDBEdit;
+    Label65: TLabel;
+    Label66: TLabel;
+    DBEdit36: TDBEdit;
+    DBEdit37: TDBEdit;
+    Label71: TLabel;
+    Label72: TLabel;
+    DBEdit38: TDBEdit;
+    DBEdit39: TDBEdit;
+    DBEdit40: TDBEdit;
+    DBEdit41: TDBEdit;
+    DBEdit42: TDBEdit;
+    DBEdit43: TDBEdit;
+    Label73: TLabel;
+    Label74: TLabel;
+    Label75: TLabel;
+    DBEdit44: TDBEdit;
+    Label76: TLabel;
+    Label77: TLabel;
+    DBEdit45: TDBEdit;
+    DBEdit46: TDBEdit;
+    DBEdit47: TDBEdit;
+    DBEdit48: TDBEdit;
+    Label78: TLabel;
+    Label79: TLabel;
+    Label80: TLabel;
+    Label81: TLabel;
+    DBEdit49: TDBEdit;
+    DBEdit50: TDBEdit;
+    DBEdit51: TDBEdit;
+    Label82: TLabel;
+    Label83: TLabel;
+    Label84: TLabel;
+    DBCheckBox30: TDBCheckBox;
+    DBEdit52: TDBEdit;
+    DBEdit53: TDBEdit;
+    DBEdit54: TDBEdit;
+    DBEdit55: TDBEdit;
+    DBEdit56: TDBEdit;
+    DBEdit57: TDBEdit;
+    DBEdit58: TDBEdit;
+    DBEdit59: TDBEdit;
+    DBEdit60: TDBEdit;
+    DBEdit61: TDBEdit;
+    DBEdit62: TDBEdit;
+    DBEdit63: TDBEdit;
+    DBEdit64: TDBEdit;
+    Label85: TLabel;
+    Label86: TLabel;
+    Label87: TLabel;
+    Label88: TLabel;
+    Label89: TLabel;
+    Label90: TLabel;
+    Label91: TLabel;
+    Label92: TLabel;
+    Label93: TLabel;
+    Label94: TLabel;
+    Label95: TLabel;
+    Label96: TLabel;
+    Label97: TLabel;
+    BitBtn14: TBitBtn;
+    DBCheckBox31: TDBCheckBox;
+    Label98: TLabel;
+    DBCheckBox32: TDBCheckBox;
+    DBEdit65: TDBEdit;
+    Label99: TLabel;
+    DBCheckBox33: TDBCheckBox;
+    DBCheckBox34: TDBCheckBox;
+    DBCheckBox35: TDBCheckBox;
+    DBCheckBox36: TDBCheckBox;
+    DBCheckBox37: TDBCheckBox;
+    DBCheckBox38: TDBCheckBox;
+    DBCheckBox39: TDBCheckBox;
+    DBCheckBox40: TDBCheckBox;
+    DBCheckBox41: TDBCheckBox;
+    DBCheckBox42: TDBCheckBox;
+    DBCheckBox43: TDBCheckBox;
+    DBEdit66: TDBEdit;
+    Label100: TLabel;
+    Label101: TLabel;
+    DBEdit67: TDBEdit;
+    DBEdit68: TDBEdit;
+    Label102: TLabel;
+    DBEdit69: TDBEdit;
+    Label103: TLabel;
+    DBCheckBox44: TDBCheckBox;
+    Label104: TLabel;
+    Label105: TLabel;
+    DBEdit70: TDBEdit;
+    Label106: TLabel;
+    BitBtn15: TBitBtn;
+    DBEdit71: TDBEdit;
+    DBCheckBox45: TDBCheckBox;
+    Label107: TLabel;
+    DBCheckBox46: TDBCheckBox;
+    DBCheckBox47: TDBCheckBox;
+    DBEdit72: TDBEdit;
+    DBCheckBox48: TDBCheckBox;
+    DBCheckBox49: TDBCheckBox;
+    DBCheckBox50: TDBCheckBox;
+    Label108: TLabel;
+    DBEdit73: TDBEdit;
+    Label109: TLabel;
+    DBCheckBox51: TDBCheckBox;
+    DBCheckBox52: TDBCheckBox;
+    DBCheckBox53: TDBCheckBox;
+    DBCheckBox54: TDBCheckBox;
+    TabSheet21: TTabSheet;
+    DBCheckBox55: TDBCheckBox;
+    DBCheckBox56: TDBCheckBox;
+    BitBtn16: TBitBtn;
+    TabSheet22: TTabSheet;
+    DBGrid8: TDBGrid;
+    DBNavigator3: TDBNavigator;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure BitBtn12Click(Sender: TObject);
+    procedure BitBtn11Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure BoldEdit33DblClick(Sender: TObject);
+    procedure BoldEdit32DblClick(Sender: TObject);
+    procedure BoldEdit29DblClick(Sender: TObject);
+    procedure BoldEdit27DblClick(Sender: TObject);
+    procedure BoldEdit26DblClick(Sender: TObject);
+    procedure BitBtn1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  PrSettForm: TPrSettForm;
+
+implementation
+
+{$R *.dfm}
+
+uses HandlesDM, ModelDM, BusinessClasses, BoldOtherHandlCompUnit, ADODMUnit;
+
+procedure TPrSettForm.BitBtn1Click(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TPrSettForm.BoldEdit26DblClick(Sender: TObject);
+begin
+  if cd.Execute then
+    begin
+      (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).BetweenStartSetColor:=
+        IntToStr(cd.Color);
+    end;
+end;
+
+procedure TPrSettForm.BoldEdit27DblClick(Sender: TObject);
+begin
+  if cd.Execute then
+    begin
+      (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).BetweenSetOnColor:=
+        IntToStr(cd.Color);
+    end;
+end;
+
+procedure TPrSettForm.BoldEdit29DblClick(Sender: TObject);
+begin
+  if cd.Execute then
+    begin
+      (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).BetweenSetEndColor:=
+        IntToStr(cd.Color);
+    end;
+end;
+
+procedure TPrSettForm.BoldEdit32DblClick(Sender: TObject);
+begin
+if cd.Execute then
+  (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).cvet_obshepriz:=
+    IntToStr(cd.Color);
+end;
+
+procedure TPrSettForm.BoldEdit33DblClick(Sender: TObject);
+begin
+if cd.Execute then
+  (BoldHandlesDM.blhDriversUnion.CurrentElement as TObjekt_vyborki_otchyotnosti).cvet_so_skidkoi:=
+    IntToStr(cd.Color);
+
+end;
+
+procedure TPrSettForm.FormShow(Sender: TObject);
+begin
+  BoldModelDM.HasAllCounterOverflow;
+  ADOConnectDM.PhonesCodesADOT.Active:=False;
+  ADOConnectDM.PhonesCodesADOT.Active:=True;
+  ADOConnectDM.RatingLevelsADOT.Active:=False;
+  ADOConnectDM.RatingLevelsADOT.Active:=True;
+  BoldModelDM.KLADRCITYADOTable.Active:=False;
+  BoldModelDM.KLADRCITYADOTable.Active:=True;
+  ADOConnectDM.TarifsTblADODS.Active:=False;
+  ADOConnectDM.TarifsTblADODS.Active:=True;
+  ADOConnectDM.TarAreaCoordsADOT.Active:=False;
+  ADOConnectDM.TarAreaCoordsADOT.Active:=True;
+  ADOConnectDM.reloadTarifPlans;
+  ADOConnectDM.reloadTarifPlansTbl;
+  ADOConnectDM.reloadOrdersTariffs;
+  ADOConnectDM.reloadOrdersOptions;
+  ADOConnectDM.reloadGrDrsWthTP;
+  ADOConnectDM.reloadDrsWthTP;
+end;
+
+procedure TPrSettForm.BitBtn11Click(Sender: TObject);
+begin
+  //DBLookupComboBox1.ScrollBy();
+end;
+
+procedure TPrSettForm.BitBtn12Click(Sender: TObject);
+begin
+  ShellExecute(PrSettForm.Handle, 'open',
+    PAnsiChar(IniFile.ReadString('BUSINESS_DATA',
+    'адрес_сервиса_выделения_зоны_тарифа',
+    'http://psdevelop.ru/gmap_constructor.html')), nil, nil, SW_NORMAL);
+end;
+
+procedure TPrSettForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  BoldModelDM.BoldUpdateDBAction1.Execute;
+  try
+    BoldModelDM.HasAllBonusADOQuery.Post;
+  except
+  end;
+  try
+    ADOConnectDM.OrdTariffsADODS.Post;
+  except
+  end;
+  try
+    ADOConnectDM.OrdOptsADODS.Post;
+  except
+  end;
+  try
+    ADOConnectDM.TarifPlansADODS.Post;
+  except
+  end;
+  try
+    ADOConnectDM.DrGroupsWthTPADODS.Post;
+  except
+  end;
+  try
+    ADOConnectDM.DrsWthTPADODS.Post;
+  except
+  end;
+  try
+    ADOConnectDM.PhonesCodesADOT.Post;
+  except
+  end;
+  try
+    ADOConnectDM.TarAreaCoordsADOT.Post;
+  except
+  end;
+end;
+
+end.

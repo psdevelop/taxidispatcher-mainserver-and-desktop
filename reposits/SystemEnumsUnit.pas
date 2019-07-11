@@ -86,6 +86,9 @@ uses ModelDM, HandlesDM, ADODMUnit, BusinessClasses, IndividNumSetUnit,
 procedure TSystemEnumsForm.FormShow(Sender: TObject);
 begin
 
+  ADOConnectDM.LookOptionsADOT.Active := False;
+  ADOConnectDM.LookOptionsADOT.Active := True;
+
   ADOConnectDM.DistrictCompaniesADODS.Active := False;
   ADOConnectDM.DistrictCompaniesADODS.Active := True;
 

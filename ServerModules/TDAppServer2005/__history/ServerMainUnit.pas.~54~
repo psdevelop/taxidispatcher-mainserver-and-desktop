@@ -1,0 +1,658 @@
+unit ServerMainUnit;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, RemoteControlUnit, Menus, DB, ADODB, ExtCtrls, SMSSendUnit, StdCtrls,
+  DateUtils, IniFiles, ComCtrls, Psapi, tlhelp32, MPlayer, MMSystem,
+  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdTime,
+  IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdSSL, IdSSLOpenSSL,
+  IdExplicitTLSClientServerBase, IdMessageClient, IdIMAP4, IdAntiFreezeBase,
+  IdAntiFreeze; //CoolTrayIcon;
+
+type
+  TServerMainForm = class(TForm)
+    MainMenu1: TMainMenu;   
+    N1: TMenuItem;
+    N2: TMenuItem;     
+    MainBASEADOC: TADOConnection;
+    MainADOCommand: TADOCommand;
+    GetAppServerUserStateADOQ: TADOQuery;
+    RefreshDataTimer: TTimer;
+    GroupBox1: TGroupBox;
+    EventsList: TListBox;
+    N3: TMenuItem;
+    N4: TMenuItem;
+    OnLineADODS: TADODataSet;
+    Last3HourADODS: TADODataSet;
+    MainSB: TStatusBar;
+    CurrTimeADODS: TADODataSet;
+    NetTimeCheckTimer: TTimer;
+    IdGetTime: TIdTime;
+    N5: TMenuItem;
+    procedure N5Click(Sender: TObject);
+    procedure NetTimeCheckTimerTimer(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure MainBASEADOCAfterConnect(Sender: TObject);
+    procedure N4Click(Sender: TObject);
+    procedure TDAppServerTrayIconClick(Sender: TObject);
+    procedure N3Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure RefreshDataTimerTimer(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure WriteEvent(text: string; SendToUsers: Boolean=False);
+    function SendLocalSQL(SQL, FunctionName: Widestring): Boolean;
+    procedure AskManipForAllUsers(CheckDrv: Boolean=True);
+    function GetAppServerDataRefreshState: Integer;
+    procedure ConnectToMainDB;
+    procedure ShowNotifyWin(NotifyMessage: String);
+    function GetCurrentWorkInfo: Boolean;
+    procedure ResetSelfAskAttr;
+    procedure ResetSelfAskRemoteAttr;
+    procedure AskManipForAllUsersWithoutMe(CheckDrv: Boolean=True);
+    procedure AskRemoteManipForAllUsers(CheckDrv: Boolean=True);
+    procedure AskRemoteManipForAllUsersWithoutMe
+      (CheckDrv: Boolean=True);
+    procedure checkTime(anywhere_ask: Boolean=False;
+      netTime: TDateTime=0);
+    procedure playWAV(filename: String);
+  end;
+
+var
+  ServerMainForm: TServerMainForm;
+  CDP: Widestring;
+  IniFile: TIniFile;
+  StartMoment: Boolean=True;
+  AutoConnectInActive: Boolean=False;
+  Last2HoursOrdersCount: Integer = 0;
+  ActiveDriversCount: Integer = 0;
+
+implementation
+
+{$R *.dfm}
+
+procedure CreateWin9xProcessList(List: TstringList); 
+var 
+  hSnapShot: THandle; 
+  ProcInfo: TProcessEntry32; 
+begin 
+  if List = nil then Exit; 
+  hSnapShot := CreateToolHelp32Snapshot(TH32CS_SNAPPROCESS, 0); 
+  if (hSnapShot <> THandle(-1)) then 
+  begin 
+    ProcInfo.dwSize := SizeOf(ProcInfo); 
+    if (Process32First(hSnapshot, ProcInfo)) then 
+    begin 
+      List.Add(ProcInfo.szExeFile); 
+      while (Process32Next(hSnapShot, ProcInfo)) do 
+        List.Add(ProcInfo.szExeFile); 
+    end; 
+    CloseHandle(hSnapShot); 
+  end; 
+end; 
+
+procedure CreateWinNTProcessList(List: TstringList); 
+var 
+  PIDArray: array [0..1023] of DWORD; 
+  cb: DWORD; 
+  I: Integer; 
+  ProcCount: Integer; 
+  hMod: HMODULE; 
+  hProcess: THandle; 
+  ModuleName: array [0..300] of Char; 
+begin 
+  if List = nil then Exit; 
+  EnumProcesses(@PIDArray, SizeOf(PIDArray), cb); 
+  ProcCount := cb div SizeOf(DWORD); 
+  for I := 0 to ProcCount - 1 do 
+  begin 
+    hProcess := OpenProcess(PROCESS_QUERY_INFORMATION or 
+      PROCESS_VM_READ, 
+      False, 
+      PIDArray[I]); 
+    if (hProcess <> 0) then 
+    begin 
+      EnumProcessModules(hProcess, @hMod, SizeOf(hMod), cb); 
+      GetModuleFilenameEx(hProcess, hMod, ModuleName, SizeOf(ModuleName)); 
+      List.Add(ModuleName); 
+      CloseHandle(hProcess); 
+    end; 
+  end; 
+end; 
+
+procedure GetProcessList(var List: TstringList); 
+var 
+  ovi: TOSVersionInfo; 
+begin 
+  if List = nil then Exit; 
+  ovi.dwOSVersionInfoSize := SizeOf(TOSVersionInfo); 
+  GetVersionEx(ovi); 
+  case ovi.dwPlatformId of 
+    VER_PLATFORM_WIN32_WINDOWS: CreateWin9xProcessList(List); 
+    VER_PLATFORM_WIN32_NT: CreateWinNTProcessList(List); 
+  end 
+end; 
+
+function EXE_Running(FileName: string; bFullpath: Boolean): Integer;
+var 
+  i: Integer; 
+  MyProcList: TstringList; 
+begin 
+  MyProcList := TStringList.Create;
+  Result := 0;
+  try 
+    GetProcessList(MyProcList); 
+    //Result := 0;
+    if MyProcList = nil then Exit; 
+    for i := 0 to MyProcList.Count - 1 do 
+    begin 
+      if not bFullpath then 
+      begin 
+        if CompareText(ExtractFileName(MyProcList.Strings[i]), FileName) = 0 then 
+          Result := Result+1
+      end 
+      else if CompareText(MyProcList.strings[i], FileName) = 0
+        then Result := Result+1;
+      //if Result then Break; 
+    end; 
+  finally 
+    MyProcList.Free; 
+  end; 
+end;
+
+function TServerMainForm.GetCurrentWorkInfo: Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  Last2HoursOrdersCount := 0;
+  ActiveDriversCount := 0;
+  try
+    Last3HourADODS.Active := False;
+    Last3HourADODS.Parameters.ParamByName('start_date').Value :=
+      IncHour(Today+Time,-3);
+    Last3HourADODS.Parameters.ParamByName('end_date').Value :=
+      Today+Time;
+    Last3HourADODS.Active := True;
+    if Last3HourADODS.RecordCount>0 then
+      begin
+        res := True;
+        Last2HoursOrdersCount :=
+          Last3HourADODS.FieldByName('orders_count').AsInteger;
+      end
+    else
+      res := False;
+  except on E:Exception do
+    begin
+      WriteEvent('Неудачное извлечение '+
+      'количества вызовов за посл. 3 часа, сообщение: '+
+      E.Message);
+    end;
+  end;
+
+  try
+    OnLineADODS.Active := False;
+    OnLineADODS.Active := True;
+    if OnLineADODS.RecordCount>0 then
+      begin
+        res := res AND True;
+        ActiveDriversCount :=
+          OnLineADODS.FieldByName('online_dr_count').AsInteger;
+      end
+    else
+      res := False;
+  except on E:Exception do
+    begin
+      WriteEvent('Неудачное извлечение '+
+      'количества водителей на линии, сообщение: '+
+      E.Message);
+    end;
+  end;
+
+  Result:=res;
+end;
+
+procedure TServerMainForm.ShowNotifyWin(NotifyMessage: String);
+begin
+  //DZBalloonTrayIcon(ServerMainForm.Handle, 1, 30, NotifyMessage, 'Сообщение сервера приложений TD', bitWarning);
+end;
+
+procedure TServerMainForm.RefreshDataTimerTimer(Sender: TObject);
+var StateRequestResult: Integer;
+begin
+  if EventsList.Items.Count>200 then
+  begin
+    try
+      if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'логировать_SMS_отправку',
+          'NO')='YES' then
+      EventsList.Items.SaveToFile(
+        CD+'\logs\sms_srv'+StringReplace(
+            StringReplace(DateTimeToStr(Today+Time),
+              '.','_', [rfReplaceAll]),
+              ':','_', [rfReplaceAll])+'.log');
+     except on E:Exception do
+        RemoteControlForm.writeToServerLog(
+          'Ошибка записи лога SMS-отправки! '+
+          E.Message);
+     end;  
+    EventsList.Items.Clear;
+  end;
+  if MainBASEADOC.connected then
+    begin
+      StateRequestResult:=
+        GetAppServerDataRefreshState;
+      if StateRequestResult=1 then
+        begin
+          SmsSendForm.CheckSMSSending;
+        end
+      else if StateRequestResult=-1 then
+        begin
+          MainBASEADOC.connected:=False;
+        end
+      else
+        begin
+        end;
+    end
+  else
+        begin
+          if IniFile.ReadString('BUSINESS_DATA','пытаться_восстанавливать_неактивное_локальное_соединение','NO')='YES' then
+            begin
+              WriteEvent('Попытка установки соединения!');
+              ConnectToMainDB;
+            end;
+        end;
+end;
+
+function TServerMainForm.SendLocalSQL(SQL, FunctionName: Widestring): Boolean;
+var res: Boolean;
+begin
+  res:=True;
+  try
+    ServerMainForm.MainADOCommand.CommandText:=SQL;
+    ServerMainForm.MainADOCommand.Execute;
+  except on E:Exception do
+   begin
+    res:=False;
+    WriteEvent('Ошибка выполнения запроса '''+FunctionName+''': '+E.Message+'.');
+   end;
+  end;
+  Result:=res;
+end;
+
+procedure TServerMainForm.WriteEvent(text: string; SendToUsers: Boolean=False);
+begin
+  EventsList.Items.Add(text+' '+DateTimeToStr(Today+Time));
+end;
+
+function TServerMainForm.GetAppServerDataRefreshState: Integer;
+var res: Integer;
+begin
+  res:=0;
+  try
+    GetAppServerUserStateADOQ.Active:=False;
+    GetAppServerUserStateADOQ.Active:=True;
+    if (GetAppServerUserStateADOQ.RecordCount=0) or
+    (GetAppServerUserStateADOQ.RecordCount>1) then
+     begin
+      WriteEvent('Ни одной или более одной записи системного пользователя app_server!');
+      res:=0
+     end
+    else
+      begin
+        res:=GetAppServerUserStateADOQ.
+          FieldByName('EstjVneshnieManip').AsInteger;
+
+		  if(GetAppServerUserStateADOQ.
+          FieldByName('HasRemOrdChanges').AsInteger>0) then
+			HasRemoteDataChanges:=True
+      else
+        HasRemoteDataChanges:=False;
+
+      if(GetAppServerUserStateADOQ.
+          FieldByName('HasRemDrChanges').AsInteger>0) then
+      HasRemoteDrDataChanges:=True
+      else
+        HasRemoteDrDataChanges:=False;
+
+      end;
+  except on E:Exception do
+   begin
+    WriteEvent('Ошибка выполнения запроса состояния учетной записи сервера приложений, ошибка: '+E.Message+'.');
+    res:=-1;
+   end;
+  end;
+  Result:=res;
+end;
+
+procedure TServerMainForm.ResetSelfAskAttr;
+begin
+  if not SendLocalSQL('UPDATE Personal SET EstjVneshnieManip=0, Prover_vodit=0 where'+
+    ' login=''app_server''','Оповещение пользователей') then
+              WriteEvent('Неудачный сброс признака наличия изменения общих данных для текущего пользователя!');
+end;
+
+procedure TServerMainForm.ResetSelfAskRemoteAttr;
+begin
+  if not SendLocalSQL('UPDATE Personal SET HasRemOrdChanges=0 where'+
+    ' login=''app_server''','Оповещение пользователей') then
+              WriteEvent('Неудачный сброс признака наличия изменения общих данных для текущего пользователя!');
+end;
+
+procedure TServerMainForm.AskManipForAllUsers(CheckDrv: Boolean=True);
+begin
+
+    if not SendLocalSQL('UPDATE Personal SET EstjVneshnieManip=1, Prover_vodit=1 ','Оповещение пользователей')
+     then
+       WriteEvent('Неудачное оповещение об изменении общеиспользуемых данных!');
+
+end;
+
+procedure TServerMainForm.AskManipForAllUsersWithoutMe(CheckDrv: Boolean=True);
+begin
+
+    if not SendLocalSQL('UPDATE Personal SET EstjVneshnieManip=1, '+
+	' Prover_vodit=1 WHERE login<>''app_server''','Оповещение пользователей')
+     then
+       WriteEvent('Неудачное оповещение об изменении общеиспользуемых данных!');
+
+end;
+
+procedure TServerMainForm.AskRemoteManipForAllUsers(CheckDrv: Boolean=True);
+begin
+
+    if not SendLocalSQL('UPDATE Personal SET HasRemOrdChanges=1 ',
+		'Оповещение пользователей')
+     then
+       WriteEvent('Неудачное оповещение об изменении общеиспользуемых данных!');
+
+end;
+
+procedure TServerMainForm.AskRemoteManipForAllUsersWithoutMe(CheckDrv: Boolean=True);
+begin
+
+    if not SendLocalSQL('UPDATE Personal SET HasRemOrdChanges=1, '+
+	' WHERE login<>''app_server''','Оповещение пользователей')
+     then
+       WriteEvent('Неудачное оповещение об изменении общеиспользуемых данных!');
+
+end;
+
+procedure TServerMainForm.ConnectToMainDB;
+begin
+  if not AutoConnectInActive then
+  begin
+    try
+      AutoConnectInActive:=True;
+    try
+        MainBASEADOC.connected:=True;
+    except
+        WriteEvent('Ошибка попытки соединения с основной БД!');
+    end;
+    finally
+      AutoConnectInActive:=False;
+      if MainBASEADOC.connected then
+        begin
+          //ShowNotifyWin('Соединение с основной БД установлено!');
+          WriteEvent('Соединение с основной БД установлено!');
+          if IniFile.ReadString('BUSINESS_DATA',
+            'контроль_времени','NO')='YES' then
+              checkTime(true);
+        end
+      else
+        WriteEvent('Неудачное соединение с основной БД!');
+    end;
+  end;
+end;
+
+procedure TServerMainForm.checkTime(anywhere_ask: Boolean=False;
+  netTime: TDateTime=0);
+var nowDT, srvDT: TDateTime;
+    secBetween: Integer;
+    secNetBetweenSrv: Integer;
+    secNetBetweenLoc: Integer;
+begin
+  nowDT:=Today+Time;
+  if MainBASEADOC.connected then
+  begin
+  try
+    CurrTimeADODS.Active:=False;
+    CurrTimeADODS.Active:=True;
+    srvDT:=CurrTimeADODS.FieldByName('curr_time').AsDateTime;
+    secBetween:=Abs(SecondsBetween(nowDT, srvDT));
+    if netTime=0 then
+    begin
+    if(anywhere_ask) and (secBetween<60) then
+      begin
+        WriteEvent('Сервер БД: '+DateTimeToStr(srvDT)+
+              '. Локально: '+DateTimeToStr(nowDT)+'.');
+        Beep; Beep; Beep;
+        playWAV('conf_check_time.wav');
+      end
+    else
+      begin
+        WriteEvent('Сервер БД: '+DateTimeToStr(srvDT)+
+              '. Локально: '+DateTimeToStr(nowDT)+'.');
+        Beep; Beep; Beep;
+        playWAV('diff_time_error.wav');
+      end;
+    end
+    else
+    begin
+      secNetBetweenSrv:=Abs(SecondsBetween(netTime, srvDT));
+      secNetBetweenLoc:=Abs(SecondsBetween(nowDT, netTime));
+      if(secNetBetweenSrv>300) or (secNetBetweenLoc>300) then
+      begin
+        WriteEvent('Интернет: '+DateTimeToStr(netTime)+
+              '. Сервер БД: '+DateTimeToStr(srvDT)+
+              '. Локально: '+DateTimeToStr(nowDT)+'.');
+        Beep; Beep; Beep;
+        playWAV('diff_net_time_error.wav');
+      end
+      else if (secBetween>60) then
+      begin
+        WriteEvent('Интернет: '+DateTimeToStr(netTime)+
+              '. Сервер БД: '+DateTimeToStr(srvDT)+
+              '. Локально: '+DateTimeToStr(nowDT)+'.');
+        Beep; Beep; Beep;
+        playWAV('diff_time_error.wav');
+      end
+      else
+      begin
+      end;
+    end;
+  except on E:Exception do
+  begin
+    playWAV('time_query_error.wav');
+    WriteEvent('Ошибка проверки времени сервера баз данных!');
+  end;
+  end;
+  end
+  else
+  begin
+  end;
+end;
+
+procedure TServerMainForm.playWAV(filename: String);
+var fn: String;
+begin
+  try
+    //TDSrvMPlayer.FileName:=CDP+'\'+filename;
+    //TDSrvMPlayer.Play;
+    fn:=CDP+'\'+filename;
+    //ShowMessage();
+    sndPlaySound(Pointer(fn),
+      SND_ASYNC);
+  except on E:Exception do
+    WriteEvent('Ошибка воспроизведения сообщения!');
+  end;
+end;
+
+procedure TServerMainForm.FormCreate(Sender: TObject);
+//var sendUTF8: UTF8String;
+begin
+  CDP:=GetCurrentDir;
+  //sendUTF8 := AnsiToUtf8('halloыы');
+  MainBASEADOC.connected:=False;
+  MainBASEADOC.ConnectionString:='FILE NAME='+CDP+'\TaxiDispatcherServer.udl';
+
+  IniFile:= TIniFile.Create(CDP+'\TaxiAppServer.ini');
+  if IniFile.ReadString('BUSINESS_DATA','всегда_запрашивать_пароль','YES')='NO' then
+        begin
+          MainBASEADOC.LoginPrompt:=False;
+        end
+      else
+        begin
+          MainBASEADOC.LoginPrompt:=True;
+        end;
+  if EXE_Running('TDAppServer.exe', False)>1 then
+  begin
+    ShowMessage('Сервер приложений уже запущен, если он не отвечает выключите его через Диспетчер задач!');
+    Application.Destroy;
+    //Close;
+  end
+  else
+  begin
+    if IniFile.ReadString('BUSINESS_DATA','автоконнект_с_основной_базой','NO')='YES' then
+    begin
+      ConnectToMainDB;
+    end;
+  end;
+  ShowNotifyWin('Соединение с основной БД установлено!');
+
+
+    //if ServerMainUnit.IniFile.ReadString('BUSINESS_DATA','сворачивать_в_трей_при_старте','NO')='YES' then
+    //begin
+    //  if (ServerMainUnit.StartMoment) then
+    //    begin
+    //      ServerMainUnit.StartMoment:=False;
+    //      Application.Minimize;
+    //      ServerMainUnit.ServerMainForm.TDAppServerTrayIcon.HideMainForm;
+    //    end;
+    //end;
+  //else
+  //  FirstForm.N29.Checked:=True;
+end;
+
+procedure TServerMainForm.N3Click(Sender: TObject);
+begin
+  //Application.Minimize;
+  //TDAppServerTrayIcon.HideMainForm;
+end;
+
+procedure TServerMainForm.TDAppServerTrayIconClick(Sender: TObject);
+begin
+  //Application.ShowMainForm:=True;
+  //TDAppServerTrayIcon.ShowMainForm;
+end;
+
+procedure TServerMainForm.N4Click(Sender: TObject);
+begin
+   if MessageDlg('Остановить сервер приложений, вы уверены? Для поддержки выполнения его функций необходимо будет его перезапустить!', mtConfirmation,[mbYes,mbNo],0) = mrYes then
+                    begin
+                        Close;
+                    end;
+end;
+
+procedure TServerMainForm.MainBASEADOCAfterConnect(Sender: TObject);
+begin
+  if ServerMainForm.MainBASEADOC.Connected then
+    begin
+    if RemoteControlForm<>nil then
+    begin
+      try
+        RemoteControlForm.SettingsADODS.Active:=False;
+        RemoteControlForm.SettingsADODS.Active:=True;
+      except on E:Exception do
+        WriteEvent('Неудачное получение параметров из БД! '+E.Message);
+      end;
+    end;
+    end;  
+end;
+
+procedure TServerMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+     try
+      if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'логировать_пул_сокетов',
+          'NO')='YES' then
+      RemoteControlForm.SocketLogMemo.Lines.SaveToFile(
+        CD+'\logs\socks_srv'+StringReplace(
+            StringReplace(DateTimeToStr(Today+Time),
+              '.','_', [rfReplaceAll]),
+              ':','_', [rfReplaceAll])+'.log');
+     except on E:Exception do
+        RemoteControlForm.writeToServerLog('Ошибка записи лога пула сокетов! '+E.Message);
+     end;
+
+     try
+      if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'логировать_SMS_отправку',
+          'NO')='YES' then
+      EventsList.Items.SaveToFile(
+        CD+'\logs\sms_srv'+StringReplace(
+            StringReplace(DateTimeToStr(Today+Time),
+              '.','_', [rfReplaceAll]),
+              ':','_', [rfReplaceAll])+'.log');
+     except on E:Exception do
+        RemoteControlForm.writeToServerLog(
+          'Ошибка записи лога SMS-отправки! '+
+          E.Message);
+     end;
+end;
+
+procedure TServerMainForm.NetTimeCheckTimerTimer(Sender: TObject);
+var CurrTime: TDateTime;
+begin
+  //time.windows.com
+  //time.nist.gov
+  //time-a.nist.gov
+  //time-b.nist.gov
+  //time-a.timefreq.bldrdoc.gov
+  //time-b.timefreq.bldrdoc.gov
+  //time-c.timefreq.bldrdoc.gov
+  if IniFile.ReadString('BUSINESS_DATA',
+    'контроль_времени','NO')='YES' then
+  if IniFile.ReadString('BUSINESS_DATA',
+    'контроль_времени_в_сети','NO')='YES' then
+  begin
+
+  try
+    IdGetTime.Host := 'time-a.nist.gov';
+
+    IdGetTime.Connect;
+
+    if IdGetTime.Connected then
+
+    begin
+
+      IdGetTime.Disconnect;
+
+      //try
+
+        CurrTime := IdGetTime.DateTime;
+        Self.checkTime(false, CurrTime);
+
+      //Except end;
+
+      WriteEvent('Результат запроса времени в сети: '+DateTimeToStr(CurrTime));
+
+    end;
+  except on E:Exception do
+    WriteEvent('Неудачный запрос времени в сети! '+E.Message);
+  end;
+  end;
+end;
+
+procedure TServerMainForm.N5Click(Sender: TObject);
+begin
+  //IdIMAP4Yandex.CheckMailBox;
+end;
+
+end.

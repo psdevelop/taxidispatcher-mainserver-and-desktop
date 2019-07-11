@@ -1,0 +1,5585 @@
+unit RemoteControlUnit;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
+  Menus, ExtCtrls, StdCtrls, DB, ADODB, Grids, DBGrids, DBClient,
+  Provider, ComCtrls, DateUtils, IdBaseComponent, IdComponent, IdTCPConnection,
+  IdTCPClient, IdHTTP, Sockets, TCPClientCollection,
+  MessageCollection, uLkJSON, Buttons, Mask, DBCtrls, ActnList, DBActns,
+  IdAntiFreezeBase, IdAntiFreeze, IdTCPServer, IdTime;
+
+type
+  TRemoteControlForm = class(TForm)
+    MainMenu1: TMainMenu;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    GroupBox1: TGroupBox;
+    Panel1: TPanel;
+    RemoteServerADOC: TADOConnection;
+    TDMessagesADOT: TADOTable;
+    TDMessagesDS: TDataSource;
+    AddOperationADOC: TADOCommand;
+    Button1: TButton;
+    DEST_ID: TEdit;
+    MSGText: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    LocalMessageTableCDS: TClientDataSet;
+    PageControl1: TPageControl;
+    TabSheet2: TTabSheet;
+    MSGTableDSP: TDataSetProvider;
+    LocalMSGDS: TDataSource;
+    N4: TMenuItem;
+    DBGrid2: TDBGrid;
+    RemoteProcessedOrdersADOQ: TADOQuery;
+    RemoteProcessedOrdersDS: TDataSource;
+    SetOrderParamADOSP: TADOStoredProc;
+    ConnectionCheckTimer: TTimer;
+    RDataStateADODS: TADODataSet;
+    RequestIdHTTP: TIdHTTP;
+    SMSServiceIdHTTP: TIdHTTP;
+    TabSheet1: TTabSheet;
+    SocketLogMemo: TMemo;
+    N5: TMenuItem;
+    SocketCheckTimer: TTimer;
+    PageControl2: TPageControl;
+    TabSheet4: TTabSheet;
+    TabSheet5: TTabSheet;
+    DBGrid1: TDBGrid;
+    RemoteOrdersDBGrid: TDBGrid;
+    AutorizedVerifyADODS: TADODataSet;
+    IncOrdersPriorityADOSP: TADOStoredProc;
+    AllActiveDriversADODS: TADODataSet;
+    AllActDrOnSectADODS: TADODataSet;
+    SetDriverOnLineADOSP: TADOStoredProc;
+    SetOrderRemoteStatusADOSP: TADOStoredProc;
+    DriverByNumADODS: TADODataSet;
+    Splitter1: TSplitter;
+    SetIndOrderSendADOSP: TADOStoredProc;
+    SetOrdOcAtStatADOSP: TADOStoredProc;
+    TabSheet3: TTabSheet;
+    BitBtn1: TBitBtn;
+    SetOnHandOrdGoADOSP: TADOStoredProc;
+    SetOrderGoADOSP: TADOStoredProc;
+    AllowOrdDispCancelADOSP: TADOStoredProc;
+    AttOrdCompleteADOSP: TADOStoredProc;
+    AllDriversADOT: TADOTable;
+    GetDrQueuePosADOSP: TADOStoredProc;
+    SetDrRemStatusADOSP: TADOStoredProc;
+    InsOrdWithStatusADOSP: TADOStoredProc;
+    InputJSONTestEdit: TComboBox;
+    OutputJSONTestEdit: TComboBox;
+    BitBtn2: TBitBtn;
+    ClientIdEdit: TEdit;
+    AutoSetDriverADOSP: TADOStoredProc;
+    AutoSetOrdFinishADOSP: TADOStoredProc;
+    SetDrSectorADOSP: TADOStoredProc;
+    GetJSONSectorListADOQ: TADOQuery;
+    GetDrSectorNameADOQ: TADOQuery;
+    AcceptingsSelADODS: TADODataSet;
+    GetDrStatusJSONADOSP: TADOStoredProc;
+    DriversADOT: TADODataSet;
+    TabSheet6: TTabSheet;
+    DBGrid3: TDBGrid;
+    DriversDS: TDataSource;
+    SetDrSyncStatusADOSP: TADOStoredProc;
+    TabSheet7: TTabSheet;
+    SettingsADODS: TADODataSet;
+    SettingsADODSBOLD_ID: TIntegerField;
+    SettingsADODSBOLD_TYPE: TSmallintField;
+    SettingsADODSTip_objekta: TStringField;
+    SettingsADODSData_nachala: TDateTimeField;
+    SettingsADODSData_konca: TDateTimeField;
+    SettingsADODSProcent_otchisleniya: TBCDField;
+    SettingsADODSFiljtr_pozyvnoi: TIntegerField;
+    SettingsADODSFiljtr_data_nachala: TDateTimeField;
+    SettingsADODSFiljtr_data_konca: TDateTimeField;
+    SettingsADODSCvet_prinyatyh: TStringField;
+    SettingsADODSCvet_nachavshihsya: TStringField;
+    SettingsADODSCvet_okonchivshihsya: TStringField;
+    SettingsADODSVybratj_poslednie_nesk_dnei: TIntegerField;
+    SettingsADODSKol_posl_dnei: TBCDField;
+    SettingsADODSData_minus_vybir_dni: TDateTimeField;
+    SettingsADODSNomer_pozyvnoi_filjtr: TIntegerField;
+    SettingsADODSCvet_predvarit: TStringField;
+    SettingsADODSData_po_umolchaniyu: TDateTimeField;
+    SettingsADODSAvtozapoln_sektorov: TIntegerField;
+    SettingsADODSNaznach_iz_obsh__spiska: TIntegerField;
+    SettingsADODSrep_time: TDateTimeField;
+    SettingsADODSAvtozap_konechn_sekt: TIntegerField;
+    SettingsADODSAvtozap_nach_sektora: TIntegerField;
+    SettingsADODSSoobsh_o_netochn_sekt_reg: TIntegerField;
+    SettingsADODSZapros_konech_sektora: TIntegerField;
+    SettingsADODSZapros_nach_sektora: TIntegerField;
+    SettingsADODSIspoljz_priz_1: TIntegerField;
+    SettingsADODSIspoljz_priz_2: TIntegerField;
+    SettingsADODSIspoljz_priz_3: TIntegerField;
+    SettingsADODSKoeff_prizov_sbavki_1: TBCDField;
+    SettingsADODSKoeff_prizov_sbavki_2: TBCDField;
+    SettingsADODSKoeff_prizov_sbavki_3: TBCDField;
+    SettingsADODSPrizovoe_kolichestvo_1: TIntegerField;
+    SettingsADODSPrizovoe_kolichestvo_2: TIntegerField;
+    SettingsADODSPrizovoe_kolichestvo_3: TIntegerField;
+    SettingsADODSVelichina_priz_sbavki_1: TBCDField;
+    SettingsADODSVelichina_priz_sbavki_2: TBCDField;
+    SettingsADODSVelichina_priz_sbavki_3: TBCDField;
+    SettingsADODSRegim_dispetchera: TIntegerField;
+    SettingsADODSEstj_nachatye: TIntegerField;
+    SettingsADODSEstj_otpravlennye: TIntegerField;
+    SettingsADODSNe_uchit_zanyat_drug_disp: TIntegerField;
+    SettingsADODSKolich_deg_grupp: TIntegerField;
+    SettingsADODSPer_obnovl_deg: TStringField;
+    SettingsADODSPer_obnovl_obychn_vod: TStringField;
+    SettingsADODSSutki_deg_gruppy: TDateTimeField;
+    SettingsADODSTek_deg_gruppa: TIntegerField;
+    SettingsADODSVr_smeny_deg_grupp: TStringField;
+    SettingsADODSKolich_vyd_benzina: TBCDField;
+    SettingsADODSKomment_k_rabote: TStringField;
+    SettingsADODSNamen_organizacii: TStringField;
+    SettingsADODSNapravlenie_1: TStringField;
+    SettingsADODSNapravlenie_2: TStringField;
+    SettingsADODSNapravlenie_3: TStringField;
+    SettingsADODSNom_putevogo_lista: TIntegerField;
+    SettingsADODSPutev_list_seriya: TStringField;
+    SettingsADODSBetweenOnEnd: TDateTimeField;
+    SettingsADODSBetweenSetOn: TDateTimeField;
+    SettingsADODSBetweenStartSet: TDateTimeField;
+    SettingsADODSBetweenOnEndColor: TStringField;
+    SettingsADODSBetweenSetOnColor: TStringField;
+    SettingsADODSBetweenStartSetColor: TStringField;
+    SettingsADODSBetweenSetEnd: TDateTimeField;
+    SettingsADODSBetweenSetEndColor: TStringField;
+    SettingsADODSViewSetEndLong: TIntegerField;
+    SettingsADODScvet_obshepriz: TStringField;
+    SettingsADODScvet_so_skidkoi: TStringField;
+    SettingsADODSobshepriz_chislo: TIntegerField;
+    SettingsADODSobshepriz_schyotchik: TIntegerField;
+    SettingsADODSsimv_avtom_ustan: TIntegerField;
+    SettingsADODSschit_okon_posl_kon_sekt: TIntegerField;
+    SettingsADODSvr_smeny_dispetcherov: TStringField;
+    SettingsADODSuse_bonus3: TIntegerField;
+    SettingsADODSuse_bonus4: TIntegerField;
+    SettingsADODSPrizovoe_kolichestvo_4: TIntegerField;
+    SettingsADODSDAYLY_SALE: TBCDField;
+    SettingsADODSMIN_DEBET: TBCDField;
+    SettingsADODSview_bonuses: TIntegerField;
+    SettingsADODSview_ab_bonuses: TIntegerField;
+    SettingsADODSuse_ab_account: TIntegerField;
+    SettingsADODSdb_version: TIntegerField;
+    DBEdit4: TDBEdit;
+    Label6: TLabel;
+    SettingsDS: TDataSource;
+    RModuleAL: TActionList;
+    SettingsDSP: TDataSetPost;
+    RemoteModIdAntiFreeze: TIdAntiFreeze;
+    IdTCPServer1: TIdTCPServer;
+    TabSheet8: TTabSheet;
+    Panel2: TPanel;
+    Test2Memo: TMemo;
+    GetJSONDriversListADOQ: TADOQuery;
+    SettingsADODSuse_dr_priority: TIntegerField;
+    SettingsADODSdir_dr_autoset: TIntegerField;
+    TabSheet9: TTabSheet;
+    Panel3: TPanel;
+    SocksStatusLabel: TLabel;
+    SocksListView: TMemo;
+    OneMinuteTaskADOSP: TADOStoredProc;
+    AutoArhADOSP: TADOStoredProc;
+    SettingsADODSauto_order_arhive: TIntegerField;
+    SettingsADODSlast_arh_date: TDateTimeField;
+    SettingsADODSmin_days_delta: TIntegerField;
+    AutoArhivedTimer: TTimer;
+    SetDrSectStatADOSP: TADOStoredProc;
+    SettingsADODSsectors_wbroadcast: TStringField;
+    SettingsADODSuse_sect_wbroadcast: TIntegerField;
+    SettingsADODShas_sect_wbroadcast: TIntegerField;
+    ResetSectBroadcastADOC: TADOCommand;
+    DriverSettingsADODS: TADODataSet;
+    SettingsADODSsync_busy_accounting: TIntegerField;
+    DBEdit12: TDBEdit;
+    DBEdit13: TDBEdit;
+    Label13: TLabel;
+    Label14: TLabel;
+    SettingsADODScurr_mob_version: TIntegerField;
+    SettingsADODSmin_mob_version: TIntegerField;
+    SettingsADODSmandatory_update: TIntegerField;
+    SettingsADODSaddit_rem_params: TStringField;
+    SettingsADODSGPS_SRV_ADR: TStringField;
+    ResetOrdBroadcastADOC: TADOCommand;
+    SettingsADODSforders_wbroadcast: TStringField;
+    SettingsADODSuse_ford_wbroadcast: TIntegerField;
+    SettingsADODShas_ford_wbroadcast: TIntegerField;
+    ProceedOpRequestADOSP: TADOStoredProc;
+    SetOrdOcAtStat2ADOSP: TADOStoredProc;
+    SetOrdDrCAttStADOSP: TADOStoredProc;
+    InsertEventADOSP: TADOStoredProc;
+    SetSectDirectionADOC: TADOCommand;
+    InsertOrdWithParamADOOSP: TADOStoredProc;
+    SMSServiceIdHTTPPOST: TIdHTTP;
+    OnPlaceADOC: TADOCommand;
+    AttOrdCompleteADOSP2: TADOStoredProc;
+    GetDrLockOnCalcDebtADOSP: TADOStoredProc;
+    SetDriverOutLineADOSP: TADOStoredProc;
+    InsertEvent2ADOSP: TADOStoredProc;
+    SetDrGPSRequStatusADOC: TADOCommand;
+    AttOrdCompleteADOSP3: TADOStoredProc;
+    GetTOListADOQ: TADOQuery;
+    SetTarifADOC: TADOCommand;
+    SetOptCombADOC: TADOCommand;
+    SettingsADODSto_show_fords: TSmallintField;
+    SettingsADODSclsms_ordground: TSmallintField;
+    SettingsADODSsend_wait_info: TSmallintField;
+    SettingsADODSsend_prev_wait: TSmallintField;
+    SettingsADODSuse_dr_balance_counter: TIntegerField;
+    SettingsADODSdont_reset_dr_queue: TSmallintField;
+    SettingsADODSodirect_to_dsect: TSmallintField;
+    SettingsADODSftime_tariff: TBCDField;
+    SettingsADODSrecalc_on_timeset: TSmallintField;
+    SettingsADODSdrcalc_start_date: TWideStringField;
+    SettingsADODSorder_sort_dr_assign: TSmallintField;
+    SettingsADODStmeter_tariff: TBCDField;
+    SettingsADODStaropt_accounting: TSmallintField;
+    SettingsADODSautotarif_by_driver: TSmallintField;
+    SettingsADODSovertar_by_driver: TSmallintField;
+    SettingsADODSautotarif_by_tplan: TSmallintField;
+    SettingsADODSday_payment: TBCDField;
+    SettingsADODSmanual_day_sale: TSmallintField;
+    SettingsADODSdayli_pay_time_offset: TIntegerField;
+    SettingsADODSnew_wperiod_opercent: TBCDField;
+    SettingsADODScheck_net_time: TSmallintField;
+    SettingsADODSlast_net_time: TDateTimeField;
+    SetDrPaymentStatusADOC: TADOCommand;
+    SetDrDailyPStatusADOSP: TADOStoredProc;
+    One10SecTaskADOSP: TADOStoredProc;
+    Timer10Sec: TTimer;
+    SettingsADODStest_phone: TStringField;
+    SettingsADODSdisp_phone: TStringField;
+    SettingsADODSmanager_phone: TStringField;
+    SettingsADODScall_demon_locsip_name: TStringField;
+    SettingsADODScall_demon_netsip_name: TStringField;
+    SettingsADODSdemon_call_ctx: TStringField;
+    SettingsADODSdemon_call_virtext: TStringField;
+    SettingsADODSdemon_call_priority: TStringField;
+    SettingsADODSdemon_call_timeout: TStringField;
+    SettingsADODSdemon_callerid: TStringField;
+    SettingsADODSclord_sort_dassign: TSmallintField;
+    SettingsADODSmax_clrereg_cnt: TSmallintField;
+    SettingsADODSfix_order_pay_with_daily_pay: TSmallintField;
+    SettingsADODSclsms_onplaceto: TSmallintField;
+    SettingsADODSdont_show_auto_count: TSmallintField;
+    SettingsADODSdont_show_auto_coords: TSmallintField;
+    SettingsADODSdont_show_driver_info: TSmallintField;
+    SettingsADODSauto_bsector_longorders: TSmallintField;
+    SettingsADODSauto_bsectorid_longorders: TIntegerField;
+    SettingsADODSauto_bsector_longtime: TIntegerField;
+    SettingsADODSauto_bsector_onlineorders: TSmallintField;
+    SettingsADODSauto_bsectorid_onlineorders: TIntegerField;
+    SettingsADODSauto_bsector_onlinetime: TIntegerField;
+    SettingsADODSauto_neardriver_onlineorders: TSmallintField;
+    SettingsADODSauto_neardriver_onlinetime: TIntegerField;
+    SettingsADODSneardriver_online_byord_geocode: TSmallintField;
+    SettingsADODSauto_neardriver_allorders: TSmallintField;
+    SettingsADODSauto_neardriver_alltime: TIntegerField;
+    SettingsADODSneardriver_all_byord_geocode: TSmallintField;
+    SettingsADODSclsms_offlinedr_assign: TSmallintField;
+    SettingsADODSuse_kladr: TSmallintField;
+    SettingsADODSkladr_object_code: TStringField;
+    SettingsADODScurrency_short: TStringField;
+    SettingsADODSstate_phone_code: TStringField;
+    SettingsADODSuse_fordbroadcast_priority: TSmallintField;
+    DecrementOrdersPriorityADOSP: TADOStoredProc;
+    PriorityDriversADODS: TADODataSet;
+    SetOrderEmptyDriverADOC: TADOCommand;
+    ManualSetOrdRemStatADOSP: TADOStoredProc;
+    SettingsADODSauto_bsect_notmanual_ord: TSmallintField;
+    SettingsADODSauto_close_client_canceling: TSmallintField;
+    SettingsADODSauto_close_clcancel_time: TIntegerField;
+    SettingsADODSsip1_robot_active_time: TDateTimeField;
+    SettingsADODSsip2_robot_active_time: TDateTimeField;
+    SettingsADODSrobot_active_time_interval: TIntegerField;
+    SettingsADODSreplace_sms_with_robot: TSmallintField;
+    SettingsADODSuse_call_robot: TSmallintField;
+    SettingsADODSstart_first_song_code: TIntegerField;
+    SettingsADODSonplace_first_song_code: TIntegerField;
+    SettingsADODSweb_protected_code: TStringField;
+    SettingsADODSauto_arh_empty_orders: TSmallintField;
+    SettingsADODSno_percent_before: TSmallintField;
+    SettingsADODSno_percent_before_summ: TBCDField;
+    SettingsADODSno_percent_before_payment: TBCDField;
+    SettingsADODSuse_prize_reserved_limit: TSmallintField;
+    SettingsADODSprize_reserved_limit: TIntegerField;
+    SettingsADODSprize_reward_summ: TBCDField;
+    SettingsADODSlock_reserv_on_limit: TSmallintField;
+    SputnikApiHTTP: TIdHTTP;
+    procedure Timer10SecTimer(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure AutoArhivedTimerTimer(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure TabSheet7Show(Sender: TObject);
+    procedure BitBtn2Click(Sender: TObject);
+    procedure BitBtn1Click(Sender: TObject);
+    procedure SocketCheckTimerTimer(Sender: TObject);
+    procedure N5Click(Sender: TObject);
+    procedure SocketLogMemoChange(Sender: TObject);
+    procedure ConnectionCheckTimerTimer(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure AddSocketServLog(MSG: Widestring);
+    function addDirectJSONMessageToClient(JSONStr: string; CurrClientID: Integer): Boolean;
+    procedure sendDriverStatus(clientIndex: Integer; msg: TMessageCollectionItem);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    SocketCoord: TSocketCoordinator;
+    ServerActive: Boolean;
+    function SendTextMessage(DEST_ID: Integer; MSG: string;
+      CLIENT_PHONE: string=''; dest_mode: string='client';
+      sale: Double=0; deliveTime: Integer=0): Boolean;
+    function RefreshMSGTable: Boolean;
+    procedure ConnectToRemoteDB;
+    function SendTextMessageWithHTTP(
+      dest_id: Integer; text: String): Boolean;
+    function IdHTTPGetDynamic(URL: string): Boolean;
+    function SendTextMessageWithHTTPService
+      (MSG: string; CLIENT_PHONE: string;
+      ThreadMode: Boolean=False;
+      dest_mode: string='client'; sale: Double=0; delivTime: Integer=0): Boolean;
+    function SendTextMessageWithHTTPServicePOST
+      (MSG: string; CLIENT_PHONE: string; ThreadMode:
+      Boolean=False; dest_mode: string='client'; sale: Double=0): Boolean;
+    function proceedOpRequest(InputJSONObject: TLkJSONObject;
+      DriverId: Integer=-1; DrNum: Integer=-1): Widestring;
+    function proceedInputJSONMessages
+      (InputJSONMessages: TMessageCollection): Boolean;
+    function verifyDriverClient
+      (login, psw: String): Boolean;
+    procedure incrementOrderPriorStat(orderId,
+      MaxOrderPriority: Integer);
+    function localRebuildSendMsgCollection: Boolean;
+    procedure deleteAskedSendingMessages;
+    function setOrderRemoteStatus(order_id, status: Integer;
+      priority_counter: Integer=-10000) : Boolean;
+    function getDriverStatusJSON(driver_id: Integer): Widestring;
+    procedure deleteOldThreadsSendingMessages;
+    //function AutoSetDriverOnOrder(orderID,
+    //orderCounter: Integer): Boolean;
+    function AutoSetOrderStatus(orderID, orderStatus: Integer;
+      order_start_time, order_ended_time,
+      last_status_time: TDateTime; rSync: Integer): Boolean;
+    function setDriverRemoteStatus(driver_id, status:
+      Integer; check_busy: Integer=-1; on_launch: Integer=-1;
+      on_line: Integer=-1; sync: Integer=-1) : Boolean;
+    function AutoSetDriverStatus(driverID, driverStatus: Integer;
+      last_status_time: TDateTime; syncStatus: Integer): Boolean;
+    function GetJSONSectorList: Widestring;
+    function GetJSONDriversList: Widestring;
+    function GetDrSectorName(driverId: Integer): String;
+    function orderHasAccepting(orderId: Integer;
+      driverId: Integer=-1; alsoCheckDriversActivity:
+      Boolean=False): Boolean;
+    function setDriverSyncStatus(driver_id, status:
+      Integer) : Boolean;
+    function getFileSize(FileName: String): Integer;
+    procedure writeToServerLog(log_line: string; writeToFile: Boolean=True;
+      writeToMemo: Boolean=True);
+    procedure refreshSocksMemo;
+    function checkRemoteDrivers: Boolean;
+    function ReloadDrSettings: Boolean;
+    procedure MessageWideBroadcasting(Msg: Widestring);
+    function getDriverOrdBroadcasting(DriverId: Integer): Widestring;
+    procedure MessageDriverOrderBroadcasting;
+    function getSectorsStatus: WideString;
+    procedure resetSectorBroadcast;
+    function getDriverJSONSettings(driverId: Integer): Widestring;
+    procedure resetOrdersBroadcast;
+    procedure decrementDriversOrderPriority;
+    function InsertEvent(ETYPE_ID, ORDER_ID, DRIVER_ID, SECTOR_ID: Integer;
+      EDATE: TDateTime; DESCRIPTION: Widestring; ADRES, PHONE: String;
+      DR_NUM: Integer): Integer;
+    function getDriverCalcBlocked(DrNum: Integer): Boolean;
+    function InsertEvent2(ETYPE_ID, ORDER_ID,
+      DRIVER_ID, SECTOR_ID: Integer; EDATE: TDateTime;
+      DESCRIPTION: Widestring; ADRES, PHONE: String;
+      DR_NUM: Integer; LATITUDE, LONGITUDE: String): Integer;
+    function GetJSONTOList: Widestring;
+    procedure setOrderTarif(orderId, tarifId: Integer);
+    procedure setOrderOptComb(orderId: Integer; optComb: String);
+    procedure ManualSetCurrOrderRemoteStatus(orderId,
+      destStatus: Integer);
+  end;
+
+var
+  RemoteControlForm: TRemoteControlForm;
+  CD, CurrDir: Widestring;
+  LastBackUpFile: Widestring;
+  AutoRemoteConnectInActive: Boolean=False;
+  LastHTTPAnswer: Widestring;
+  SendMsgCollection: TMessageCollection;
+  MaxOrderPriority, MaxIndivOrderPriority: Integer;
+  StartWithOthersSendPriority: Integer;
+  localRebuildSendMsgInProcess: Boolean=False;
+  inputMessagesInProcess: Boolean=False;
+  clientCheckingInActive: Boolean=False;
+  HasRemoteDataChanges: Boolean=False;
+  HasRemoteDrDataChanges: Boolean=False;
+  logFile: TextFile;
+  logActive: Boolean=False;
+  sectorWideBroadcastCounter: Integer=5;
+  ordersDBProcessingCounter: Integer=2;
+  orderWideBroadcastCounter: Integer=2;
+
+const
+  ORDER_NO_REM_STATUS = 0;
+  ORDER_INDIVID_TAKE = 1;
+  ORDER_SECTOR_PUBLISHING = 2;
+  ORDER_ALL_PUBLISHING = 3;
+  ORDER_PUBLUSHED_WAIT = 4;
+  ORDER_IS_OCCUPED = 5;
+  ORDER_OCCUPED_DENY = 6;
+  ORDER_OCCUPED_ALLOW = 7;
+  ORDER_BUSY = 8; //???
+  ORDER_ONHAND_ALLOW = 9;
+  ORDER_ONHAND_ACTIVE = 10;
+  ORDER_DISP_CANCEL = 11;
+  ORDER_DISP_CANCEL_DR_INCOURSE = 12;
+  ORDER_DRV_CANCEL = 13;
+  ORDER_DRV_CANCEL_DISP_ALLOW = 14;
+  ORDER_DRV_COMPLETE = 15;
+  ORDER_COMLETE_ALLOW = 16;
+
+  ORDER_ALLOW_ASK_WAIT = 17;
+  ORDER_ONHAND_ALLOW_ASK_WAIT = 18;
+  ORDER_DISP_CANCEL_ASK_WAIT = 19;
+  ORDER_CLOSE_ERROR = 20;
+  ORDER_DRCANCEL_DENY = 21;
+  ORDER_INWORKING_WAIT = 22;
+  ORDER_ONHAND_ATTEPMT = 23;
+  ORDER_ONHAND_DENY = 24;
+  ORDER_ONHAND_ALLOW_USER_WAIT = 25;
+  ORDER_COMPLETE_ALLOW_USER_WAIT = 26;
+  ORDER_CLOSE_ASK_WAIT = 27;
+  //ORDER_ONHAND_ABORT = 28;
+  ORDER_DRV_CANCEL_USER_WAIT = 29;
+
+  ORDER_CLOSE = 100;
+
+  DR_ERROR_CL_SOCKET = -2;
+  DR_NOT_CONNECTED = -1;
+  DR_NOT_AUTORIZED = 0;
+  FREE_DRIVER = 1;
+  DR_IN_DECISION = 2;
+  DR_IN_WORKING = 3;
+  DR_IN_WORKING_ONHAND = 4;
+  DR_IN_CANCELING = 5;
+  DR_IN_SELF_CANCELING = 6;
+  DR_ON_REST = 7;
+  DR_OUT_FROM_LINE = 8;
+  DR_IN_WORKING_ONHAND_ATTEMPT = 9;
+  DR_IN_CANCELING_ATTEMPT = 10;
+  DR_IN_SELF_CANCELING_ATTEMPT = 11;
+  DR_ON_REST_ATTEMPT = 12;
+  DR_OUT_FROM_LINE_ATTEMPT = 13;
+  DR_IN_WORKING_ONHAND_DENY = 14;
+  DR_IN_SELF_CANCELING_DENY = 15; //???
+  DR_ON_REST_DENY = 16;
+  DR_OUT_FROM_LINE_DENY = 17;
+  DR_FROM_REST_ATTEMPT = 18;
+  DR_NOACTIVE_STATUS=100;
+
+  EVENT_ALARM = 1;
+  EVENT_ON_REST = 2;
+  EVENT_SECTOR_DIRECTION = 3;
+  EVENT_FROM_REST = 4;
+  EVENT_FROM_LINE = 5;
+  EVENT_GPS_COORDS = 6;
+
+  PAY_NULL = 0;
+  PAY_REQU = 1;
+  PAY_REQU_SEND = 2;
+  PAY_ALLOW = 3;
+  PAY_DECLINE = 4;
+
+  SPUTNIK_API_SEARCH = 0;
+  SPUTNIK_API_ROUTE = 1;
+
+implementation
+
+uses ServerMainUnit, SMSSendUnit, EncdDecd,
+  IdURI;
+
+{$R *.dfm}
+
+function TranslitRus2Lat(const Str: string; replaceDelimeter: Boolean=True): string;
+const
+  RArrayL = 'абвгдеёжзийклмнопрстуфхцчшщьыъэюя';
+  RArrayU = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ';
+  colChar = 33;
+  arr: array[1..2, 1..ColChar] of string =
+  (('a', 'b', 'v', 'g', 'd', 'e', 'e', 'zh', 'z', 'i', 'y',
+    'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f',
+    'h', 'c', 'ch', 'sh', 'sh', '''', 'y', '''', 'e', 'yu', 'ya'),
+    ('A', 'B', 'V', 'G', 'D', 'E', 'E', 'ZH', 'Z', 'I', 'Y',
+    'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F',
+    'H', 'C', 'CH', 'SH', 'SH', '''', 'Y', '''', 'E', 'YU', 'YA'));
+var
+  i: Integer;
+  LenS: Integer;
+  p: integer;
+  d: byte;
+begin
+  result := '';
+  LenS := length(str);
+  for i := 1 to lenS do
+  begin
+    d := 1;
+    p := pos(str[i], RArrayL);
+    if p = 0 then
+    begin
+      p := pos(str[i], RArrayU);
+      d := 2
+    end;
+    if p <> 0 then
+      result := result + arr[d, p]
+    else
+      result := result + str[i]; //если не русская буква, то берем исходную
+  end;
+  if replaceDelimeter then
+  result:=StringReplace(StringReplace(result,
+          '"',' ', [rfReplaceAll]),
+          '''',' ', [rfReplaceAll]);
+  //else
+  //result:=
+end;
+
+procedure TRemoteControlForm.refreshSocksMemo;
+var i:Integer;
+begin
+  SocksListView.Clear;
+  socksStatusLabel.Caption:=
+    'Всего сокет-нитей: '+IntToStr(SocketCoord.TCPClientCollection.Count);
+  if true then
+      for i:=0 to SocketCoord.TCPClientCollection.Count-1 do
+      begin
+        try
+        SocksListView.Lines.Add(
+          'id='+IntToStr(SocketCoord.TCPClientCollection.
+          Items[i].ClientID)+', поз. '+IntToStr(
+          SocketCoord.TCPClientCollection.Items[i].Pozyvnoi)+
+          ':'+SocketCoord.TCPClientCollection.
+          Items[i].StatusStr);
+        except on E:Exception do
+          socksStatusLabel.Caption:=
+            E.Message;
+        end;
+      end;
+end;
+
+function TRemoteControlForm.IdHTTPGetDynamic(URL: string): Boolean;
+var res: Boolean;
+    //idHttp :TIdHTTP;
+begin
+
+  res:=False;
+  //idHttp := TIdHTTP.Create(nil);
+  { тут следует "настроить" параметры idHTTP }
+  { ... }
+  try
+    //idHttp.Get(URL, mStream);
+    try
+      RequestIdHTTP.ConnectTimeout := 60000;
+      RequestIdHTTP.ReadTimeout := 60000;
+
+      LastHTTPAnswer :=
+        UTF8ToAnsi(RequestIdHTTP.
+        Get(TIdURI.URLEncode(AnsiToUTF8(URL))));
+
+      if (RequestIdHTTP.Response<>nil) then
+        if (RequestIdHTTP.Response.ResponseCode=200) then
+        begin
+          if (LastHTTPAnswer=StringReplace(LastHTTPAnswer,
+                      '[not_success]', '',
+                      [rfReplaceAll, rfIgnoreCase])) then
+            begin
+              res:=True;
+              ServerMainForm.WriteEvent(
+                'Успешно, ответ сервера: '
+                +LastHTTPAnswer);
+            end
+          else
+            ServerMainForm.WriteEvent(
+            'Ошибка протокола системы: '
+              +StringReplace(LastHTTPAnswer,
+                      '[not_success]', '',
+                      [rfReplaceAll, rfIgnoreCase])+'.');
+        end;
+      LastHTTPAnswer:=StringReplace(LastHTTPAnswer,
+                      '[not_success]', '',
+                      [rfReplaceAll, rfIgnoreCase]);
+
+      except on E:Exception do
+        begin
+          ServerMainForm.WriteEvent(
+            'Ошибка добавления сообщения через HTTP: '+E.Message+'.');
+        end;
+      end;
+  finally
+    //idHttp.Free;
+    RequestIdHTTP.Disconnect;
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.SendTextMessageWithHTTP(
+      dest_id: Integer; text: String): Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  LastHTTPAnswer := '[not_success]Без результата!';
+  IdHTTPGetDynamic(
+      IniFile.ReadString('BUSINESS_DATA',
+      'базовый_адрес_HTTP_приложения',
+      'http://anapataxi.ru/')+'index.php?'+
+      'action=clear_messages&dest_id='+IntToStr(dest_id)+
+      '&psw='+
+      EncodeString(IniFile.ReadString('BUSINESS_DATA',
+      'HTTP_password',
+      'password')));
+  Result := IdHTTPGetDynamic(
+      IniFile.ReadString('BUSINESS_DATA',
+      'базовый_адрес_HTTP_приложения',
+      'http://anapataxi.ru/')+'index.php?'+
+      'action=add_message&dest_id='+IntToStr(dest_id)+
+      '&msg_text='+text+'&psw='+
+      EncodeString(IniFile.ReadString('BUSINESS_DATA',
+      'HTTP_password',
+      'password')));
+end;
+
+function TRemoteControlForm.SendTextMessageWithHTTPService(MSG: string;
+    CLIENT_PHONE: string; ThreadMode: Boolean=False;
+    dest_mode: string='client'; sale: Double=0; delivTime: Integer=0): Boolean;
+var s, msg_enc, delive_str: string;
+    res: Boolean;
+begin
+  res:=False;
+  delive_str:='';
+  ServerMainForm.WriteEvent(CLIENT_PHONE+':'+MSG);
+  if (Length(MSG)>0) and (Length(CLIENT_PHONE) >= 5) then
+  if  ThreadMode then
+  begin
+    ServerMainForm.WriteEvent('Unsupported Thread SMS-mode!');
+  end
+  else
+  begin
+    ServerMainForm.WriteEvent('Go SMS!');
+    try
+      if IniFile.ReadString('BUSINESS_DATA',
+        'шаблон_отправки_на_Интернет_сервис',
+        '')<>'' then
+      begin
+      if (dest_mode='driver') then
+        s := IniFile.ReadString('BUSINESS_DATA',
+          'шаблон_отправки_водителю',
+          '')
+      else
+       begin
+
+       ServerMainForm.WriteEvent('Сумма '+FloatToStr(sale));
+       if (sale>0) and (IniFile.ReadString('BUSINESS_DATA',
+          'отсылать_данные_клиент_отчет',
+          'NO')='YES') then  ServerMainForm.WriteEvent
+            ('Отсылаю данные клиент отчет!')
+       else
+       begin
+          ServerMainForm.WriteEvent
+            ('Время доставки='+IntToStr(delivTime));
+       end;
+
+        if (sale>0) and (IniFile.ReadString('BUSINESS_DATA',
+          'отсылать_данные_клиент_отчет',
+          'NO')='YES')   then
+          s := IniFile.ReadString('BUSINESS_DATA',
+          'шаблон_отправки_клиенту_об_отчете',
+          '')
+          else
+          begin
+            s := IniFile.ReadString('BUSINESS_DATA',
+          'шаблон_отправки_на_Интернет_сервис',
+          '');
+            ServerMainForm.WriteEvent
+            ('Отсылаю данные клиент вызов!');
+            if (delivTime>0) and (IniFile.ReadString('BUSINESS_DATA',
+              'отпр_вр_ожидания_в_SMS',
+              'NO')='YES')   then
+              begin
+              ServerMainForm.WriteEvent(
+                  'Отсылаю данные клиенту о времени прибытия!');
+                 delive_str:=StringReplace(IniFile.ReadString('BUSINESS_DATA',
+                  'шаблон_сообщ_ожидания','(прибытие ***___msg_text мин.)'),
+                  '***___msg_text',IntToStr(delivTime),
+                  [rfReplaceAll]);
+              end;
+          end;
+        end;
+
+      s:=StringReplace(s,'***___br',#13#10,
+          [rfReplaceAll]);
+
+      if (s<>StringReplace(s,
+        '***___dest_number','',
+        [rfReplaceAll])) or True then
+      begin
+
+      s:=StringReplace(s,
+        '***___dest_number','7'+
+        //'9184652120',
+        CLIENT_PHONE,
+        [rfReplaceAll]);
+      //SMSServiceIdHTTP.URL.
+      //AnsiToUTF8(
+      if (s<>StringReplace(s,
+        '***___msg_text','',
+        [rfReplaceAll])) or True then
+      begin
+
+      if (sale>0) and (IniFile.ReadString('BUSINESS_DATA',
+          'отсылать_данные_клиент_отчет',
+          'NO')='YES')   then
+          s:=StringReplace(s,
+        '***___msg_text',FloatToStr(sale),[rfReplaceAll])
+          else
+      s:=StringReplace(s,
+        '***___msg_text',MSG+delive_str,[rfReplaceAll]);
+
+      ServerMainForm.WriteEvent(
+            'Запрос: '+s+'.');
+      ServerMainForm.WriteEvent(
+            'Encode: '+TIdURI.URLEncode(s)+'.');
+
+      s := SMSServiceIdHTTP.Get(TIdURI.URLEncode(AnsiToUTF8(s)));
+      ServerMainForm.WriteEvent(
+            'Ответ: '+StringReplace
+            (s,#13,#13#10, [rfReplaceAll]));
+      res:=True;
+      end
+        else ServerMainForm.WriteEvent('Ошибка отправки код 1!');
+      end
+        else ServerMainForm.WriteEvent('Ошибка отправки код 2!');
+      end
+        else ServerMainForm.WriteEvent('Ошибка отправки код 3!');
+    except on E:Exception do
+        begin
+          //if not res then
+          ServerMainForm.WriteEvent(
+            'Ошибка добавления сообщения через сервис HTTP: '+E.Message+'.');
+          try
+            SMSServiceIdHTTP.Disconnect;
+          except on E:Exception do
+            ServerMainForm.WriteEvent(
+            'Ошибка сброса соединения! '+E.Message);
+          end;
+        end;
+      end;
+  end;
+  if not res then
+    ServerMainForm.WriteEvent('Bad result!');
+  Result:=res;
+end;
+
+function TRemoteControlForm.SendSputnikApiHTTPRequest
+
+function TRemoteControlForm.SendTextMessageWithHTTPServicePOST
+  (MSG: string; CLIENT_PHONE: string; ThreadMode:
+  Boolean=False; dest_mode: string='client'; sale: Double=0): Boolean;
+var s, msg_enc, post_http_base, repl_str, templ_str: string;
+    res, has_repl: Boolean;
+    post: TStringList;
+	i: Integer;
+begin
+  res:=False;
+  ServerMainForm.WriteEvent(CLIENT_PHONE+':'+MSG);
+  if (Length(MSG)>0) and (Length(CLIENT_PHONE) >= 5) then
+  if  ThreadMode then
+  begin
+    ServerMainForm.WriteEvent('Unsupported Thread SMS-mode!');
+  end
+  else
+  begin
+    ServerMainForm.WriteEvent('Go SMS!');
+    try
+      post := TStringList.Create;
+      if IniFile.ReadString('BUSINESS_DATA',
+        'http_post_основание_адреса',
+        '')<>'' then
+      begin
+      post_http_base:=IniFile.ReadString('BUSINESS_DATA',
+        'http_post_основание_адреса','');
+      if (dest_mode='driver') then
+        post.LoadFromFile(CDP+'\driver_order_post.txt')
+      else
+       begin
+
+       ServerMainForm.WriteEvent('Сумма '+FloatToStr(sale));
+       if (sale>0) and (IniFile.ReadString('BUSINESS_DATA',
+          'отсылать_данные_клиент_отчет',
+          'NO')='YES') then  ServerMainForm.WriteEvent
+            ('Отсылаю данные клиент отчет!');
+
+        if (sale>0) and (IniFile.ReadString('BUSINESS_DATA',
+          'отсылать_данные_клиент_отчет',
+          'NO')='YES')   then
+            post.LoadFromFile(CDP+'\client_report_post.txt')
+          else
+            post.LoadFromFile(CDP+'\client_call_post.txt');
+        end;
+
+      has_repl:=False;
+	    templ_str:='***___br';
+	    repl_str:=#13#10;
+	    for i:=0 to post.Count-1 do
+	    begin
+		    if post.Strings[i]<>StringReplace(
+          post.Strings[i],templ_str,repl_str,
+          [rfReplaceAll]) then
+		        has_repl:=True;
+		    post.Strings[i]:=StringReplace(post.Strings[i],
+        templ_str,repl_str,[rfReplaceAll]);
+	    end;
+
+      if (post.Count>0) then
+      begin
+
+      has_repl:=False;
+	    templ_str:='***___dest_number';
+	    repl_str:='7'+CLIENT_PHONE;
+	    for i:=0 to post.Count-1 do
+	    begin
+		    if post.Strings[i]<>StringReplace(
+          post.Strings[i],templ_str,repl_str,
+          [rfReplaceAll]) then
+		        has_repl:=True;
+		    post.Strings[i]:=StringReplace(post.Strings[i],
+        templ_str,repl_str,[rfReplaceAll]);
+	    end;
+
+      if has_repl or True then
+      begin
+
+      has_repl:=False;
+	    templ_str:='***___msg_text';
+      if (sale>0) and (IniFile.ReadString('BUSINESS_DATA',
+          'отсылать_данные_клиент_отчет',
+          'NO')='YES')   then
+          repl_str:=FloatToStr(sale)
+          else
+          repl_str:=MSG;
+	    for i:=0 to post.Count-1 do
+	    begin
+		    if post.Strings[i]<>StringReplace(
+          post.Strings[i],templ_str,repl_str,
+          [rfReplaceAll]) then
+		        has_repl:=True;
+		    post.Strings[i]:=StringReplace(post.Strings[i],
+        templ_str,repl_str,[rfReplaceAll]);
+	    end;
+
+      if (has_repl and ((sale=0) or ((sale>0) and
+          (IniFile.ReadString('BUSINESS_DATA',
+          'отсылать_данные_клиент_отчет',
+          'NO')='YES')))) or True then
+      begin
+
+	  {if (IniFile.ReadString('BUSINESS_DATA',
+          'преобраз_в_UTF8_для_POST',
+          'NO')='YES') then
+	  for i:=0 to post.Count-1 do
+         post.Strings[i]:=AnsiToUTF8(post.Strings[i]); }
+
+	  ServerMainForm.EventsList.Items.Add('Запрос POST:');
+      for i:=0 to post.Count-1 do
+         ServerMainForm.EventsList.Items.Add(post.Strings[i]);
+    if (IniFile.ReadString('BUSINESS_DATA',
+          'преобраз_в_UTF8_для_POST',
+          'NO')='YES') then
+    begin
+      for i:=0 to post.Count-1 do
+      begin
+
+        if (IniFile.ReadString('BUSINESS_DATA',
+          'no_url_decode_для_POST',
+          'NO')='YES') then
+          post.Strings[i]:=AnsiToUTF8(post.Strings[i])
+          else
+         post.Strings[i]:=TIdURI.ParamsEncode(AnsiToUTF8(post.Strings[i]));
+      end
+    end
+    else
+    if (IniFile.ReadString('BUSINESS_DATA',
+          'no_url_decode_для_POST',
+          'NO')<>'YES') then
+      for i:=0 to post.Count-1 do
+         post.Strings[i]:=TIdURI.ParamsEncode(post.Strings[i]);
+
+      ServerMainForm.EventsList.Items.Add('Encode:');
+      for i:=0 to post.Count-1 do
+         ServerMainForm.EventsList.Items.Add(post.Strings[i]);
+      //SMSServiceIdHTTPPOST.URL.Params
+
+      s := SMSServiceIdHTTPPOST.Post(post_http_base, post);
+        //TIdURI.URLEncode(AnsiToUTF8(s)));
+      ServerMainForm.WriteEvent(
+            'Ответ: '+StringReplace
+            (s,#13,#13#10, [rfReplaceAll]));
+      res:=True;
+      end
+        else ServerMainForm.WriteEvent('Ошибка post-отправки код 1!');
+      end
+        else ServerMainForm.WriteEvent('Ошибка post-отправки код 2!');
+      end
+        else ServerMainForm.WriteEvent('Ошибка post-отправки код 3!');
+      end
+        else ServerMainForm.WriteEvent('Ошибка post-отправки код 4!');
+    except on E:Exception do
+        begin
+          //if not res then
+          ServerMainForm.WriteEvent(
+            'Ошибка добавления сообщения через сервис HTTP POST: '+E.Message+'.');
+          try
+            SMSServiceIdHTTPPOST.Disconnect;
+          except on E:Exception do
+            ServerMainForm.WriteEvent(
+            'Ошибка сброса соединения POST! '+E.Message);
+          end;
+        end;
+      end;
+  end;
+  if not res then
+    ServerMainForm.WriteEvent('Bad result POST!');
+  Result:=res;
+end;
+
+function TRemoteControlForm.SendTextMessage(DEST_ID: Integer;
+  MSG: string; CLIENT_PHONE: string=''; dest_mode: string='client';
+  sale: Double=0; deliveTime: Integer=0): Boolean;
+var res: Boolean;
+begin
+  if IniFile.ReadString('BUSINESS_DATA',
+    'отправлять_СМС_на_Интернет_сервис',
+    'NO')='YES' then
+    begin
+      ServerMainForm.WriteEvent('Стоит сумма '+FloatToStr(sale));
+      if IniFile.ReadString('BUSINESS_DATA',
+        'использ_POST_запросы_для_SMS',
+        'NO')='YES' then
+        Result:=SendTextMessageWithHTTPServicePOST
+          (MSG, CLIENT_PHONE, False, dest_mode, sale)
+      else
+        Result:=SendTextMessageWithHTTPService
+          (MSG, CLIENT_PHONE, False, dest_mode, sale, deliveTime);
+    end
+  else if IniFile.ReadString('BUSINESS_DATA',
+    'отправлять_СМС_через_HTTP',
+    'NO')='YES' then
+    begin
+      Result:=SendTextMessageWithHTTP(DEST_ID, MSG);
+    end
+  else
+    begin
+      if IniFile.ReadString('BUSINESS_DATA','вести_контроль_удаленного_управления','NO')='YES' then
+      begin
+      if False then
+        begin
+          RefreshMSGTable;
+          Result:=True;
+        end
+      else
+        begin
+          Result:=false;
+        end;
+      end
+      else
+        Result:=false;
+    end;
+end;
+
+procedure TRemoteControlForm.Button1Click(Sender: TObject);
+begin
+  if SendTextMessage(StrToInt(DEST_ID.Text),MSGText.Text) then
+    ServerMainForm.WriteEvent('Текстовое сообщение отправлено!')
+  else
+    ServerMainForm.WriteEvent('Ошибка отправки текстового сообщения!');
+  RefreshMSGTable;
+end;
+
+function TRemoteControlForm.RefreshMSGTable: Boolean;
+begin
+  try
+    TDMessagesADOT.Active:=False;
+    TDMessagesADOT.Active:=True;
+    Result:=True;
+  except on E:Exception do
+   begin
+    ServerMainForm.WriteEvent('Ошибка обновления таблицы сообщений: '+E.Message+'.');
+    Result:=False;
+   end;
+  end;
+end;
+
+procedure TRemoteControlForm.FormCreate(Sender: TObject);
+var logSize: Integer;
+begin
+  CD:=GetCurrentDir;
+  CurrDir:=GetCurrentDir;
+  RemoteServerADOC.Connected:=False;
+  RemoteServerADOC.ConnectionString:='FILE NAME='+CDP+'\RemoteControl.udl';
+  if IniFile.ReadString('BUSINESS_DATA','вести_контроль_удаленного_управления','NO')='YES' then
+    begin
+      ConnectToRemoteDB;
+      RefreshMSGTable;
+    end;
+
+  InputJSONTestEdit.Items.LoadFromFile(
+    CDP+'\input_instructions.txt');
+  InputJSONTestEdit.ItemIndex:=0;
+  OutputJSONTestEdit.Items.LoadFromFile(
+    CDP+'\output_instructions.txt');
+  OutputJSONTestEdit.ItemIndex:=0;
+
+  MaxOrderPriority := IniFile.ReadInteger('BUSINESS_DATA',
+	'граничный_приоритет',0);
+  MaxIndivOrderPriority := IniFile.ReadInteger('BUSINESS_DATA',
+	'приоритет_индивидуального_заказа',0);
+  StartWithOthersSendPriority := IniFile.ReadInteger('BUSINESS_DATA',
+	'стартовый_приоритет_рассылки_по_остальным',100);
+
+  ServerActive:=False;
+
+  if (IniFile.ReadString('BUSINESS_DATA',
+	'работать_с_сокет_клиентами','NO')='YES') then
+  begin
+	if (IniFile.ReadString('BUSINESS_DATA',
+	'автоматически_запускать_сокет_сервер','NO')='YES') then
+    begin
+      SocketCoord:=TSocketCoordinator.Create(
+      IniFile.ReadInteger('BUSINESS_DATA',
+	      'порт_сокет_сервера',6030));
+	    SocketCoord.Resume;
+      ServerActive:=True;
+      SendMsgCollection :=
+		    TMessageCollection.Create();
+      N5.Enabled:=False;
+      
+    end;
+  end
+  else
+	begin
+	  N5.Enabled:=False;
+	end;
+
+  if (IniFile.ReadInteger('BUSINESS_DATA',
+	  'интервал_основного_цикла_опроса',5000)<>
+    SocketCheckTimer.Interval) and not
+    ((IniFile.ReadInteger('BUSINESS_DATA',
+	  'интервал_основного_цикла_опроса',5000)<
+    2000) and (IniFile.ReadString('BUSINESS_DATA',
+	  'не_управлять_зявками_принудит_режим','NO')='NO')) and
+    not (IniFile.ReadInteger('BUSINESS_DATA',
+	  'интервал_основного_цикла_опроса',5000)<1000) and
+    not (IniFile.ReadInteger('BUSINESS_DATA',
+	  'интервал_основного_цикла_опроса',5000)>10000) then
+  begin
+    SocketCheckTimer.Interval:=IniFile.
+      ReadInteger('BUSINESS_DATA',
+	    'интервал_основного_цикла_опроса',5000);
+  end;
+
+  if (IniFile.ReadString('BUSINESS_DATA',
+	'вести_лог','NO')='YES') then
+  begin
+  try
+
+  logSize:=getFileSize(GetCurrentDir+'\server.log');
+  writeToServerLog('Размер лог файла '''+GetCurrentDir+
+    '\server.log'''+' - '+IntToStr(logSize), False);
+
+  AssignFile(logFile, GetCurrentDir+'\server.log');
+  if FileExists(GetCurrentDir+'\server.log') then
+    begin
+      if logSize>1 then
+      begin
+          CopyFile(PAnsiChar(GetCurrentDir+'\server.log'),
+            PAnsiChar(GetCurrentDir+'\logs\server'+StringReplace(
+            StringReplace(DateTimeToStr(Today+Time),
+              '.','_', [rfReplaceAll]),
+              ':','_', [rfReplaceAll])+'.log'),True);
+        Rewrite(logFile);
+      end
+      else
+        Append(logFile);
+    end
+  else
+    Rewrite(logFile);
+
+  logActive:=True;
+
+  except on E:Exception do
+    writeToServerLog('Ошибка инициализации лог-файла! '+E.Message, False);
+  end;
+  end;
+
+  writeToServerLog('Сервер загружен в память!');
+
+end;
+
+function TRemoteControlForm.getFileSize(FileName: String): Integer;
+var
+  FS: TFileStream;
+begin
+  try
+    try
+      FS := TFileStream.Create(Filename, fmOpenRead);
+    except
+      Result := -1;
+    end;
+    if Result <> -1 then Result := FS.Size;
+    FS.Free;
+  except
+    Result:=-1;
+  end;
+end;
+
+procedure TRemoteControlForm.writeToServerLog(log_line: string; writeToFile: Boolean=True;
+  writeToMemo: Boolean=True);
+begin
+
+  if writeToMemo then
+  begin
+    try
+      SocketLogMemo.Lines.Add(log_line);
+    except on E:Exception do
+    end;
+  end;
+
+  if (IniFile.ReadString('BUSINESS_DATA',
+	'вести_лог','NO')='YES') then
+  begin
+  if writeToFile and logActive then
+  begin
+    try
+      WriteLn(logFile, log_line);
+    except on E:Exception do
+      try
+        SocketLogMemo.Lines.Add('Неудачная запись в файл лога сервера!');
+      except
+      end;
+    end;
+  end;
+  end;
+
+end;
+
+function TRemoteControlForm.getDriverJSONSettings(driverId: Integer): Widestring;
+var res: Widestring;
+begin
+  res:='{"command":"sets","msg_end":"ok"}';
+  try
+    DriverSettingsADODS.Active:=False;
+    DriverSettingsADODS.Parameters.ParamByName('driver_id').
+      Value:=driverId;
+    DriverSettingsADODS.Active:=True;
+    if DriverSettingsADODS.RecordCount>0 then
+      res:=DriverSettingsADODS.FieldByName('driver_sets').AsString;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+        'Ошибка запроса настроек'+
+        ' водителя. '+E.Message);
+  end;
+  Result:=res;
+end;
+
+procedure TRemoteControlForm.ConnectionCheckTimerTimer(Sender: TObject);
+var StateRequestResult: Integer;
+    success: Boolean;
+begin
+
+  if ServerMainForm.MainBASEADOC.Connected then
+  begin
+
+  if IniFile.ReadString('BUSINESS_DATA',
+  'ежеминутная_процедура','NO')='YES' then
+  begin
+    success:=False;
+    SocketLogMemo.Lines.Add(
+        'Вызов процедуры'+
+        ' ежеминутной задачи...');
+    try
+      OneMinuteTaskADOSP.Parameters.Refresh;
+      OneMinuteTaskADOSP.Parameters.
+        ParamByName('@success').Value:=
+        0;
+      OneMinuteTaskADOSP.ExecProc;
+      if OneMinuteTaskADOSP.Parameters.
+        ParamValues['@success']=1 then
+                success:=True;
+    except on E:Exception do
+      SocketLogMemo.Lines.Add(
+        'Неудачный вызов процедуры'+
+        ' ежеминутной задачи! '+E.Message);
+    end;
+  end;
+
+  end;
+
+end;
+
+procedure TRemoteControlForm.ConnectToRemoteDB;
+begin
+  if not AutoRemoteConnectInActive then
+  begin
+    try
+      AutoRemoteConnectInActive:=True;
+      try
+        RemoteServerADOC.connected:=True;
+      except
+        ServerMainForm.WriteEvent('Ошибка попытки соединения с удаленной БД!');
+      end;
+    finally
+      AutoRemoteConnectInActive:=False;
+      if RemoteServerADOC.connected then
+        ServerMainForm.WriteEvent('Соединение с удаленной БД установлено!')
+      else
+        ServerMainForm.WriteEvent('Неудачное соединение с удаленной БД!');
+    end;
+  end;
+end;
+
+procedure TRemoteControlForm.SocketLogMemoChange(Sender: TObject);
+begin
+  if SocketLogMemo.Lines.Count>200 then
+  begin
+     try
+      if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'логировать_пул_сокетов',
+          'NO')='YES' then
+      SocketLogMemo.Lines.SaveToFile(
+        CD+'\logs\socks_srv'+StringReplace(
+            StringReplace(DateTimeToStr(Today+Time),
+              '.','_', [rfReplaceAll]),
+              ':','_', [rfReplaceAll])+'.log');
+     except on E:Exception do
+        self.writeToServerLog('Ошибка записи лога пула сокетов! '+E.Message);
+     end;
+     SocketLogMemo.Clear;
+  end;
+end;
+
+procedure TRemoteControlForm.AddSocketServLog(MSG: Widestring);
+begin
+  SocketLogMemo.Lines.Add(MSG);
+end;
+
+procedure TRemoteControlForm.N5Click(Sender: TObject);
+begin
+  SocketCoord:=TSocketCoordinator.Create(
+  IniFile.ReadInteger('BUSINESS_DATA',
+	      'порт_сокет_сервера',6030));
+  SocketCoord.Resume;
+  ServerActive:=True;
+  SendMsgCollection :=
+    TMessageCollection.Create();
+  N5.Enabled:=False;
+end;
+
+function TRemoteControlForm.addDirectJSONMessageToClient(JSONStr: string; CurrClientID: Integer): Boolean;
+var res: Boolean;
+    NewMSWCollectItem: TMessageCollectionItem;
+begin
+  res:=True;
+
+  NewMSWCollectItem:=SendMsgCollection.Add;
+  NewMSWCollectItem.SetDirectJSONString(JSONStr);
+  NewMSWCollectItem.ClientID:=CurrClientID;
+  NewMSWCollectItem.GetMessage().ClientID:=
+    CurrClientID;
+  Result:=res;
+end;
+
+function TRemoteControlForm.orderHasAccepting(orderId: Integer;
+      driverId: Integer=-1; alsoCheckDriversActivity:
+      Boolean=False): Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  try
+    AcceptingsSelADODS.Active:=False;
+    AcceptingsSelADODS.Parameters.ParamByName
+      ('order_id').Value:=orderId;
+    AcceptingsSelADODS.Parameters.ParamByName
+      ('driver_id').Value:=driverId;
+    AcceptingsSelADODS.Parameters.ParamByName
+      ('driver_id2').Value:=driverId;
+    AcceptingsSelADODS.Active:=True;
+
+    SocketLogMemo.Lines.Add(
+      'Заявок от претендентов '+
+      IntToStr(AcceptingsSelADODS.RecordCount));
+
+    if AcceptingsSelADODS.RecordCount>0 then
+      res:=True;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'ОШИБКА запроса '+
+      'количества заявок'+
+      ' постановки  в очередь!!! '+E.Message);
+  end;
+  Result:=res;
+end;
+
+procedure TRemoteControlForm.ManualSetCurrOrderRemoteStatus(orderId,
+  destStatus: Integer);
+var count: Integer;
+begin
+      try
+        ManualSetOrdRemStatADOSP.Parameters.Refresh;
+        ManualSetOrdRemStatADOSP.Parameters.
+          ParamByName('@order_id').Value:=orderId;
+		    ManualSetOrdRemStatADOSP.Parameters.
+          ParamByName('@dest_status').Value:=destStatus;
+		    ManualSetOrdRemStatADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+        ManualSetOrdRemStatADOSP.ExecProc;
+		    count:=ManualSetOrdRemStatADOSP.Parameters.
+                ParamByName('@count').Value;
+		  if (count<1) then
+			  SocketLogMemo.Lines.Add('ОПЕРАЦИЯ НЕ ВЫПОЛНЕНА!!! '+
+          'Не найдено заявки с подходящим статусом!');
+      except on E: Exception do
+      end;
+end;
+
+//procedure TRemoteControlForm.synchroDBAndThreadsStatuses;
+//var i: Integer;
+//begin
+//end;
+
+function TRemoteControlForm.AutoSetOrderStatus(orderID, orderStatus: Integer;
+  order_start_time, order_ended_time,
+  last_status_time: TDateTime; rSync: Integer): Boolean;
+var res: Boolean;
+    autoDrSetCounter, count, destStat: Integer;
+begin
+  res:=False;
+  case orderStatus of
+    ORDER_INDIVID_TAKE,ORDER_SECTOR_PUBLISHING,
+    ORDER_ALL_PUBLISHING,ORDER_PUBLUSHED_WAIT,
+    ORDER_IS_OCCUPED,ORDER_OCCUPED_DENY:
+      begin
+        //Оставил в полуавт режиме
+        if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'автоматич_назначать_из_претенд_на_заявку',
+          'NO')='YES' then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_ожидания_до_автоназнач_из_претенд',
+          60000);
+
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+
+            //SocketLogMemo.Lines.Add(
+            //      'ПОПЫТКА автоназначения '+
+            //      'водителя из претендентов...');
+
+            try
+              //if Self.orderHasAccepting(orderId)  then
+              //begin
+
+                //SocketLogMemo.Lines.Add(
+                //  'ПОПЫТКА автоназначения '+
+                //  'водителя из претендентов...');
+
+                AutoSetDriverADOSP.
+                Parameters.Refresh;
+                AutoSetDriverADOSP.Parameters.
+                  ParamByName('@order_id').Value:=
+                  orderID;
+                AutoSetDriverADOSP.Parameters.
+                  ParamByName('@delta_time_param').Value:=
+                  autoDrSetCounter;
+                AutoSetDriverADOSP.Parameters.
+                  ParamByName('@count').Value:=
+                  0;
+                if IniFile.ReadString
+                  ('BUSINESS_DATA',
+                  'сорт_претендентов_по_времени_реакции',
+                  'YES')='YES' then
+                AutoSetDriverADOSP.Parameters.
+                  ParamByName('@sort_with_accept').Value:=1
+                else
+                  AutoSetDriverADOSP.Parameters.
+                  ParamByName('@sort_with_accept').Value:=0;
+                if IniFile.ReadString
+                  ('BUSINESS_DATA',
+                  'первые_по_реакции_впереди',
+                  'YES')='YES' then
+                AutoSetDriverADOSP.Parameters.
+                  ParamByName('@manual_before').Value:=1
+                else
+                  AutoSetDriverADOSP.Parameters.
+                  ParamByName('@manual_before').Value:=0;
+                AutoSetDriverADOSP.ExecProc;
+                count:=AutoSetDriverADOSP.Parameters.
+                  ParamValues['@count'];
+                if (count>0) then
+                begin
+                  res:=True;
+                  SocketLogMemo.Lines.Add(
+                  'Выполнено автоназначение '+
+                  'водителя из претендентов!');
+                end
+                else
+                begin
+                  //SocketLogMemo.Lines.Add(
+                  //'Не выполнено автоназначение '+
+                  //'водителя из претендентов '+
+                  //'(статус водителя или заявки не подошел)!');
+                end;
+              //end;
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры автоназначения '+
+                  'водителя из претендентов! '+E.Message);
+            end;
+          end;
+
+        end;
+
+        //Оставил в полуавт режиме
+        if (IniFile.ReadString('BUSINESS_DATA',
+          'автоматич_рассыл_заново_при_отработке_претенд',
+          'NO')='YES') and (orderStatus>3) then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_ожидания_повторн_рассылки',
+          60000); 
+
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+            try
+              if not Self.orderHasAccepting(orderId) then
+              begin
+                SocketLogMemo.Lines.Add(
+                  'ПОПЫТКА повторного рассыла заявки...');
+
+                if setOrderRemoteStatus(orderId,
+                  ORDER_SECTOR_PUBLISHING, -1) then
+                begin
+                  res:=True;
+                  SocketLogMemo.Lines.Add(
+                  'Выполнен повторный рассыл для '+
+                  'заявки!');
+                end
+                else
+                begin
+                  SocketLogMemo.Lines.Add(
+                  'Не выполнен повторный рассыл для '+
+                  'заявки '+
+                  '(статус водителя или заявки не подошел)!');
+                end;
+              end;
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры повторный рассыл для '+
+                  'заявки!');
+            end;
+
+          end;
+
+        end;
+
+      end;
+    ORDER_OCCUPED_ALLOW, ORDER_ALLOW_ASK_WAIT:
+      begin
+        //Оставил в полуавт режиме
+        if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'автоназн_след_претенд_при_отсутств_ответа',
+          'NO')='YES' then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_автоназн_претенд_при_отсутств_ответа',
+          60000);
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+            try
+              if Self.orderHasAccepting(orderId)  then
+              begin
+                SocketLogMemo.Lines.Add(
+                  'ПОПЫТКА назн. след. претендента заявки...');
+                if setOrderRemoteStatus(orderId,
+                  ORDER_OCCUPED_DENY) then
+                begin
+                  res:=True;
+                  SocketLogMemo.Lines.Add(
+                  'Выполнено назн. след. претендента '+
+                  'заявки!');
+                end
+                else
+                begin
+                  SocketLogMemo.Lines.Add(
+                  'Не выполнено назн. след. претендента '+
+                  'заявки '+
+                  '(статус водителя или заявки не подошел)!');
+                end;
+              end;
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры назн. след. претендента '+
+                  'заявки!');
+            end;
+
+          end;
+
+        end;
+
+        //Оставил в полуавт режиме
+        if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'автоматич_рассыл_заново_при_отработке_претенд',
+          'NO')='YES' then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_ожидания_повторн_рассылки',
+          60000);
+
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+            try
+              if not Self.orderHasAccepting(orderId)  then
+              begin
+                SocketLogMemo.Lines.Add(
+                  'ПОПЫТКА повторного рассыла заявки...');
+
+                if setOrderRemoteStatus(orderId,
+                  ORDER_SECTOR_PUBLISHING, -1) then
+                begin
+                  res:=True;
+                  SocketLogMemo.Lines.Add(
+                  'Выполнен повторный рассыл для '+
+                  'заявки!');
+                end
+                else
+                begin
+                  SocketLogMemo.Lines.Add(
+                  'Не выполнен повторный рассыл для '+
+                  'заявки '+
+                  '(статус водителя или заявки не подошел)!');
+                end;
+              end;
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры повторный рассыл для '+
+                  'заявки!');
+            end;
+
+          end;
+
+        end;
+
+      end;
+    ORDER_BUSY:
+      begin
+        //Оставил в полуавт режиме
+        if (IniFile.ReadString
+          ('BUSINESS_DATA',
+          'автоназн_след_претенд_при_отсутств_ответа',
+          'NO')='YES') and (IniFile.ReadString
+          ('BUSINESS_DATA',
+          'переназн_рабочей_заявки_при_отс_подтвержд',
+          'NO')='YES') and (rSync=1) then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_автоназн_претенд_при_отсутств_ответа',
+          60000);
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+            try
+              if Self.orderHasAccepting(orderId)  then
+              begin
+                SocketLogMemo.Lines.Add(
+                  'ПОПЫТКА назн. след. претендента заявки...');
+                if setOrderRemoteStatus(orderId,
+                  ORDER_OCCUPED_DENY) then
+                begin
+                  res:=True;
+                  SocketLogMemo.Lines.Add(
+                  'Выполнено назн. след. претендента '+
+                  'заявки!');
+                end
+                else
+                begin
+                  SocketLogMemo.Lines.Add(
+                  'Не выполнено назн. след. претендента '+
+                  'заявки '+
+                  '(статус водителя или заявки не подошел)!');
+                end;
+              end;
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры назн. след. претендента '+
+                  'заявки!');
+            end;
+
+          end;
+
+        end;
+
+        //Оставил в полуавт режиме
+        if (IniFile.ReadString
+          ('BUSINESS_DATA',
+          'автоматич_рассыл_заново_при_отработке_претенд',
+          'NO')='YES') and (IniFile.ReadString
+          ('BUSINESS_DATA',
+          'переназн_рабочей_заявки_при_отс_подтвержд',
+          'NO')='YES') and (rSync=1) then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_ожидания_повторн_рассылки',
+          60000);
+
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+            try
+              if not Self.orderHasAccepting(orderId)  then
+              begin
+                SocketLogMemo.Lines.Add(
+                  'ПОПЫТКА повторного рассыла заявки...');
+
+                destStat:=ORDER_SECTOR_PUBLISHING;
+                if IniFile.ReadString
+                  ('BUSINESS_DATA',
+                  'сброс_на_учетный_статус_при_повт_рассыле',
+                  'NO')='YES' then
+                destStat:=0;
+
+                if setOrderRemoteStatus(orderId,
+                  destStat, -1) then
+                begin
+                  res:=True;
+                  SocketLogMemo.Lines.Add(
+                  'Выполнен повторный рассыл для '+
+                  'заявки!');
+                end
+                else
+                begin
+                  SocketLogMemo.Lines.Add(
+                  'Не выполнен повторный рассыл для '+
+                  'заявки '+
+                  '(статус водителя или заявки не подошел)!');
+                end;
+              end;
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры повторный рассыл для '+
+                  'заявки!');
+            end;
+
+          end;
+
+        end;
+
+      end;
+    ORDER_ONHAND_ALLOW, ORDER_ONHAND_ALLOW_ASK_WAIT:
+    begin
+      if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'снимать_по_истеч_отдан_с_руки',
+          'NO')='YES' then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_ожидания_отданного_с_руки',
+          60000);
+
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+
+            SocketLogMemo.Lines.Add(
+            'ПОПЫТКА сброса отданного с руки...');
+
+            try
+                if setOrderRemoteStatus(orderId,
+                  ORDER_ONHAND_ALLOW_USER_WAIT) then
+                begin
+                  res:=True;
+                  SocketLogMemo.Lines.Add(
+                  'Выполнен сброс отданной с руки '+
+                  'заявки!');
+                end
+                else
+                begin
+                  SocketLogMemo.Lines.Add(
+                  'Не выполнен сброс отданной с руки '+
+                  'заявки '+
+                  '(статус водителя или заявки не подошел)!');
+                end;
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры сброса отданной с руки '+
+                  'заявки!');
+            end;
+
+          end;
+
+        end;
+    end;
+    ORDER_DISP_CANCEL, ORDER_DISP_CANCEL_ASK_WAIT, ORDER_DRV_CANCEL:
+    begin
+      if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'автосброс_отмены_при_отсутствии_потдверждения',
+          'NO')='YES' then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_автосброса_отмены',
+          60000);
+
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+
+            SocketLogMemo.Lines.Add(
+            'ПОПЫТКА автосброса отмены...');
+
+            try
+
+                SetOrderEmptyDriverADOC.Parameters.
+                  ParamByName('order_id').Value:=
+                    orderId;
+                SetOrderEmptyDriverADOC.Execute;
+
+                res:=True;
+                SocketLogMemo.Lines.Add(
+                  'Выполнен автосброс отмены '+
+                  'заявки!');
+
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка автосброса отмены '+
+                  'заявки!'+E.Message);
+            end;
+
+          end;
+
+        end;
+    end;
+    //ORDER_DRV_COMPLETE, ORDER_COMLETE_ALLOW,
+    //ORDER_DISP_CANCEL_DR_INCOURSE,
+    ORDER_COMPLETE_ALLOW_USER_WAIT:
+      begin
+
+        if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'автоматически_закрывать_заявку',
+          'NO')='YES' then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_ожидания_до_автозакр_заявки',
+          60000);
+
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+
+            SocketLogMemo.Lines.Add(
+                  'ПОПЫТКА автофиниширования заявки...');
+
+            try
+
+                ManualSetCurrOrderRemoteStatus
+                (orderID, ORDER_CLOSE);
+
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры автофиниширование '+
+                  'заявки!');
+            end;
+
+          end;
+
+        end;
+
+      end;
+
+      ORDER_ONHAND_ALLOW_USER_WAIT :
+      begin
+
+        if IniFile.ReadString
+          ('BUSINESS_DATA',
+          'автоотправка_неразреш_с_руки',
+          'NO')='YES' then
+        begin
+          autoDrSetCounter:=IniFile.ReadInteger
+          ('BUSINESS_DATA',
+          'время_отправки_неразреш_с_руки',
+          60000);
+
+          if SecondsBetween(last_status_time,
+            (Today+Time))>autoDrSetCounter then
+          begin
+
+            SocketLogMemo.Lines.Add(
+                  'ПОПЫТКА автооправки неразрешенных с руки...');
+
+            try
+
+                ManualSetCurrOrderRemoteStatus
+                (orderID, ORDER_BUSY);
+
+            except on E:Exception do
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(
+                  'Ошибка процедуры автооправки неразрешенных с руки '+
+                  'заявки!');
+            end;
+
+          end;
+
+        end;
+
+      end;
+
+    else
+      begin
+      end;
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.setDriverSyncStatus(driver_id, status:
+      Integer) : Boolean;
+var res: Boolean;
+    count: Integer;
+begin
+  count:=0;
+  res:=False;
+            try
+              SetDrSyncStatusADOSP.Parameters.Refresh;
+              SetDrSyncStatusADOSP.Parameters.
+                ParamByName('@status').Value:=
+                status;
+              SetDrSyncStatusADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                driver_id;
+              SetDrSyncStatusADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+              SetDrSyncStatusADOSP.ExecProc;
+              count:=SetDrSyncStatusADOSP.Parameters.
+                ParamValues['@count'];
+              //SocketLogMemo.Lines.Add('Найдено водителей - '+IntToStr(count));
+              if (count>0) then
+              begin
+                res:=True;
+              end
+              else
+              begin
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачный вызов процедуры'+
+                ' уст. статуса синхронизации водителя! '+E.Message);
+            end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.setDriverRemoteStatus(driver_id, status:
+      Integer; check_busy: Integer=-1; on_launch: Integer=-1;
+      on_line: Integer=-1; sync: Integer=-1) : Boolean;
+var res: Boolean;
+    count: Integer;
+begin
+  count:=0;
+  res:=False;
+            try
+              SetDrRemStatusADOSP.Parameters.Refresh;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@status').Value:=
+                status;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@check_busy').
+                Value:=check_busy;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@on_launch').
+                Value:=on_launch;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@on_line').
+                Value:=on_line;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@sync').
+                Value:=sync;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                driver_id;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+              SetDrRemStatusADOSP.ExecProc;
+              count:=SetDrRemStatusADOSP.Parameters.
+                ParamValues['@count'];
+              //SocketLogMemo.Lines.Add('Найдено водителей - '+IntToStr(count));
+              if (count>0) then
+              begin
+                res:=True;
+              end
+              else
+              begin
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачный вызов процедуры'+
+                ' уст. статуса водителя! '+E.Message);
+            end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.AutoSetDriverStatus(driverID, driverStatus: Integer;
+      last_status_time: TDateTime; syncStatus: Integer): Boolean;
+var res: Boolean;
+    autoSetCounter: Integer;
+begin
+  res:=False;
+
+  if SyncStatus=2 then
+        begin
+
+          if (IniFile.ReadString
+          ('BUSINESS_DATA',
+          'пересылать_недоставленный_статус_вод',
+          'NO')='YES') and
+          (SocketCoord.GetClientItemIndexByDrId
+          (driverID)>=0) then
+          begin
+            autoSetCounter:=IniFile.ReadInteger
+            ('BUSINESS_DATA',
+            'время_пересылк_недост_статуса_вод',
+            60000);
+
+            if SecondsBetween(last_status_time,
+              (Today+Time))>autoSetCounter then
+            begin
+
+              SocketLogMemo.Lines.Add(
+                  'ПОПЫТКА установки признака пересылки статусной информации...');
+
+              if self.setDriverSyncStatus
+                (driverID, 1) then
+                begin
+                  res:=True;
+                end
+              else
+                SocketLogMemo.Lines.Add(
+                  'НЕУДАЧНАЯ ПОПЫТКА установки признака пересылки статусной информации...');
+
+             end;
+
+        end;
+  end;
+
+  if (SocketCoord.GetClientItemIndexByDrId(driverID)<0) and
+    (driverStatus<>DR_ERROR_CL_SOCKET) and not res then
+  begin
+    if Self.setDriverRemoteStatus(driverID,
+          DR_ERROR_CL_SOCKET, -1, -1, -1, -1) then
+          begin
+            //SocketLogMemo.Lines.Add(
+            //    'Установка статуса отсутствия связи в БД! ИД '+
+            //    IntToStr(driverID));
+            res:=True;
+          end
+          else
+            SocketLogMemo.Lines.Add(
+                'Неудачная установка статуса отсутствия связи в БД! ИД '+
+                IntToStr(driverID));
+  end;
+  Result:=res;
+end;
+
+procedure TRemoteControlForm.incrementOrderPriorStat(orderId, MaxOrderPriority: Integer);
+begin
+      try
+
+        IncOrdersPriorityADOSP.
+          Parameters.Refresh;
+        IncOrdersPriorityADOSP.
+          Parameters.
+        ParamByName('@max_priority').Value:=
+          MaxOrderPriority;
+        //IncOrdersPriorityADOSP.
+        //  Parameters.
+        //ParamByName('@order_id').Value:=
+        //  orderId;
+        IncOrdersPriorityADOSP.ExecProc;
+
+      except on Ex:Exception do
+        SocketLogMemo.Lines.Add
+        ('Ошибка инкремента приоритетного показателя заявки!'+
+          Ex.Message);
+      end;
+end;
+
+procedure TRemoteControlForm.setOrderTarif(orderId, tarifId: Integer);
+begin
+  try
+    SetTarifADOC.Parameters.ParamByName('order_id').Value:=
+        orderId;
+    SetTarifADOC.Parameters.ParamByName('tarif_id').Value:=
+        tarifId;
+    SetTarifADOC.Execute;
+  except on Ex:Exception do
+        SocketLogMemo.Lines.Add
+        ('Ошибка установки тарифа заявки!'+
+          Ex.Message);
+  end;
+end;
+
+procedure TRemoteControlForm.setOrderOptComb(orderId: Integer; optComb: String);
+begin
+  try
+    SetOptCombADOC.Parameters.ParamByName('order_id').Value:=
+        orderId;
+    SetOptCombADOC.Parameters.ParamByName('opts_comb').Value:=
+        optComb;
+    SetOptCombADOC.Execute;
+  except on Ex:Exception do
+        SocketLogMemo.Lines.Add
+        ('Ошибка установки опций заявки!'+
+          Ex.Message);
+  end;
+end;
+
+function TRemoteControlForm.getSectorsStatus: WideString;
+begin
+  if self.ReloadDrSettings then
+    Result:=SettingsADODS.FieldByName
+      ('sectors_wbroadcast').AsString
+  else
+    Result:='{"command":"err_op","msg_end":"ok"}';
+end;
+
+procedure TRemoteControlForm.resetSectorBroadcast;
+begin
+  try
+    ResetSectBroadcastADOC.Execute;
+  except
+  end;
+end;
+
+procedure TRemoteControlForm.resetOrdersBroadcast;
+begin
+  try
+    ResetOrdBroadcastADOC.Execute;
+  except
+  end;
+end;
+
+procedure TRemoteControlForm.decrementDriversOrderPriority;
+begin
+  try
+    DecrementOrdersPriorityADOSP.Parameters.Refresh;
+    DecrementOrdersPriorityADOSP.Parameters.
+      ParamByName('@reset_has_broad').Value:=1;
+    DecrementOrdersPriorityADOSP.ExecProc;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачный вызов процедуры'+
+      ' декремента приоритетов заказов водителей! '+E.Message);
+  end;
+end;
+
+function TRemoteControlForm.checkRemoteDrivers: Boolean;
+var res: Boolean;
+    DriverStatus, SyncStatus, GPSRequStatus: Integer;
+    CurrClientID, ClientCollectionIndex, manual_day_sale: Integer;
+begin
+
+  if sectorWideBroadcastCounter>=0 then
+  sectorWideBroadcastCounter:=
+    sectorWideBroadcastCounter-1;
+  if orderWideBroadcastCounter>=0 then
+  orderWideBroadcastCounter:=
+    orderWideBroadcastCounter-1;
+  if self.ReloadDrSettings then
+  begin
+
+    if IniFile.ReadString
+      ('BUSINESS_DATA',
+      'общий_рассыл_статуса_секторов',
+      'NO')='YES' then
+      if (SettingsADODS.FieldByName
+        ('use_sect_wbroadcast').AsInteger=1) and
+        (SettingsADODS.FieldByName
+        ('has_sect_wbroadcast').AsInteger=1) then
+        begin
+          if sectorWideBroadcastCounter<=0 then
+          begin
+            sectorWideBroadcastCounter:=
+              IniFile.ReadInteger
+                ('BUSINESS_DATA',
+                'интервал_секторной_рассылки',
+                5);
+            MessageWideBroadcasting(
+            SettingsADODS.FieldByName
+              ('sectors_wbroadcast').AsString);
+            resetSectorBroadcast;
+          end;
+        end;
+
+    if IniFile.ReadString
+      ('BUSINESS_DATA',
+      'оповещательная_раздача_заявок',
+      'NO')='YES' then
+      if (SettingsADODS.FieldByName
+        ('use_ford_wbroadcast').AsInteger=1) and
+        (SettingsADODS.FieldByName
+        ('has_ford_wbroadcast').AsInteger=1) then
+        begin
+          if orderWideBroadcastCounter<=0 then
+          begin
+            orderWideBroadcastCounter:=
+              IniFile.ReadInteger
+                ('BUSINESS_DATA',
+                'интервал_оповещательной_раздачи',
+                2);
+                if ( SettingsADODS.FieldByName
+                ('use_fordbroadcast_priority').AsInteger=1) then
+                begin
+                    SocketLogMemo.Lines.Add(
+                  'Приоритетная раздача заявок в аукцион!');
+                    MessageDriverOrderBroadcasting;
+                end
+                else
+                begin
+                    MessageWideBroadcasting(
+                      SettingsADODS.FieldByName
+                        ('forders_wbroadcast').AsString);
+                    resetOrdersBroadcast;
+                end;
+
+          end;
+        end;
+
+  end;
+
+  DriversADOT.Active:=False;
+  try
+    DriversADOT.Active:=True;
+    if DriversADOT.RecordCount>0 then
+    begin
+      DriversADOT.First;
+      while(not DriversADOT.Eof) do
+      begin
+        DriverStatus := DriversADOT.
+          FieldByName('REMOTE_STATUS').AsInteger;
+
+        SyncStatus := DriversADOT.
+          FieldByName('SYNC_STATUS').AsInteger;
+
+        GPSRequStatus := DriversADOT.
+          FieldByName('GPSC_REQU_FLAG').AsInteger;
+
+        manual_day_sale := DriversADOT.
+          FieldByName('manual_day_sale').AsInteger;
+
+        if AutoSetDriverStatus( DriversADOT.
+          FieldByName('BOLD_ID').AsInteger,
+          DriverStatus, DriversADOT.
+          FieldByName('LAST_STATUS_TIME').AsDateTime,
+          SyncStatus) then
+        begin
+          DriversADOT.Next;
+          Continue;
+        end;
+
+        if (DriversADOT.
+          FieldByName('daily_paym_status').AsInteger=PAY_REQU) then
+        begin
+            try
+
+                ClientCollectionIndex:=SocketCoord.
+                  GetClientItemIndexByDrNum(
+                  DriversADOT.
+                  FieldByName('Pozyvnoi').AsInteger);
+
+                if (ClientCollectionIndex<0) then
+                begin
+
+                  SocketLogMemo.Lines.Add(
+                    'Не найдено рабочей нити при обработке '+
+                    'признака запроса оплаты для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger));
+
+                end
+                else
+                begin
+
+                CurrClientID:=SocketCoord.TCPClientCollection.
+                  Items[ClientCollectionIndex].ClientID;
+
+                addDirectJSONMessageToClient(
+                  '{"command":"dpay_req","txt":"'+
+                  DriversADOT.FieldByName('paym_check_date').AsString+
+                  '","msg_end":"ok"}', CurrClientID);
+
+                SetDrPaymentStatusADOC.Parameters.
+                  ParamByName('dpstat').Value:=PAY_REQU_SEND;
+                SetDrPaymentStatusADOC.Parameters.
+                  ParamByName('driver_id').Value:=DriversADOT.
+                  FieldByName('BOLD_ID').AsInteger;
+                SetDrPaymentStatusADOC.Execute;
+
+                end;
+          except on E: Exception do
+            SocketLogMemo.Lines.Add(
+                    'Ошибка обработки статуса запроса '+
+                    'оплаты для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger)+' '+
+                    E.Message);
+          end;
+        end;
+
+        if GPSRequStatus=1 then
+        begin
+          try
+
+                ClientCollectionIndex:=SocketCoord.
+                  GetClientItemIndexByDrNum(
+                  DriversADOT.
+                  FieldByName('Pozyvnoi').AsInteger);
+
+                if (ClientCollectionIndex<0) then
+                begin
+
+                  SocketLogMemo.Lines.Add(
+                    'Не найдено рабочей нити при обработке '+
+                    'признака запроса геокоординат для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger));
+
+                end
+                else
+                begin
+
+                CurrClientID:=SocketCoord.TCPClientCollection.
+                  Items[ClientCollectionIndex].ClientID;
+
+                addDirectJSONMessageToClient(
+                  '{"command":"gpsc_requ","msg_end":"ok"}', CurrClientID);
+
+                SetDrGPSRequStatusADOC.Parameters.
+                  ParamByName('status').Value:=0;
+                SetDrGPSRequStatusADOC.Parameters.
+                  ParamByName('driver_id').Value:=DriversADOT.
+                  FieldByName('BOLD_ID').AsInteger;
+                SetDrGPSRequStatusADOC.Execute;
+
+                end;
+          except on E: Exception do
+            SocketLogMemo.Lines.Add(
+                    'Ошибка обработки статуса запроса '+
+                    'GPS-координат для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger));
+          end;
+        end;
+
+        if SyncStatus=1 then
+        begin
+          //SocketLogMemo.Lines.Add('----');
+          if self.setDriverSyncStatus(DriversADOT.
+          FieldByName('BOLD_ID').AsInteger, 0) then
+          begin
+
+            ClientCollectionIndex:=SocketCoord.
+                  GetClientItemIndexByDrNum(
+                  DriversADOT.
+                  FieldByName('Pozyvnoi').AsInteger);
+
+                if (ClientCollectionIndex<0) then
+                begin
+
+                  SocketLogMemo.Lines.Add(
+                    'Не найдено рабочей нити при обработке '+
+                    'признака отсылки статуса для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger));
+
+                end
+                else
+                begin
+
+                CurrClientID:=SocketCoord.TCPClientCollection.
+                  Items[ClientCollectionIndex].ClientID;
+
+                if SocketCoord.TCPClientCollection.
+                    Items[ClientCollectionIndex].useUTF8 then
+                  addDirectJSONMessageToClient(
+                  Self.getDriverStatusJSON
+                    (DriversADOT.FieldByName('BOLD_ID').
+                    AsInteger), CurrClientID)
+                else
+                  addDirectJSONMessageToClient(
+                  TranslitRus2Lat(Self.getDriverStatusJSON
+                    (DriversADOT.FieldByName('BOLD_ID').
+                    AsInteger), False), CurrClientID);
+
+                end;
+
+                DriversADOT.Next;
+                Continue;
+          end;
+
+        end;
+
+        case DriverStatus of
+          0:
+            begin
+            end;
+		  DR_ON_REST:
+			begin
+        if Self.setDriverRemoteStatus(DriversADOT.
+          FieldByName('BOLD_ID').AsInteger,
+          DR_NOACTIVE_STATUS, 1, 1, -1, 1) then
+        begin
+
+          ClientCollectionIndex:=SocketCoord.
+                  GetClientItemIndexByDrNum(
+                  DriversADOT.
+                  FieldByName('Pozyvnoi').AsInteger);
+
+                //if IniFile.ReadString
+                //  ('BUSINESS_DATA',
+                //  'отсылать_индивидуально_установленному',
+                //  'NO')='YES' then
+                if (ClientCollectionIndex<0) then
+                begin
+
+                  SocketLogMemo.Lines.Add(
+                    'Не найдено рабочей нити при обработке '+
+                    'состояний заявок для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger));
+
+                end
+                else
+                begin
+
+                CurrClientID:=SocketCoord.TCPClientCollection.
+                  Items[ClientCollectionIndex].ClientID;
+
+                addDirectJSONMessageToClient(
+                '{"command":"go_on_rest"'+
+                ',"client_id":"'+IntToStr(CurrClientID)+
+                '","msg_end":"ok"}', CurrClientID);
+                end;
+
+        end
+        else
+          SocketLogMemo.Lines.Add(
+                    'Неудачная обработка '+
+                    'состояния на перерыв для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger));
+			end;
+      DR_FROM_REST_ATTEMPT:
+      begin
+        if Self.setDriverRemoteStatus(DriversADOT.
+          FieldByName('BOLD_ID').AsInteger,
+          DR_NOACTIVE_STATUS, 1, 0, -1, 1) then
+        begin
+
+          ClientCollectionIndex:=SocketCoord.
+                  GetClientItemIndexByDrNum(
+                  DriversADOT.
+                  FieldByName('Pozyvnoi').AsInteger);
+
+                //if IniFile.ReadString
+                //  ('BUSINESS_DATA',
+                //  'отсылать_индивидуально_установленному',
+                //  'NO')='YES' then
+                if (ClientCollectionIndex<0) then
+                begin
+
+                  SocketLogMemo.Lines.Add(
+                    'Не найдено рабочей нити при обработке '+
+                    'состояний заявок для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger));
+
+                end
+                else
+                begin
+
+                CurrClientID:=SocketCoord.TCPClientCollection.
+                  Items[ClientCollectionIndex].ClientID;
+
+                addDirectJSONMessageToClient(
+                '{"command":"go_from_rest"'+
+                ',"client_id":"'+IntToStr(CurrClientID)+
+                '","msg_end":"ok"}', CurrClientID);
+                end;
+
+        end
+        else
+          SocketLogMemo.Lines.Add(
+                    'Неудачная обработка '+
+                    'состояния с перерыва для водителя с позывным '+
+                    IntToStr(DriversADOT.
+                    FieldByName('Pozyvnoi').AsInteger));
+      end;
+		  DR_OUT_FROM_LINE:
+			begin
+			end;
+		  DR_ON_REST_DENY:
+			begin
+			end;
+		  DR_OUT_FROM_LINE_DENY:
+			begin
+			end;
+		  DR_IN_WORKING_ONHAND_DENY:
+			begin
+			end;
+          else
+            begin
+            end;
+        end;
+
+        DriversADOT.Next;
+      end;
+    end;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add('Неудачное обновление удаленных '+
+    'статусов водителей! '+E.Message);
+  end;
+end;
+
+procedure TRemoteControlForm.MessageWideBroadcasting(Msg: Widestring);
+var i: Integer;
+begin
+  SocketLogMemo.Lines.Add('Массовая рассылка статусов...');
+  if SocketCoord.TCPClientCollection.Count>0 then
+    begin
+      for i:=0 to SocketCoord.TCPClientCollection.Count-1 do
+        addDirectJSONMessageToClient(
+                  Msg, SocketCoord.TCPClientCollection.
+                  Items[i].ClientId);
+    end;
+end;
+
+function TRemoteControlForm.getDriverOrdBroadcasting(DriverId: Integer): Widestring;
+var hasDriver: Boolean;
+    driverOrders: Widestring;
+begin
+  hasDriver:=False;
+  driverOrders:='';
+
+  try
+
+  if PriorityDriversADODS.Active then
+  begin
+    if PriorityDriversADODS.RecordCount>0 then
+    begin
+      PriorityDriversADODS.First;
+      while not PriorityDriversADODS.Eof do
+      begin
+        if PriorityDriversADODS.FieldByName('BOLD_ID').
+            AsInteger = DriverId then
+        begin
+          hasDriver:=True;
+          driverOrders:=PriorityDriversADODS.
+            FieldByName('forders_wbroadcast').AsVariant;
+          Break;
+        end;
+        PriorityDriversADODS.Next;
+      end;
+    end;
+  end;
+
+  except on E:Exception do
+  begin
+    SocketLogMemo.Lines.Add('Ошибка получения приоритетной рассылки для отдельного водителя!'+E.Message);
+  end;
+  end;
+
+  Result:=driverOrders;
+end;
+
+procedure TRemoteControlForm.MessageDriverOrderBroadcasting;
+var i: Integer;
+    prioritySucc: Boolean;
+    driverOrders: Widestring;
+begin
+
+  prioritySucc:=False;
+  try
+    PriorityDriversADODS.Active:=False;
+    PriorityDriversADODS.Active:=True;
+    prioritySucc:=True;
+  except on E:Exception do
+  begin
+    SocketLogMemo.Lines.Add('Ошибка получения данных приоритетной рассылки водителей!'+E.Message);
+  end;
+  end;
+
+  try
+
+  if prioritySucc then
+  begin
+  SocketLogMemo.Lines.Add('Массовая рассылка статусов c приоритетом...');
+  if SocketCoord.TCPClientCollection.Count>0 then
+    begin
+      for i:=0 to SocketCoord.TCPClientCollection.Count-1 do
+      begin
+        driverOrders:=getDriverOrdBroadcasting(SocketCoord.
+            TCPClientCollection.Items[i].DriverDBID);
+        if driverOrders<>'' then
+        begin
+            //SocketLogMemo.Lines.Add('['+driverOrders+'] :'+
+            //IntToStr(SocketCoord.TCPClientCollection.Items[i].Pozyvnoi));
+            addDirectJSONMessageToClient(
+                  driverOrders,
+                  SocketCoord.TCPClientCollection.
+                  Items[i].ClientId);
+        end
+        else
+        begin
+          SocketLogMemo.Lines.Add('Пустой список ожидающих для '+
+            IntToStr(SocketCoord.TCPClientCollection.Items[i].Pozyvnoi));
+        end;
+      end;
+    end;
+
+  end;
+
+  except on E:Exception do
+  begin
+    SocketLogMemo.Lines.Add('Ошибка приоритетной рассылки ожидающих для водителей!'+E.Message);
+  end;
+  end;
+
+  decrementDriversOrderPriority;
+end;
+
+function TRemoteControlForm.localRebuildSendMsgCollection: Boolean;
+var i, OrderStatus, CurrClientID: Integer;
+    CurrDriverSectorID, CurrOrderID: Integer;
+    CurrOrderPriorityCounter: Integer;
+    ClientCollectionIndex, REMOTE_DRNUM: Integer;
+    OrderData, manual_param: String;
+    res: Boolean;
+begin
+
+res:=False;
+
+  if localRebuildSendMsgInProcess or
+    inputMessagesInProcess then
+  begin
+    SocketLogMemo.Lines.Add
+    ('localRebuildSendMsgInProcess or inputMessagesInProcess!!!');
+  end
+  else
+  begin
+    localRebuildSendMsgInProcess:=True;
+  try
+  //ServerMainForm.ResetSelfAskRemoteAttr;
+  HasRemoteDataChanges:=False;
+  ServerMainForm.MainSB.Panels[0].Text:=
+    'Обработка заявок и водителей...';
+
+  checkRemoteDrivers;
+
+  if ordersDBProcessingCounter>=0 then
+  ordersDBProcessingCounter:=
+    ordersDBProcessingCounter-1;
+
+  //SocketLogMemo.Lines.Add
+  //  ('Обработка заявок - попытка!');
+
+  if
+  not (IniFile.ReadString('BUSINESS_DATA',
+    'не_управлять_зявками_принудит_режим',
+    'NO')='YES')
+   and (ordersDBProcessingCounter<=0)
+    then
+  begin
+
+  //SocketLogMemo.Lines.Add
+  //  ('Обработка заявок!');
+
+  ordersDBProcessingCounter:=
+    IniFile.ReadInteger
+      ('BUSINESS_DATA',
+      'делитель_обработки_заявок',
+      1);
+
+  RemoteProcessedOrdersADOQ.Active:=False;
+  try
+
+    RemoteProcessedOrdersADOQ.Active:=True;
+    if RemoteProcessedOrdersADOQ.RecordCount>0 then
+    begin
+
+      RemoteProcessedOrdersADOQ.First;
+
+      while (not RemoteProcessedOrdersADOQ.Eof) do
+      begin
+
+        CurrOrderID:=RemoteProcessedOrdersADOQ.
+          FieldByName('BOLD_ID').AsInteger;
+
+        OrderStatus:=RemoteProcessedOrdersADOQ.
+          FieldByName('REMOTE_SET').AsInteger;
+
+        REMOTE_DRNUM:=RemoteProcessedOrdersADOQ.
+				  FieldByName('REMOTE_DRNUM').AsInteger;
+
+        if AutoSetOrderStatus(CurrOrderID, OrderStatus,
+          RemoteProcessedOrdersADOQ.FieldByName
+          ('Nachalo_zakaza_data').AsDateTime,
+          RemoteProcessedOrdersADOQ.FieldByName
+          ('Konec_zakaza_data').AsDateTime,
+          RemoteProcessedOrdersADOQ.FieldByName
+          ('LAST_STATUS_TIME').AsDateTime,
+          RemoteProcessedOrdersADOQ.FieldByName
+          ('REMOTE_SYNC').AsInteger) then
+        begin
+          RemoteProcessedOrdersADOQ.Next;
+          Continue;
+        end;
+
+        CurrDriverSectorID:=
+          RemoteProcessedOrdersADOQ.FieldByName(
+              'SECTOR_ID').AsInteger;
+
+        if (CurrDriverSectorID<=0) and
+        (IniFile.ReadString('BUSINESS_DATA',
+        'не_выставлять_сект_заявки_по_водителю','NO')<>'YES') then
+        begin
+          DriverByNumADODS.Active:=False;
+          try
+          DriverByNumADODS.Parameters.
+            ParamByName('poz').Value:=
+            REMOTE_DRNUM;
+          DriverByNumADODS.Active:=True;
+
+          if DriverByNumADODS.RecordCount=1 then
+          begin
+            CurrDriverSectorID:=
+              DriverByNumADODS.FieldByName
+              ('rabotaet_na_sektore').AsInteger;
+
+            if not ServerMainForm.SendLocalSQL(
+            'UPDATE Zakaz SET SECTOR_ID='+
+            IntToStr(CurrDriverSectorID)+' where'+
+            ' BOLD_ID='+IntToStr(CurrOrderID),
+            'Запрос изменения сектора распределения заявки!') then
+              SocketLogMemo.Lines.Add(
+              'Неудачный запрос изменения сектора распределения заявки!');
+
+          end
+          else
+          begin
+            SocketLogMemo.Lines.Add(
+              'Ни одного или более одного водителей с позывным '+
+              IntToStr(REMOTE_DRNUM)+' у активной заявки!');
+          end;
+          except on E:Exception do
+          begin
+            SocketLogMemo.Lines.Add(
+              'Ошибка запроса данных '+
+              'о водителе активной заявки! '+
+              E.Message);
+          end;
+          end;
+          //Следующая итерация если сектор не был определен
+          RemoteProcessedOrdersADOQ.Next;
+          Continue;
+
+        end;
+
+        if IniFile.ReadString
+              ('BUSINESS_DATA',
+              'индивидуальная_приоритетная_раздача',
+              'NO')='YES' then
+        begin
+
+        CurrOrderPriorityCounter:=RemoteProcessedOrdersADOQ.
+          FieldByName('PRIORITY').AsInteger;
+
+        if (MaxOrderPriority<CurrOrderPriorityCounter) and
+          (OrderStatus>0) and (OrderStatus<4) then
+          if not setOrderRemoteStatus(CurrOrderID,4) then
+            SocketLogMemo.Lines.Add('Не найдено заявки '+
+              'для установки статуса 4!')
+          else
+          begin
+            RemoteProcessedOrdersADOQ.Next;
+            Continue;
+          end;
+
+        if (IniFile.ReadString(
+          'BUSINESS_DATA',
+          'показывать_телефон_в_JAVA_приложении',
+          'NO')<>'YES') then
+          OrderData:=StringReplace(
+          RemoteProcessedOrdersADOQ.
+          FieldByName('Adres_vyzova_vvodim').AsString,
+          '/',' ', [rfReplaceAll])
+        else
+        OrderData:=StringReplace(
+          RemoteProcessedOrdersADOQ.
+          FieldByName('Telefon_klienta').AsString+' '+
+          RemoteProcessedOrdersADOQ.
+          FieldByName('Adres_vyzova_vvodim').AsString,
+          '/',' ', [rfReplaceAll]);
+
+        case OrderStatus of
+        ORDER_INDIVID_TAKE:
+          begin
+            //Диспетчер отдал новую заявку
+
+            //if not setOrderRemoteStatus(CurrOrderID,
+            //ORDER_INDIVID_TAKE, -1) then
+            //  SocketLogMemo.Lines.Add('Не найдено заявки '+
+            //  'для установки статуса ORDER_INDIVID_TAKE!');
+
+            ClientCollectionIndex:=SocketCoord.
+              GetClientItemIndexByDrNum(REMOTE_DRNUM);
+
+            //Отсылка индивидуальному без приоритетов
+            if IniFile.ReadString
+              ('BUSINESS_DATA',
+              'отсылать_индивидуально_установленному',
+              'NO')='YES' then
+            if (ClientCollectionIndex<0) then
+              begin
+                SocketLogMemo.Lines.Add(
+                  'Не найдено рабочей нити при обработке '+
+                  'состояний заявок для водителя с позывным '+
+                  IntToStr(REMOTE_DRNUM));
+              end
+            else
+              begin
+                CurrClientID:=SocketCoord.TCPClientCollection.
+                  Items[ClientCollectionIndex].ClientID;
+
+                manual_param:=',"manual":"no"';
+                if IniFile.ReadString
+                  ('BUSINESS_DATA',
+                  'опрос_перед_отдачей_индивидуально',
+                  'NO')='YES' then
+                  manual_param:=',"manual":"yes"';
+
+                if not SocketCoord.TCPClientCollection.
+                    Items[ClientCollectionIndex].useUTF8 then
+                  OrderData:=TranslitRus2Lat(OrderData);
+
+                addDirectJSONMessageToClient(
+                  '{"command":"take_order",'+
+                  '"order_id":"'+IntToStr(CurrOrderID)+
+                  '","order_data":"'+OrderData+
+                  '","client_id":"'+IntToStr(CurrClientID)+
+                  '"'+manual_param+',"msg_end":"ok"}', CurrClientID);
+              end;
+
+            //Если индивидуальный посыл вначале
+            //с отступом в приоритете
+            if (RemoteProcessedOrdersADOQ.
+              FieldByName('Individ_order').
+              AsInteger=1) and (IniFile.ReadString
+              ('BUSINESS_DATA',
+              'использовать_индивидуальный_приоритет',
+              'NO')='YES') then
+              begin
+                  SetIndOrderSendADOSP.
+                    Parameters.Refresh;
+                  SetIndOrderSendADOSP.Parameters.
+                    ParamByName('@order_id').Value:=
+                    CurrOrderID;
+
+                  SetIndOrderSendADOSP.Parameters.
+                    ParamByName('@indiv_priority').Value:=
+                    MaxIndivOrderPriority;
+
+                  SetIndOrderSendADOSP.ExecProc;
+              end
+            else
+              begin
+                if (IniFile.ReadString('BUSINESS_DATA',
+                  'рассылка_по_всем','NO')='YES') or
+                  (CurrDriverSectorID<=0) then
+                begin
+                  if not setOrderRemoteStatus(CurrOrderID,3,-1) then
+                    SocketLogMemo.Lines.Add('Не найдено заявки '+
+                      'для установки статуса 3!');
+                end
+                else if IniFile.ReadString(
+                  'BUSINESS_DATA',
+                  'рассылка_по_сокетам_сектора',
+                  'NO')='YES' then
+                begin
+                  if setOrderRemoteStatus(CurrOrderID,2,-1) then
+                    SocketLogMemo.Lines.Add('Не найдено заявки '+
+                      'для установки статуса 2!');
+                end
+                else
+                begin
+                  if setOrderRemoteStatus(CurrOrderID,4) then
+                    SocketLogMemo.Lines.Add('Не найдено заявки '+
+                      'для установки статуса 4!');
+                end;
+
+              end;
+
+          end;
+
+       ORDER_SECTOR_PUBLISHING:
+          begin
+            if (IniFile.ReadString(
+            'BUSINESS_DATA',
+            'рассылка_по_сокетам_сектора',
+            'NO')='YES') and
+            (CurrDriverSectorID>0) then
+            begin
+              //Рассылка по сектору
+
+              AllActDrOnSectADODS.Active:=False;
+              try
+
+                AllActDrOnSectADODS.Parameters.
+                ParamByName('sector_id').Value :=
+                  CurrDriverSectorID;
+                AllActDrOnSectADODS.Parameters.
+                ParamByName('order_priority').Value :=
+                  CurrOrderPriorityCounter;
+                if (IniFile.ReadString('BUSINESS_DATA',
+                  'включать_занятых_в_рассыл_для_сектора',
+                  'NO')='YES') then
+                  AllActDrOnSectADODS.Parameters.
+                  ParamByName('include_all').Value:=1
+                else
+                  AllActDrOnSectADODS.Parameters.
+                  ParamByName('include_all').Value:=0;
+                AllActDrOnSectADODS.Active:=True;
+
+                //Перебор отправки по сектору
+                if AllActDrOnSectADODS.RecordCount>0 then
+                begin
+                  AllActDrOnSectADODS.First;
+                  while not AllActDrOnSectADODS.Eof do
+                  begin
+                    ClientCollectionIndex:=SocketCoord.
+                      GetClientItemIndexByDrNum(
+                      AllActDrOnSectADODS.
+                      FieldByName('Pozyvnoi').AsInteger);
+
+                    if (ClientCollectionIndex<0) then
+                    begin
+                      SocketLogMemo.Lines.Add(
+                        'Не найдено рабочей нити при обработке '+
+                        'состояний заявок для водителя с позывным '+
+                        IntToStr(AllActDrOnSectADODS.
+                        FieldByName('Pozyvnoi').AsInteger));
+                    end
+                    else
+                    begin
+                      CurrClientID:=SocketCoord.TCPClientCollection.
+                        Items[ClientCollectionIndex].ClientID;
+
+                      CurrClientID:=SocketCoord.TCPClientCollection.
+                        Items[ClientCollectionIndex].ClientID;
+
+                      manual_param:=',"manual":"no"';
+                      if IniFile.ReadString('BUSINESS_DATA',
+                        'опрос_перед_отдачами_для_сектора',
+                        'NO')='YES' then
+                          manual_param:=',"manual":"yes"';
+
+                      if not SocketCoord.TCPClientCollection.
+                        Items[ClientCollectionIndex].useUTF8 then
+                        OrderData:=TranslitRus2Lat(OrderData);
+
+                      addDirectJSONMessageToClient(
+                        '{"command":"take_order",'+
+                        '"order_id":"'+IntToStr(CurrOrderID)+
+                        '","order_data":"'+OrderData+
+                        '","client_id":"'+IntToStr(CurrClientID)+
+                        '"'+manual_param+',"msg_end":"ok"}', CurrClientID);
+                    end;
+
+                    AllActDrOnSectADODS.Next;
+                  end;
+                end;
+                //Конец перебора отправки по сектору
+
+                if (IniFile.ReadString('BUSINESS_DATA',
+                  'рассылать_остальным_после_рассылки_по_сектору',
+                  'NO')='YES') and (CurrOrderPriorityCounter
+                  >=StartWithOthersSendPriority) then
+                begin
+                  if not setOrderRemoteStatus(CurrOrderID,3,-1) then
+                    SocketLogMemo.Lines.Add('Не найдено заявки '+
+                      'для установки статуса 3!');
+                end;
+
+              except on Ex:Exception do
+                SocketLogMemo.Lines.Add('Ошибка при '+
+                  'рассылке по сектору! '+Ex.Message);
+              end;
+
+            end
+            else
+            //Если не удовлетвор условие рассылки по сектору
+            //переходим на другие виды рассылки
+            begin
+              if ((IniFile.ReadString(
+                'BUSINESS_DATA',
+                'рассылать_остальным_после_рассылки_по_сектору',
+                'NO')='YES') and
+                (CurrDriverSectorID<=0)) or
+                (IniFile.ReadString(
+                  'BUSINESS_DATA',
+                  'рассылка_по_всем',
+                  'NO')='YES')  then
+              begin
+                if not setOrderRemoteStatus(CurrOrderID,3,-1) then
+                    SocketLogMemo.Lines.Add('Не найдено заявки '+
+                      'для установки статуса 3!');
+              end
+              else
+              begin
+                if not setOrderRemoteStatus(CurrOrderID,4) then
+                    SocketLogMemo.Lines.Add('Не найдено заявки '+
+                      'для установки статуса 4!');
+              end;
+            end;
+            //Конец перехода на другие рассылки
+
+          end;
+
+      ORDER_ALL_PUBLISHING:
+          begin
+            AllActiveDriversADODS.Active:=False;
+              try
+                AllActiveDriversADODS.Parameters.
+                ParamByName('order_priority').Value :=
+                  CurrOrderPriorityCounter;
+
+                if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'включать_занятых_в_рассыл_для_всех',
+                'NO')='YES') then
+                  AllActiveDriversADODS.Parameters.
+                    ParamByName('include_all').Value:=1
+                else
+                  AllActiveDriversADODS.Parameters.
+                    ParamByName('include_all').Value:=0;
+
+                AllActiveDriversADODS.Active:=True;
+
+                if AllActiveDriversADODS.RecordCount>0 then
+                begin
+                  AllActiveDriversADODS.First;
+                  while not AllActiveDriversADODS.Eof do
+                  begin
+                    ClientCollectionIndex:=SocketCoord.
+                      GetClientItemIndexByDrNum(
+                      AllActiveDriversADODS.
+                      FieldByName('Pozyvnoi').AsInteger);
+
+                    if (ClientCollectionIndex<0) then
+                    begin
+                      SocketLogMemo.Lines.Add(
+                        'Не найдено рабочей нити при обработке '+
+                        'состояний заявок для водителя с позывным '+
+                        IntToStr(AllActiveDriversADODS.
+                        FieldByName('Pozyvnoi').AsInteger));
+                    end
+                    else
+                    begin
+                      CurrClientID:=SocketCoord.TCPClientCollection.
+                        Items[ClientCollectionIndex].ClientID;
+
+                      manual_param:=',"manual":"no"';
+                      if IniFile.ReadString
+                        ('BUSINESS_DATA',
+                        'опрос_перед_отдачами_для_всех',
+                        'NO')='YES' then
+                        manual_param:=',"manual":"yes"';
+
+                      if not SocketCoord.TCPClientCollection.
+                        Items[ClientCollectionIndex].useUTF8 then
+                        OrderData:=TranslitRus2Lat(OrderData);
+
+                      addDirectJSONMessageToClient(
+                        '{"command":"take_order",'+
+                        '"order_id":"'+IntToStr(CurrOrderID)+
+                        '","order_data":"'+OrderData+
+                        '","client_id":"'+IntToStr(CurrClientID)+
+                        '"'+manual_param+',"msg_end":"ok"}',
+                        CurrClientID);
+                    end;
+
+                    AllActiveDriversADODS.Next;
+                  end;
+                end;
+
+               except on Ex:Exception do
+                  SocketLogMemo.Lines.Add('Ошибка при '+
+                  'рассылке по всем! '+Ex.Message);
+               end;
+          end;
+
+      ORDER_PUBLUSHED_WAIT, ORDER_IS_OCCUPED,
+      ORDER_OCCUPED_DENY:
+      begin
+        //Состояние когда сделан весь возможный
+        //рассыл (неважно, удачный или нет)
+        //При установке извне при приеме заказа
+        //приложением варианты отправки 2 и 3 прекращаются
+      end;
+
+		  ORDER_OCCUPED_ALLOW: //=7
+		  begin
+			  ClientCollectionIndex:=SocketCoord.
+          GetClientItemIndexByDrNum(REMOTE_DRNUM);
+
+			  if (ClientCollectionIndex<0) then
+        begin
+          SocketLogMemo.Lines.Add(
+            'Не найдено рабочей нити при обработке '+
+            'состояния 7 заявок для водителя с позывным '+
+            IntToStr(REMOTE_DRNUM));
+
+          if IniFile.ReadString
+            ('BUSINESS_DATA',
+            'автоназн_след_претенд_при_отсутств_сокета',
+            'NO')='YES' then
+          begin
+            if setOrderRemoteStatus(CurrOrderID,
+              ORDER_OCCUPED_DENY) then
+            begin
+            end
+            else
+              SocketLogMemo.Lines.Add('Не найдено заявки '+
+                'для установки статуса ORDER_OCCUPED_DENY'+
+                ', ситуация автоназн_след_претенд_при_отсутств_сокета!');
+          end;
+
+        end
+        else
+        begin
+          CurrClientID:=SocketCoord.TCPClientCollection.
+            Items[ClientCollectionIndex].ClientID;
+
+          if setOrderRemoteStatus(CurrOrderID,
+            ORDER_ALLOW_ASK_WAIT) then
+              begin
+              if not SocketCoord.TCPClientCollection.
+                    Items[ClientCollectionIndex].useUTF8 then
+                  OrderData:=TranslitRus2Lat(OrderData);
+              addDirectJSONMessageToClient(
+                '{"command":"order_is_your",'+
+                '"order_id":"'+IntToStr(CurrOrderID)+
+                '","order_data":"'+OrderData+
+                '","client_id":"'+IntToStr(CurrClientID)+
+                '","msg_end":"ok"}', CurrClientID);
+              end
+          else
+            SocketLogMemo.Lines.Add('Не найдено заявки '+
+              'для установки статуса ORDER_ALLOW_ASK_WAIT!');
+
+        end;
+		  end;
+
+		  //ORDER_OCCUPED_ALLOW: ORDER_BUSY = 8;
+		  ORDER_ONHAND_ALLOW: //ORDER_ONHAND_ALLOW = 9;
+		  begin
+			ClientCollectionIndex:=SocketCoord.
+        GetClientItemIndexByDrNum(REMOTE_DRNUM);
+			  if (ClientCollectionIndex<0) then
+        begin
+          SocketLogMemo.Lines.Add(
+            'Не найдено рабочей нити при обработке '+
+            'состояния ORDER_ONHAND_ALLOW '+
+						'заявок для водителя с позывным '+
+            IntToStr(REMOTE_DRNUM));
+        end
+        else
+        begin
+						CurrClientID:=SocketCoord.TCPClientCollection.
+							Items[ClientCollectionIndex].ClientID;
+
+            if setOrderRemoteStatus(CurrOrderID,
+              ORDER_ONHAND_ALLOW_ASK_WAIT) then
+              begin
+                if not SocketCoord.TCPClientCollection.
+                    Items[ClientCollectionIndex].useUTF8 then
+                  OrderData:=TranslitRus2Lat(OrderData);
+						    addDirectJSONMessageToClient(
+						      '{"command":"go_on_hand",'+
+						      '"order_id":"'+IntToStr(CurrOrderID)+
+						      '","order_data":"'+OrderData+
+						      '","client_id":"'+IntToStr(CurrClientID)+
+						      '","msg_end":"ok"}', CurrClientID);
+              end
+            else
+               SocketLogMemo.Lines.Add('Не найдено заявки '+
+                'для установки статуса ORDER_ONHAND_ALLOW_ASK_WAIT!');
+        end;
+
+		  end;
+		  
+		  //ORDER_ONHAND_ACTIVE = 10; Заменено на ORDER_BUSY = 8;
+		  ORDER_DISP_CANCEL: //ORDER_DISP_CANCEL = 11;
+		  begin
+			  ClientCollectionIndex:=SocketCoord.
+          GetClientItemIndexByDrNum(
+          REMOTE_DRNUM);
+
+			    if (ClientCollectionIndex<0) then
+          begin
+            SocketLogMemo.Lines.Add(
+              'Не найдено рабочей нити при обработке '+
+              'состояния ORDER_DISP_CANCEL '+
+						  'заявок для водителя с позывным '+
+              IntToStr(REMOTE_DRNUM));
+          end
+          else
+          begin
+						CurrClientID:=SocketCoord.TCPClientCollection.
+							Items[ClientCollectionIndex].ClientID;
+            if setOrderRemoteStatus(CurrOrderID,
+              ORDER_DISP_CANCEL_ASK_WAIT) then
+              begin
+                if not SocketCoord.TCPClientCollection.
+                    Items[ClientCollectionIndex].useUTF8 then
+                  OrderData:=TranslitRus2Lat(OrderData);
+						    addDirectJSONMessageToClient(
+						      '{"command":"order_cancel",'+
+						      '"order_id":"'+IntToStr(CurrOrderID)+
+						      '","order_data":"'+OrderData+
+						      '","client_id":"'+IntToStr(CurrClientID)+
+						      '","msg_end":"ok"}', CurrClientID);
+              end
+            else
+               SocketLogMemo.Lines.Add('Не найдено заявки '+
+                'для установки статуса ORDER_DISP_CANCEL_ASK_WAIT!');
+        end;
+
+		  end;
+		  //ORDER_DISP_CANCEL_DR_INCOURSE = 12;
+		  //ORDER_DRV_CANCEL = 13;
+		  ORDER_DRV_CANCEL_DISP_ALLOW:  //ORDER_DRV_CANCEL_DISP_ALLOW = 14;
+		    begin
+		    end;
+		  //ORDER_DRV_COMPLETE = 15
+		  ORDER_COMLETE_ALLOW: //ORDER_COMLETE_ALLOW = 16;
+		    begin
+		    end;
+		  ORDER_CLOSE_ERROR:
+		    begin
+		    end;
+		  ORDER_DRCANCEL_DENY:
+		    begin
+		    end;
+      else
+          begin
+          end;
+      //Конец CASE-элемента обработки состояний заявок
+      end;
+
+        //Конец условия индивидуальной приоритетной раздачи
+        //рабочей нити по позывному
+      end;
+
+      RemoteProcessedOrdersADOQ.Next;
+    end;
+    //Конец цикла перебора заявок
+
+    if (IniFile.ReadString(
+      'BUSINESS_DATA',
+      'включить_режим_приоритетной_автораздачи',
+      'NO')='YES') then
+        self.incrementOrderPriorStat(
+          -1,MaxOrderPriority);
+
+    end;
+
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Ошибка цикла обработки '+
+      'состояния активных заявок! '+
+      E.Message);
+  end;
+
+  //Конец условия на принудительный режим
+  end;
+
+  finally
+    localRebuildSendMsgInProcess:=False;
+  end;
+  end;
+
+  Result:=res;
+
+end;
+
+function TRemoteControlForm.ReloadDrSettings: Boolean;
+begin
+  try
+    SettingsADODS.Active:=False;
+    SettingsADODS.Active:=True;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачное получение параметров из БД!'+
+      E.Message);
+  end;
+  Result:=SettingsADODS.Active;
+end;
+
+procedure TRemoteControlForm.SocketCheckTimerTimer(Sender: TObject);
+var send_repeat_count, send_repeat_max_num: Integer;
+begin
+
+if (IniFile.ReadString('BUSINESS_DATA',
+	'работать_с_сокет_клиентами','NO')='YES') then
+  begin
+
+  if clientCheckingInActive then
+  begin
+  end
+  else
+  begin
+    clientCheckingInActive:=True;
+    try
+    if ServerActive then
+    begin
+    if ServerMainForm.MainBASEADOC.Connected then
+    begin
+
+      if SettingsADODS.Active then
+      begin
+      if SettingsADODS.RecordCount>0 then
+      if SettingsADODS.FieldByName('db_version').AsInteger>=5 then
+      begin
+
+	    if HasRemoteDataChanges or HasRemoteDrDataChanges or True then
+      begin
+        //SocketLogMemo.Lines.Add(
+        //'Start localRebuildSendMsgCollection!');
+        localRebuildSendMsgCollection;
+      end;
+
+      send_repeat_max_num:=IniFile.ReadInteger(
+        'BUSINESS_DATA','количество_итераций_повтора_отправки',
+        2);
+      send_repeat_count:=0;
+
+      repeat
+      proceedInputJSONMessages(
+        SocketCoord.CheckClients(SendMsgCollection));
+
+      deleteAskedSendingMessages;
+      deleteOldThreadsSendingMessages;
+      send_repeat_count:=send_repeat_count+1;
+      until ((send_repeat_count>send_repeat_max_num) or
+        (SendMsgCollection.Count=0));
+
+      refreshSocksMemo;  
+
+      end;
+
+      end
+      else
+      begin
+        SocketLogMemo.Lines.Add(
+        'Неактивный набор параметров БД!');
+        try
+          SettingsADODS.Active:=False;
+          SettingsADODS.Active:=True;
+        except on E:Exception do
+           SocketLogMemo.Lines.Add(
+            'Неудачное получение параметров из БД!'+
+              E.Message);
+        end;
+      end;
+    end
+    else
+      SocketLogMemo.Lines.Add(
+        'Нет соединения с локальной БД '+
+        'для формирования сокет-отправки!');
+
+
+
+    end;
+
+    finally
+      clientCheckingInActive:=False;
+    end;
+  end;
+
+  end;
+end;
+
+procedure TRemoteControlForm.deleteOldThreadsSendingMessages;
+var i, clIndex:Integer;
+    itsDeleting: Boolean;
+begin
+  if SendMsgCollection.Count>0 then
+  begin
+    itsDeleting:=True;
+    while(itsDeleting) do
+      begin
+        itsDeleting:=False;
+        for i:=0 to SendMsgCollection.Count-1 do
+          begin
+            if SocketCoord.GetActiveClientItemIndexByClientId
+              (SendMsgCollection.Items[i].ClientID)<0 then
+              begin
+                SendMsgCollection.Delete(i);
+                itsDeleting:=True;
+                Break;
+              end;
+          end;
+      end;    
+  end;
+end;
+
+procedure TRemoteControlForm.deleteAskedSendingMessages;
+var i:Integer;
+    itsDeleting: Boolean;
+begin
+  
+  if SendMsgCollection.Count>0 then
+  begin
+    itsDeleting:=True;
+    while(itsDeleting) do
+      begin
+        itsDeleting:=False;
+
+        for i:=0 to SendMsgCollection.Count-1 do
+        begin
+          if SendMsgCollection.Items[i].
+            OnDeletedASKed then
+          begin
+            SendMsgCollection.Delete(i);
+            itsDeleting:=True;
+            Break;
+          end;
+        end;
+
+      end;
+  end;
+
+end;
+
+function TRemoteControlForm.setOrderRemoteStatus(order_id,
+  status: Integer; priority_counter: Integer=-10000) : Boolean;
+var count: Integer;
+    res: Boolean;
+begin
+  count:=0;
+  res:=False;
+  try
+    SetOrderRemoteStatusADOSP.
+      Parameters.Refresh;
+    SetOrderRemoteStatusADOSP.Parameters.
+      ParamByName('@order_id').Value:=
+      order_id;
+    SetOrderRemoteStatusADOSP.Parameters.
+      ParamByName('@status').Value:=
+      status;
+    SetOrderRemoteStatusADOSP.Parameters.
+      ParamByName('@count').Value:=0;
+    SetOrderRemoteStatusADOSP.Parameters.
+      ParamByName('@priority_counter').
+      Value:=priority_counter;
+    SetOrderRemoteStatusADOSP.ExecProc;
+    count:=SetOrderRemoteStatusADOSP.Parameters.
+      ParamValues['@count'];
+    if (count>0) then
+      res:=True;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачная операция '+
+      'установки статуса заказа! '+
+      E.Message);
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.getDriverStatusJSON(driver_id: Integer): Widestring;
+var res: Widestring;
+begin
+  res:='{"command":"driver_status","did":"-1","msg_end":"ok"}';
+  try
+    GetDrStatusJSONADOSP.
+      Parameters.Refresh;
+    GetDrStatusJSONADOSP.Parameters.
+      ParamByName('@driver_id').Value:=
+      driver_id;
+    if (IniFile.ReadString(
+      'BUSINESS_DATA',
+      'показывать_телефон_в_JAVA_приложении',
+      'NO')<>'YES') then
+        GetDrStatusJSONADOSP.Parameters.
+          ParamByName('@show_phone').Value:=
+            0
+    else
+        GetDrStatusJSONADOSP.Parameters.
+          ParamByName('@show_phone').Value:=
+          1;
+    GetDrStatusJSONADOSP.Parameters.
+      ParamByName('@res').Value:='';
+    GetDrStatusJSONADOSP.ExecProc;
+    res:=GetDrStatusJSONADOSP.Parameters.
+      ParamValues['@res'];
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачная операция '+
+      'запроса статуса водителя! '+
+      E.Message);
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.proceedOpRequest(
+  InputJSONObject: TLkJSONObject; DriverId: Integer=-1; DrNum: Integer=-1): Widestring;
+var res: Widestring;
+begin
+  res:='{"command":"opa","scs":"no","msg_end":"ok"}';
+  try
+    ProceedOpRequestADOSP.
+      Parameters.Refresh;
+    ProceedOpRequestADOSP.Parameters.
+      ParamByName('@opnm').Value:=
+      InputJSONObject.getString('opnm');
+    if DriverId>0 then
+      ProceedOpRequestADOSP.Parameters.
+      ParamByName('@prm1').Value:=DriverId
+    else
+    ProceedOpRequestADOSP.Parameters.
+      ParamByName('@prm1').Value:=
+      StrToIntDef(InputJSONObject.getString('prm1'),-1);
+    if DrNum>0 then
+      ProceedOpRequestADOSP.Parameters.
+      ParamByName('@prm2').Value:=DrNum
+    else
+    ProceedOpRequestADOSP.Parameters.
+      ParamByName('@prm2').Value:=
+      StrToIntDef(InputJSONObject.getString('prm2'),-1);
+    ProceedOpRequestADOSP.Parameters.
+      ParamByName('@prm3').Value:=
+      StrToIntDef(InputJSONObject.getString('prm3'),-1);
+    ProceedOpRequestADOSP.Parameters.
+      ParamByName('@prm4').Value:=
+      InputJSONObject.getString('prm4');
+    ProceedOpRequestADOSP.Parameters.
+      ParamByName('@prm5').Value:=
+      InputJSONObject.getString('prm5');
+    ProceedOpRequestADOSP.Parameters.
+      ParamByName('@op_answer').Value:='';
+    ProceedOpRequestADOSP.ExecProc;
+
+    res:=ProceedOpRequestADOSP.Parameters.
+      ParamValues['@op_answer'];
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачная обработка '+
+      'запроса операции ! '+
+      InputJSONObject.getString('opnm') +' '+
+      E.Message);
+  end;
+  SocketLogMemo.Lines.Add(
+      'Результат операции: '+res);
+  Result:=res;
+end;
+
+procedure TRemoteControlForm.sendDriverStatus(clientIndex: Integer; msg: TMessageCollectionItem);
+var
+  NewMSWCollectItem: TMessageCollectionItem;
+begin
+  NewMSWCollectItem:=SendMsgCollection.Add;
+
+  if SocketCoord.TCPClientCollection.
+    Items[clientIndex].useUTF8 then
+
+    NewMSWCollectItem.SetDirectJSONString(
+      Self.getDriverStatusJSON
+        (msg.DriverDBID))
+  else
+    NewMSWCollectItem.SetDirectJSONString(
+      TranslitRus2Lat(Self.getDriverStatusJSON
+        (msg.DriverDBID), False));
+
+  NewMSWCollectItem.ClientID:=
+    msg.ClientID;
+  NewMSWCollectItem.GetMessage().ClientID:=
+    msg.ClientID;
+end;
+
+function TRemoteControlForm.proceedInputJSONMessages
+  (InputJSONMessages: TMessageCollection): Boolean;
+var i, j, k, m, count, order_id, client_index: Integer;
+    NewMSWCollectItem: TMessageCollectionItem;
+    InputJSONObject: TLkJSONObject;
+    commandName, sectorName: String;
+    orderSumm: Double;
+    res: Boolean;
+    success_login, success_send: Boolean;
+    clientIndex, waiting, order_time, order_distance: Integer;
+begin
+res:=False;
+if not ServerMainForm.MainBASEADOC.Connected then
+    begin
+      SocketLogMemo.Lines.Add(
+        'Нет соединения с локальной БД '+
+        'для обработки сокет-приема!');
+    end
+else
+  if inputMessagesInProcess or
+    localRebuildSendMsgInProcess then
+  begin
+  end
+  else
+  begin
+    inputMessagesInProcess:=True;
+  try
+
+  ServerMainForm.MainSB.Panels[0].Text:=
+    DateTimeToStr(Today+Time)+' : Обработка входящих запросов...';
+  //SocketLogMemo.Lines.Add('Обработка входящих запросов...');
+  for i:=0 to InputJSONMessages.Count-1 do
+  begin
+    InputJSONObject := InputJSONMessages.
+      Items[i].MSGJSONObject;
+
+      clientIndex:=-1;
+
+      for k:=0 to SocketCoord.TCPClientCollection.Count-1 do
+        if SocketCoord.TCPClientCollection.
+          Items[k].ClientID=
+          InputJSONMessages.Items[i].ClientID then
+          begin
+            clientIndex:=k;
+          end;
+
+      if clientIndex>=0 then
+      begin
+
+      try
+
+      if InputJSONMessages.Items[i].itsSystemMessage and
+        SocketCoord.TCPClientCollection.
+                    Items[clientIndex].Autorized  then
+      begin
+        commandName:=InputJSONObject.
+          getString('oper_type');
+        if commandName='' then
+          commandName:=InputJSONObject.
+          getString('ot');
+        if (commandName='order_accepting') or
+          (commandName='oac') then
+          begin
+
+            if InputJSONObject.
+              getString('order_id')='' then
+            order_id:=StrToIntDef(InputJSONObject.
+              getString('oid'),-1)
+            else
+            order_id:=StrToIntDef(InputJSONObject.
+              getString('order_id'),-1);
+
+            waiting := StrToIntDef(InputJSONObject.
+              getString('wait'),0);
+
+            if order_id>0 then
+            begin
+
+            if waiting<0 then waiting:=0;
+
+            if not ServerMainForm.SendLocalSQL(
+              'UPDATE Zakaz SET REMOTE_SYNC=0, WAITING='+
+              IntToStr(waiting)+
+              ' WHERE BOLD_ID='+IntToStr(order_id),
+              'Установка признака синхронизации!') then
+              SocketLogMemo.Lines.Add(
+                  'Неудачная установка признака '+
+                  'синхронизации утверждения заявки!');
+            end
+            else
+              SocketLogMemo.Lines.Add(
+                  'Неудачная установка признака '+
+                  'синхронизации утверждения заявки!');
+
+          end
+        else if commandName='accept_status' then
+          begin
+            if not self.setDriverSyncStatus(InputJSONMessages.
+              Items[i].DriverDBID, 0) then
+               SocketLogMemo.Lines.Add(
+                  'Неудачная установка признака '+
+                  'синхронизации статуса водителя!')
+            else
+               SocketLogMemo.Lines.Add(
+                  'Удачная установка признака '+
+                  'синхронизации статуса водителя!');
+          end
+        else
+          begin
+          end;
+      end
+      else
+      begin
+
+      try
+        commandName:=InputJSONObject.getString('command');
+        //SocketLogMemo.Lines.Add('---'+commandName+'---');
+        if commandName='' then
+          commandName:=InputJSONObject.getString('cmd');
+      except
+        try
+          commandName:=InputJSONObject.getString('cmd');
+        except
+          commandName:='unknown';
+          SocketLogMemo.Lines.Add('Не обнаружен тип команды!');
+        end;
+      end;
+
+      if commandName='connect_attempt' then
+          begin
+          end
+      else if commandName='autr' then
+          begin
+            success_login:=False;
+
+            if (Length(InputJSONObject.getString('lg'))>0)
+              and (Length(InputJSONObject.getString('pw'))>5) then
+            begin
+            if verifyDriverClient(
+              InputJSONObject.getString('lg'),
+              InputJSONObject.getString('pw'))
+            then
+            begin
+            if InputJSONObject.getString('uu')='ok' then
+              SocketCoord.TCPClientCollection.
+                    Items[clientIndex].SetTreadUTF8Use(true);
+            if Self.setDriverRemoteStatus(
+            AutorizedVerifyADODS.
+                FieldByName('BOLD_ID').AsInteger,
+              FREE_DRIVER, 1, -1, -1, -1)
+            then
+            begin
+
+              try
+                if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'автопостановка_на_линию_при_авторизации',
+                'NO')='YES') then
+                begin
+                  SetDriverOnLineADOSP.
+                    Parameters.Refresh;
+                  SetDriverOnLineADOSP.Parameters.
+                    ParamByName('@driver_id').Value:=
+                      AutorizedVerifyADODS.
+                      FieldByName('BOLD_ID').AsInteger;
+                  SetDriverOnLineADOSP.ExecProc;
+                end;
+                //SetDriverOnLineADOSP.Active:=False;
+                SocketLogMemo.Lines.Add(        
+                  'Удачная аутентификация');
+
+                NewMSWCollectItem:=SendMsgCollection.Add;
+
+                NewMSWCollectItem.SetDirectJSONString(
+                '{"command":"autr_ok",'+
+                '"client_id":"'+IntToStr(
+                InputJSONMessages.Items[i].ClientID)+
+                '","msg_end":"ok"}');
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+
+
+                SocketLogMemo.Lines.Add('Количество нитей '+
+                  IntToStr(SocketCoord.TCPClientCollection.
+                  Count));
+
+                SocketCoord.TCPClientCollection.
+                    Items[clientIndex].Pozyvnoi:=
+                    AutorizedVerifyADODS.
+                    FieldByName('Pozyvnoi').AsInteger;
+                SocketCoord.TCPClientCollection.
+                    Items[clientIndex].DriverDBID:=
+                    AutorizedVerifyADODS.
+                    FieldByName('BOLD_ID').AsInteger;
+                SocketCoord.TCPClientCollection.
+                    Items[clientIndex].Autorized:=True;
+
+                success_login:=True;
+
+                SocketLogMemo.Lines.Add('Подключился'+
+                    ' водитель с позывным '+
+                    IntToStr(SocketCoord.TCPClientCollection.
+                    Items[clientIndex].Pozyvnoi));
+
+                if success_login then
+                  begin
+                  if InputJSONObject.getString('sl')='ok' then
+                  begin
+                    NewMSWCollectItem:=SendMsgCollection.Add;
+
+                    if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then
+                      NewMSWCollectItem.SetDirectJSONString(
+                        GetJSONSectorList)
+                    else
+                      NewMSWCollectItem.SetDirectJSONString(
+                        TranslitRus2Lat(GetJSONSectorList, False));
+
+                    NewMSWCollectItem.ClientID:=
+                      InputJSONMessages.Items[i].ClientID;
+                    NewMSWCollectItem.GetMessage().ClientID:=
+                      InputJSONMessages.Items[i].ClientID;
+
+                    if (IniFile.ReadString(
+                      'BUSINESS_DATA',
+                      'использовать_тарифы',
+                      'NO')='YES') then
+                      begin
+                        NewMSWCollectItem:=SendMsgCollection.Add;
+
+                        if SocketCoord.TCPClientCollection.
+                          Items[clientIndex].useUTF8 then
+                            NewMSWCollectItem.SetDirectJSONString(
+                              GetJSONTOList)
+                        else
+                          NewMSWCollectItem.SetDirectJSONString(
+                            TranslitRus2Lat(GetJSONTOList, False));
+
+                        NewMSWCollectItem.ClientID:=
+                          InputJSONMessages.Items[i].ClientID;
+                        NewMSWCollectItem.GetMessage().ClientID:=
+                          InputJSONMessages.Items[i].ClientID;
+                      end;
+                  end;
+
+                  NewMSWCollectItem:=SendMsgCollection.Add;
+                  if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then
+                    NewMSWCollectItem.SetDirectJSONString(
+                      Self.getDriverStatusJSON
+                      (AutorizedVerifyADODS.
+                        FieldByName('BOLD_ID').AsInteger))
+                  else
+                    NewMSWCollectItem.SetDirectJSONString(
+                      TranslitRus2Lat(Self.getDriverStatusJSON
+                      (AutorizedVerifyADODS.
+                        FieldByName('BOLD_ID').AsInteger), False));
+                  NewMSWCollectItem.ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+                  NewMSWCollectItem.GetMessage().ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+
+                  NewMSWCollectItem:=SendMsgCollection.Add;
+                  NewMSWCollectItem.SetDirectJSONString(
+                    Self.getDriverJSONSettings
+                    (AutorizedVerifyADODS.
+                      FieldByName('BOLD_ID').AsInteger));
+                  NewMSWCollectItem.ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+                  NewMSWCollectItem.GetMessage().ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+
+                  NewMSWCollectItem:=SendMsgCollection.Add;
+                  NewMSWCollectItem.SetDirectJSONString(
+                    getSectorsStatus);
+                  NewMSWCollectItem.ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+                  NewMSWCollectItem.GetMessage().ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+
+                  try
+                  if ( SettingsADODS.FieldByName
+                    ('use_fordbroadcast_priority').AsInteger=1) then
+                  begin
+                  end
+                  else
+                  begin
+                    addDirectJSONMessageToClient(
+                      SettingsADODS.FieldByName
+                      ('forders_wbroadcast').AsString,
+                      InputJSONMessages.Items[i].ClientID);
+                  end;
+                  except on Efb:Exception do
+                  begin
+                    SocketLogMemo.Lines.Add(
+                      'Неудачная операция отсылки аукционных заявок подключившемуся водителю!'+
+                      Efb.Message);
+                  end;
+                  end;
+
+                  SocketCoord.deleteOldClientThreads(
+                      InputJSONMessages.Items[i].
+                      ClientID,
+                      AutorizedVerifyADODS.
+                      FieldByName('Pozyvnoi').AsInteger);
+
+                  end;
+
+              except on E:Exception do
+                SocketLogMemo.Lines.Add(
+                  'Неудачная операция '+
+                  'постановки на линию! '+
+                  E.Message);
+              end;
+              end
+              else
+                begin
+
+                  NewMSWCollectItem:=SendMsgCollection.Add;
+
+                  NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"autr_uns",'+
+                  '"msg_end":"ok"}');
+                  SocketLogMemo.Lines.Add('Неудачная аутентификация (тип 1)');
+
+                  NewMSWCollectItem.ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+                  NewMSWCollectItem.GetMessage().ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+
+                end;
+              end
+            else
+            begin
+              //Подозрение на атаку (подбор пароля)
+              NewMSWCollectItem:=SendMsgCollection.Add;
+
+              NewMSWCollectItem.SetDirectJSONString(
+              '{"command":"autr_uns",'+
+              '"msg_end":"ok"}');
+              SocketLogMemo.Lines.Add('Неудачная аутентификация (тип 2)');
+
+              NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+            end;
+            end
+            else
+              begin
+                //Подозрение на атаку
+              end;
+
+          end;
+
+    if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].Autorized then
+		if commandName='accept_order' then
+          begin
+            if StrToIntDef(InputJSONObject.
+                getString('wait'),-1)>0 then
+            begin   
+            //Водитель пытается принять предложенный заказ
+            count:=0;
+            try
+			
+              SetOrdOcAtStat2ADOSP.Parameters.Refresh;
+              SetOrdOcAtStat2ADOSP.Parameters.
+                ParamByName('@order_id').Value:=
+                StrToIntDef(InputJSONObject.
+                getString('order_id'),-1);
+              SetOrdOcAtStat2ADOSP.Parameters.
+                ParamByName('@waiting').Value:=
+                StrToIntDef(InputJSONObject.
+                getString('wait'),60);
+              SetOrdOcAtStat2ADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              if InputJSONObject.getString('manual')='yes' then
+                SetOrdOcAtStat2ADOSP.Parameters.
+                ParamByName('@is_manual').Value:=
+                1
+              else
+                SetOrdOcAtStat2ADOSP.Parameters.
+                ParamByName('@is_manual').Value:=
+                0;
+			        if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'ожидание_при_запросе_на_выполнение',
+                'NO')<>'YES') then
+				        SetOrdOcAtStat2ADOSP.Parameters.
+                ParamByName('@status').Value:=ORDER_IS_OCCUPED
+			        else
+				      SetOrdOcAtStat2ADOSP.Parameters.
+                ParamByName('@status').Value:=ORDER_OCCUPED_DENY;
+              SetOrdOcAtStat2ADOSP.Parameters.
+                ParamByName('@count').Value:=0;  
+              SetOrdOcAtStat2ADOSP.ExecProc;
+              //SetOrdOcAtStatADOSP.Refresh;
+              //SetOrdOcAtStatADOSP.Active:=True;
+              count:=SetOrdOcAtStat2ADOSP.Parameters.
+                ParamValues['@count'];
+              SocketLogMemo.Lines.Add('Найдено заказов - '+IntToStr(count));
+              if (count>0) then
+                SocketLogMemo.Lines.Add(
+                'Запрос попытки '+
+                'принять заказ '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...')
+              else
+              begin
+
+                NewMSWCollectItem:=SendMsgCollection.Add;
+
+                NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"order_occuped",'+
+                  '"order_id":"'+InputJSONObject.
+                  getString('order_id')+
+                  '","client_id":"'+IntToStr(
+                  InputJSONMessages.Items[i].ClientId)+
+                  '","msg_end":"ok"}');
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+
+                SocketLogMemo.Lines.Add(
+                'Запрос попытки '+
+                'принять заказ '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса попытки '+
+                'принять заказ! '+E.Message);
+            end;
+            end
+            else
+            begin
+			      //Водитель пытается принять предложенный заказ
+            count:=0;
+            try
+			
+              SetOrdOcAtStatADOSP.Parameters.Refresh;
+              SetOrdOcAtStatADOSP.Parameters.
+                ParamByName('@order_id').Value:=
+                StrToIntDef(InputJSONObject.
+                getString('order_id'),-1);
+              SetOrdOcAtStatADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              if InputJSONObject.getString('manual')='yes' then
+                SetOrdOcAtStatADOSP.Parameters.
+                ParamByName('@is_manual').Value:=
+                1
+              else
+                SetOrdOcAtStatADOSP.Parameters.
+                ParamByName('@is_manual').Value:=
+                0;
+			        if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'ожидание_при_запросе_на_выполнение',
+                'NO')<>'YES') then
+				        SetOrdOcAtStatADOSP.Parameters.
+                ParamByName('@status').Value:=ORDER_IS_OCCUPED
+			        else
+				      SetOrdOcAtStatADOSP.Parameters.
+                ParamByName('@status').Value:=ORDER_OCCUPED_DENY;
+              SetOrdOcAtStatADOSP.Parameters.
+                ParamByName('@count').Value:=0;  
+              SetOrdOcAtStatADOSP.ExecProc;
+              //SetOrdOcAtStatADOSP.Refresh;
+              //SetOrdOcAtStatADOSP.Active:=True;
+              count:=SetOrdOcAtStatADOSP.Parameters.
+                ParamValues['@count'];
+              SocketLogMemo.Lines.Add('Найдено заказов - '+IntToStr(count));
+              if (count>0) then
+                SocketLogMemo.Lines.Add(
+                'Запрос попытки '+
+                'принять заказ '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...')
+              else
+              begin
+
+                NewMSWCollectItem:=SendMsgCollection.Add;
+
+                NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"order_occuped",'+
+                  '"order_id":"'+InputJSONObject.
+                  getString('order_id')+
+                  '","client_id":"'+IntToStr(
+                  InputJSONMessages.Items[i].ClientId)+
+                  '","msg_end":"ok"}');
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+
+                SocketLogMemo.Lines.Add(
+                'Запрос попытки '+
+                'принять заказ '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса попытки '+
+                'принять заказ! '+E.Message);
+            end;
+            end
+          end 
+		else if commandName='no_accept_order' then
+          begin
+			    //Водитель отказывается принять предложенный заказ
+          end
+		else if commandName='order_is_my' then
+          begin
+			    //Водитель подтвердил принятый заказ
+            count:=0;
+            try
+              SetOrderGoADOSP.Parameters.Refresh;
+              SetOrderGoADOSP.Parameters.
+                ParamByName('@order_id').Value:=
+                StrToIntDef(InputJSONObject.
+                getString('order_id'),-1);
+              SetOrderGoADOSP.Parameters.
+                ParamByName('@dr_num').Value:=
+                InputJSONMessages.Items[i].Pozyvnoi;
+              SetOrderGoADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+              SetOrderGoADOSP.ExecProc;
+              //SetOrdOcAtStatADOSP.Refresh;
+              //SetOrdOcAtStatADOSP.Active:=True;
+              count:=SetOrderGoADOSP.Parameters.
+                ParamValues['@count'];
+              SocketLogMemo.Lines.Add('Найдено заказов - '+IntToStr(count));
+              if (count>0) then
+              begin
+                client_index:=SocketCoord.
+                  GetActiveClientItemIndexByClientId(
+                  InputJSONMessages.Items[i].ClientId);
+                if (client_index>=0) then
+                begin
+                if SocketCoord.TCPClientCollection.
+                  Items[client_index].GetTreadObject.
+                  SendUTFString('{"sync":"ok","order_id":"'+
+                  InputJSONObject.getString('order_id')+
+                  '","client_id":"'+IntToStr(InputJSONMessages.
+                  Items[i].ClientId)+
+                  '","oper_type":"order_accepting","msg_end":"ok"}',
+                  True) then
+                SocketLogMemo.Lines.Add(
+                'Подтрверждение принятия заказа '
+                +InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принято...');
+                end;
+              end
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Подтрверждение принятия заказа '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТО!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка подтверждения '+
+                'принятия заказ! '+E.Message);
+            end;
+          end
+		else if commandName='onhand_order' then
+          begin
+			//Водитель просит заказ с руки	  
+            if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'запретить_запросы_с_руки',
+                'NO')<>'YES') then
+			begin
+			order_id:=-1;
+            count:=0;
+            try
+
+              InsOrdWithStatusADOSP.Parameters.Refresh;
+			        if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'ожидание_при_запросе_с_руки',
+                'NO')='YES') then
+				        InsOrdWithStatusADOSP.Parameters.
+                  ParamByName('@status').Value:=
+                  ORDER_ONHAND_ALLOW_USER_WAIT
+			        else  //сразу отдаем с руки
+                InsOrdWithStatusADOSP.Parameters.
+                  ParamByName('@status').Value:=
+                  ORDER_ONHAND_ALLOW;
+              InsOrdWithStatusADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              InsOrdWithStatusADOSP.Parameters.
+                ParamByName('@order_id').Value:=-1;
+              InsOrdWithStatusADOSP.Parameters.
+                ParamByName('@disp_id').Value:=-1;
+              InsOrdWithStatusADOSP.Parameters.
+                ParamByName('@adres').Value:=IniFile.ReadString(
+                'BUSINESS_DATA',
+                'текст_при_запросе_с_руки',
+                'С РУКИ');
+              InsOrdWithStatusADOSP.ExecProc;
+
+              order_id:=InsOrdWithStatusADOSP.Parameters.
+                ParamValues['@order_id'];
+              SocketLogMemo.Lines.Add('Найдено водителей - '+IntToStr(order_id));
+
+              if (order_id>0) then
+                //разрешение отправляется в цикле проверки сост заявок
+                SocketLogMemo.Lines.Add(
+                'Запрос с руки '
+                +InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...')
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Запрос с руки '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса с руки! '+E.Message);
+            end;
+			end;
+          end
+		else if commandName='accept_order_cancel' then
+          begin
+			      //Водитель подтвердил отмену заказа диспетчером
+            if Self.setOrderRemoteStatus(
+              StrToIntDef(InputJSONObject.
+                getString('order_id'),-1),
+                ORDER_DISP_CANCEL_DR_INCOURSE) then
+                SocketLogMemo.Lines.Add(
+                'Подтверждение отмены диспетчера '
+                +InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принято...')
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Подтверждение отмены диспетчера '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТО!!!');
+              end;
+          end
+		else if commandName='working_abort' then
+          begin
+			      //Водитель сообщает об отмене заказа клиентом
+          end
+    else if commandName='decline_order' then
+          begin
+			      //Водитель сообщает об отмене заказа
+			if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'разрешить_отмену_водителем',
+                'NO')='YES') then
+			begin
+            count:=0;
+            try
+              SetOrdDrCAttStADOSP.Parameters.Refresh;
+              SetOrdDrCAttStADOSP.Parameters.
+                ParamByName('@order_id').Value:=
+                StrToIntDef(InputJSONObject.
+                getString('order_id'),-1);
+              SetOrdDrCAttStADOSP.Parameters.
+                ParamByName('@dr_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              SetOrdDrCAttStADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+              SetOrdDrCAttStADOSP.ExecProc;
+              //SetOrdOcAtStatADOSP.Refresh;
+              //SetOrdOcAtStatADOSP.Active:=True;
+              count:=SetOrdDrCAttStADOSP.Parameters.
+                ParamValues['@count'];
+              SocketLogMemo.Lines.Add('Найдено заказов - '+IntToStr(count));
+              if (count>0) then
+              begin
+                SocketLogMemo.Lines.Add(
+                'Отказ или отмена заказа '
+                +InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принято...');
+              end
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Отказ или отмена заказа '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТО!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка отказа '+
+                'или отмены заказа! '+E.Message);
+            end;
+			end;
+          end
+    else if commandName='sect_direct' then
+          begin
+			if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'разрешить_передачу_сект_направления',
+                'NO')='YES') then
+			begin//Водитель сообщает о секторе направления
+            try
+              SetSectDirectionADOC.Parameters.
+                ParamByName('sector_id').Value:=
+              StrToIntDef(InputJSONObject.
+                getString('sector_id'),-1);
+              SetSectDirectionADOC.Parameters.
+                ParamByName('order_id').Value:=
+              StrToIntDef(InputJSONObject.
+                getString('order_id'),-1);
+              SetSectDirectionADOC.Execute;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка установки '+
+                'сектора направления заказа! '+E.Message);
+            end;
+			end;
+          end
+	else if commandName='iam_here' then
+          begin
+			if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'разрешить_сообщ_на_точке',
+                'NO')='YES') then
+			begin//Водитель сообщает о секторе направления
+            try
+              OnPlaceADOC.Parameters.
+                ParamByName('order_id').Value:=
+              StrToIntDef(InputJSONObject.
+                getString('order_id'),-1);
+              OnPlaceADOC.Execute;
+              sendDriverStatus(clientIndex, InputJSONMessages.Items[i]);
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка установки '+
+                'признака НА ТОЧКЕ заказа! '+E.Message);
+            end;
+			end;
+          end
+    else if commandName='alarm' then
+          begin
+			      //EVENT_ALARM = 1;
+            //EVENT_ON_REST = 2;
+            //EVENT_SECTOR_DIRECTION = 3;
+            Self.InsertEvent(EVENT_ALARM,-1,InputJSONMessages.Items[i].DriverDBID,
+            -1, Today+Time, 'Водитель нажал тревожную кнопку!!!','','',
+            InputJSONMessages.Items[i].Pozyvnoi);
+          end
+    else if commandName='gpsc' then
+          begin
+			      //EVENT_ALARM = 1;
+            //EVENT_ON_REST = 2;
+            //EVENT_SECTOR_DIRECTION = 3;
+            Self.InsertEvent2(EVENT_GPS_COORDS,-1,InputJSONMessages.Items[i].DriverDBID,
+            -1, Today+Time, 'Переданы координаты водителя!!!','','',
+            InputJSONMessages.Items[i].Pozyvnoi,InputJSONObject.
+                  getString('lt'),InputJSONObject.
+                  getString('ln'));
+          end
+		else if commandName='order_complete' then
+          begin
+			      //Водитель отчитывается по завершению
+            count:=0;
+            try
+
+              order_time:=0;
+              try
+                order_time:=StrToIntDef(InputJSONObject.
+                  getString('time'),0);
+              except on E:Exception do
+              end;
+
+              order_distance:=0;
+              try
+                order_distance:=StrToIntDef(InputJSONObject.
+                  getString('tdist'),0);
+              except on E:Exception do
+              end;
+
+              orderSumm:=StrToFloatDef(InputJSONObject.
+                getString('sale'),-1.0);
+
+              if (orderSumm>=0) then
+              begin
+              if (order_time<=0) and (order_distance<=0) then
+              begin
+              AttOrdCompleteADOSP.Parameters.Refresh;
+              AttOrdCompleteADOSP.Parameters.
+                ParamByName('@order_id').Value:=
+                StrToIntDef(InputJSONObject.
+                getString('order_id'),-1);
+              AttOrdCompleteADOSP.Parameters.
+                ParamByName('@summ').Value:=
+                orderSumm;
+              AttOrdCompleteADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+			        if (IniFile.ReadString(
+                    'BUSINESS_DATA','ожидание_при_отчете',
+                    'NO')='YES') then
+				      AttOrdCompleteADOSP.Parameters.
+                ParamByName('@status').Value:=
+					    ORDER_COMPLETE_ALLOW_USER_WAIT
+			        else //сразу считаем разрешенным к завершению
+				      AttOrdCompleteADOSP.Parameters.
+					      ParamByName('@status').Value:=
+						    ORDER_COMLETE_ALLOW;
+              AttOrdCompleteADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+              AttOrdCompleteADOSP.ExecProc;
+              //SetOrdOcAtStatADOSP.Refresh;
+              //SetOrdOcAtStatADOSP.Active:=True;
+              count:=AttOrdCompleteADOSP.Parameters.
+                ParamValues['@count'];
+              end
+              else
+              begin
+              AttOrdCompleteADOSP3.Parameters.Refresh;
+              AttOrdCompleteADOSP3.Parameters.
+                ParamByName('@order_id').Value:=
+                StrToIntDef(InputJSONObject.
+                getString('order_id'),-1);
+              AttOrdCompleteADOSP3.Parameters.
+                ParamByName('@summ').Value:=
+                orderSumm;
+              AttOrdCompleteADOSP3.Parameters.
+                ParamByName('@order_time').Value:=
+                order_time;
+              AttOrdCompleteADOSP3.Parameters.
+                ParamByName('@tm_distance').Value:=
+                order_distance;
+              AttOrdCompleteADOSP3.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+			        if (IniFile.ReadString(
+                    'BUSINESS_DATA','ожидание_при_отчете',
+                    'NO')='YES') then
+				      AttOrdCompleteADOSP3.Parameters.
+                ParamByName('@status').Value:=
+					    ORDER_COMPLETE_ALLOW_USER_WAIT
+			        else //сразу считаем разрешенным к завершению
+				      AttOrdCompleteADOSP3.Parameters.
+					      ParamByName('@status').Value:=
+						    ORDER_COMLETE_ALLOW;
+              AttOrdCompleteADOSP3.Parameters.
+                ParamByName('@count').Value:=0;
+              AttOrdCompleteADOSP3.ExecProc;
+              //SetOrdOcAtStatADOSP.Refresh;
+              //SetOrdOcAtStatADOSP.Active:=True;
+              count:=AttOrdCompleteADOSP3.Parameters.
+                ParamValues['@count'];
+              end;
+              SocketLogMemo.Lines.Add('Найдено заказов - '+IntToStr(count));
+              end
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Неверная отчетная сумма!');
+              end;
+              if (count>0) then
+              begin
+                success_send:=True;
+
+                client_index:=SocketCoord.
+                  GetActiveClientItemIndexByClientId(
+                  InputJSONMessages.Items[i].ClientId);
+
+                if (client_index>=0) and
+                  not (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'ожидание_при_отчете',
+                'NO')='YES') then
+                success_send:=SocketCoord.TCPClientCollection.
+                  Items[client_index].GetTreadObject.
+                  SendUTFString(
+                  '{"command":"order_close","order_id":"'+
+                  InputJSONObject.getString('order_id')+
+                  '","client_id":"'+IntToStr(InputJSONMessages.
+                  Items[i].ClientId)+
+                  '","msg_end":"ok"}',
+                  True);
+                if success_send then
+                SocketLogMemo.Lines.Add(
+                'Отчет заказа '
+                +InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' передан в базу...')
+                else
+                  SocketLogMemo.Lines.Add(
+                'Неудачная отправка '+
+                'подтверждения, но отчет заказа '
+                +InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' передан в базу...');
+              end
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Отчет заказа '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка отчета '+
+                'заказа от водителя! '+E.Message);
+            end;
+          end
+		else if commandName='sign_out' then
+          begin
+			      //Водитель просит о снятии с линии
+            count:=0;
+            try
+
+              if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'разрешить_снятие_с_линии',
+                'NO')='YES') then
+              begin
+                SetDriverOutLineADOSP.Parameters.Refresh;
+                SetDriverOutLineADOSP.Parameters.
+                  ParamByName('@driver_id').Value:=
+                    InputJSONMessages.Items[i].DriverDBID;
+                SetDriverOutLineADOSP.Parameters.
+                  ParamByName('@count').Value:=0;
+                SetDriverOutLineADOSP.ExecProc;
+                count:=SetDriverOutLineADOSP.Parameters.
+                  ParamValues['@count'];
+              end
+              else
+              begin
+                if (IniFile.ReadString(
+                  'BUSINESS_DATA',
+                  'создавать_событие_о_снятии',
+                  'NO')='YES') then
+                Self.InsertEvent(RemoteControlUnit.EVENT_FROM_LINE,
+                  -1,InputJSONMessages.Items[i].DriverDBID,
+                  -1, Today+Time, 'Водитель хочет cняться с линии!!!','','',
+                  InputJSONMessages.Items[i].Pozyvnoi);
+
+              end;
+
+              SocketLogMemo.Lines.Add('Найдено водителей - '+IntToStr(count));
+              if (count>0) then
+              begin
+                SocketLogMemo.Lines.Add(
+                'Запрос на снятие с линии'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...');
+
+                NewMSWCollectItem:=SendMsgCollection.Add;
+
+                NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"out_stat",'+
+                  '"succ":"yes"'+
+                  ',"msg_end":"ok"}');
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+              end
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Запрос на снятие с линии'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+
+                NewMSWCollectItem:=SendMsgCollection.Add;
+
+                NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"out_stat",'+
+                  '"succ":"no"'+
+                  ',"msg_end":"ok"}');
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса на снятие с линии! '+E.Message);
+            end;
+          end
+		else if commandName='on_rest' then
+          begin
+			      //Водитель просит перерыв
+            count:=0;
+            try
+              SetDrRemStatusADOSP.Parameters.Refresh;
+              if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'автоматическая_постановка_на_перерыв',
+                'NO')='YES') then
+              begin
+                SetDrRemStatusADOSP.Parameters.
+                ParamByName('@status').Value:=
+                DR_ON_REST;
+                SetDrRemStatusADOSP.Parameters.
+                ParamByName('@check_busy').Value:=-1;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@on_launch').Value:=-1;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@on_line').Value:=-1;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@sync').Value:=-1;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              SetDrRemStatusADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+              SetDrRemStatusADOSP.ExecProc;
+              //SetOrdOcAtStatADOSP.Refresh;
+              //SetOrdOcAtStatADOSP.Active:=True;
+              count:=SetDrRemStatusADOSP.Parameters.
+                ParamValues['@count'];
+              end
+              else
+              begin
+              Self.InsertEvent(RemoteControlUnit.EVENT_ON_REST,
+                -1,InputJSONMessages.Items[i].DriverDBID,
+                -1, Today+Time, 'Водитель хочет на перерыв!!!','','',
+                InputJSONMessages.Items[i].Pozyvnoi);
+              //SetDrRemStatusADOSP.Parameters.
+              //  ParamByName('@status').Value:=
+              //  DR_ON_REST_ATTEMPT;
+              end;
+
+              SocketLogMemo.Lines.Add('Найдено водителей - '+IntToStr(count));
+              if (count>0) then
+                SocketLogMemo.Lines.Add(
+                'Запрос на перерыв'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...')
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Запрос на перерыв'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса на перерыв! '+E.Message);
+            end;
+          end
+    else if commandName='from_rest' then
+      begin
+        if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'автоматическое_снятие_с_перерыва',
+                'NO')='YES') then
+        begin
+          if Self.setDriverRemoteStatus(
+          InputJSONMessages.Items[i].DriverDBID,
+          DR_FROM_REST_ATTEMPT, 1, -1, -1, -1) then
+          begin
+            SocketLogMemo.Lines.Add(
+                'Запрос на перерыв'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...');
+          end
+          else
+            SocketLogMemo.Lines.Add(
+                'Запрос c перерыва'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+        end
+        else
+              begin
+              Self.InsertEvent(RemoteControlUnit.EVENT_FROM_REST,
+                -1,InputJSONMessages.Items[i].DriverDBID,
+                -1, Today+Time, 'Водитель хочет уйти с перерыва!!!','','',
+                InputJSONMessages.Items[i].Pozyvnoi);
+              end;
+      end
+		else if commandName='queue_query' then
+          begin
+			      //Водитель просит информацию о своем местоположении в очереди
+            count:=0;
+            try
+              GetDrQueuePosADOSP.Parameters.Refresh;
+              GetDrQueuePosADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              GetDrQueuePosADOSP.Parameters.
+                ParamByName('@pos_msg').Value:='';
+              GetDrQueuePosADOSP.ExecProc;
+
+              NewMSWCollectItem:=SendMsgCollection.Add;
+
+              if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then
+                NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"queue_answer",'+
+                  '"msg":"'+
+                  GetDrQueuePosADOSP.Parameters.
+                  ParamValues['@pos_msg']+
+                  '","client_id":"'+IntToStr(
+                  InputJSONMessages.Items[i].ClientId)+
+                  '","msg_end":"ok"}')
+              else
+                NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"queue_answer",'+
+                  '"msg":"'+TranslitRus2Lat(
+                  GetDrQueuePosADOSP.Parameters.
+                  ParamValues['@pos_msg'])+
+                  '","client_id":"'+IntToStr(
+                  InputJSONMessages.Items[i].ClientId)+
+                  '","msg_end":"ok"}');
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+              {SocketLogMemo.Lines.Add('Найдено заказов - '+IntToStr(count));
+              if (count>0) then
+                SocketLogMemo.Lines.Add(
+                'Подтрверждение принятия заказа '
+                +InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принято...')
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Подтрверждение принятия заказа '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТО!!!');
+              end;  }
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса '+
+                'местоположения в очереди! '+E.Message);
+            end;
+          end
+        else if commandName='sector_list_query' then
+          begin
+			      //Водитель просит информацию о своем местоположении в очереди
+            count:=0;
+            try
+
+              NewMSWCollectItem:=SendMsgCollection.Add;
+
+              if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then
+                NewMSWCollectItem.SetDirectJSONString(
+                  GetJSONSectorList)
+              else
+                NewMSWCollectItem.SetDirectJSONString(
+                  TranslitRus2Lat(GetJSONSectorList, False));
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса '+
+                'списка секторов! '+E.Message);
+            end;
+          end
+        else if commandName='op_requ' then
+          begin
+            if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'использовать_тарифы',
+                'NO')='YES')   then
+            begin
+			      //Водитель просит информацию о своем местоположении в очереди
+            count:=0;
+            try
+
+              NewMSWCollectItem:=SendMsgCollection.Add;
+
+              if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then
+                NewMSWCollectItem.SetDirectJSONString(
+                  GetJSONTOList)
+              else
+                NewMSWCollectItem.SetDirectJSONString(
+                  TranslitRus2Lat(GetJSONTOList, False));
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса '+
+                'списка тарифов и опций! '+E.Message);
+            end;
+            end;
+          end
+        else if commandName='dls' then
+          begin
+			      //Водитель просит информацию о своем местоположении в очереди
+            count:=0;
+            try
+
+              NewMSWCollectItem:=SendMsgCollection.Add;
+
+              if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then
+                NewMSWCollectItem.SetDirectJSONString(
+                  GetJSONDriversList)
+              else
+                NewMSWCollectItem.SetDirectJSONString(
+                  TranslitRus2Lat(GetJSONDriversList, False));
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса '+
+                'списка водителей! '+E.Message);
+            end;
+          end
+        else if commandName='change_sector' then
+          begin
+			      //Водитель просит информацию о своем местоположении в очереди
+            count:=0;
+            sectorName:='';
+            try
+              SetDrSectorADOSP.Parameters.Refresh;
+              SetDrSectorADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              SetDrSectorADOSP.Parameters.
+                ParamByName('@sector_id').Value:=
+                StrToIntDef(InputJSONObject.
+                getString('sector_id'),-1);
+              SetDrSectorADOSP.Parameters.
+                ParamByName('@count').Value:=1;
+              SetDrSectorADOSP.Parameters.
+                ParamByName('@remote_sync').Value:=1;
+              SetDrSectorADOSP.Parameters.
+                ParamByName('@sector_name').Value:='';
+              SetDrSectorADOSP.ExecProc;
+
+              count:=SetDrSectorADOSP.Parameters.
+                ParamValues['@count'];
+              sectorName:=SetDrSectorADOSP.Parameters.
+                ParamValues['@sector_name'];
+
+              SocketLogMemo.Lines.Add('Найдено ВОДИТЕЛЕЙ - '+IntToStr(count));
+              if (count>0) then
+              begin
+
+                NewMSWCollectItem:=SendMsgCollection.Add;
+
+                if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then
+                NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"goto_sector"'+
+                  ',"sector_id":"'+InputJSONObject.
+                  getString('sector_id')+
+                  '","sector_name":"'+sectorName+
+                  '","client_id":"'+IntToStr(
+                  InputJSONMessages.Items[i].ClientId)+
+                  '","msg_end":"ok"}')
+                else
+                NewMSWCollectItem.SetDirectJSONString(
+                  '{"command":"goto_sector"'+
+                  ',"sector_id":"'+InputJSONObject.
+                  getString('sector_id')+
+                  '","sector_name":"'+TranslitRus2Lat(
+                  sectorName)+
+                  '","client_id":"'+IntToStr(
+                  InputJSONMessages.Items[i].ClientId)+
+                  '","msg_end":"ok"}');
+
+                NewMSWCollectItem.ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+                NewMSWCollectItem.GetMessage().ClientID:=
+                  InputJSONMessages.Items[i].ClientID;
+
+                SocketLogMemo.Lines.Add(
+                'Запрос смены сектора '
+                +InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...');
+              end
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Запрос смены сектора '+InputJSONObject.
+                getString('order_id')+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+              end;  
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка запроса '+
+                'смены сектора! '+E.Message);
+            end;
+          end
+        else if (commandName='status_request') or
+          (commandName='r') then
+        begin
+          NewMSWCollectItem:=SendMsgCollection.Add;
+
+          if SocketCoord.TCPClientCollection.
+                    Items[clientIndex].useUTF8 then
+            NewMSWCollectItem.SetDirectJSONString(
+              Self.getDriverStatusJSON
+              (InputJSONMessages.Items[i].DriverDBID))
+          else
+            NewMSWCollectItem.SetDirectJSONString(
+              TranslitRus2Lat(Self.getDriverStatusJSON
+              (InputJSONMessages.Items[i].DriverDBID), False));
+
+          NewMSWCollectItem.ClientID:=
+            InputJSONMessages.Items[i].ClientID;
+          NewMSWCollectItem.GetMessage().ClientID:=
+            InputJSONMessages.Items[i].ClientID;
+        end
+        else if (commandName='ss') then
+        begin
+            NewMSWCollectItem:=SendMsgCollection.Add;
+                  NewMSWCollectItem.SetDirectJSONString(
+                    getSectorsStatus);
+                  NewMSWCollectItem.ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+                  NewMSWCollectItem.GetMessage().ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+        end 
+        else if (commandName='opr') then
+        begin
+         if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'разр_передачу_баланса',
+                'NO')='YES') or (InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('opnm')<>'dr_bal') then
+         begin
+            NewMSWCollectItem:=SendMsgCollection.Add;
+                  NewMSWCollectItem.SetDirectJSONString(
+                    proceedOpRequest(InputJSONMessages.
+                      Items[i].MSGJSONObject,
+                      InputJSONMessages.Items[i].DriverDBID,
+                      InputJSONMessages.Items[i].Pozyvnoi));
+                  NewMSWCollectItem.ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+                  NewMSWCollectItem.GetMessage().ClientID:=
+                    InputJSONMessages.Items[i].ClientID;
+         end;
+        end
+        else if (commandName='dpay_aok') then
+        begin
+          //Водитель согласен на ежедневное отчисление
+            count:=0;
+            try
+
+              SetDrDailyPStatusADOSP.Parameters.Refresh;
+              SetDrDailyPStatusADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              SetDrDailyPStatusADOSP.Parameters.
+                ParamByName('@pstatus').Value:=
+                PAY_ALLOW;
+              SetDrDailyPStatusADOSP.Parameters.
+                ParamByName('@count').Value:=1;
+              SetDrDailyPStatusADOSP.ExecProc;
+
+              count:=SetDrDailyPStatusADOSP.Parameters.
+                ParamValues['@count'];
+
+              //SocketLogMemo.Lines.Add('Найдено ВОДИТЕЛЕЙ - '+IntToStr(count));
+              if (count>0) then
+              begin
+
+                SocketLogMemo.Lines.Add(
+                'Согласие на оплату'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...');
+              end
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Согласие на оплату'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка согласия '+
+                'на оплату! '+E.Message);
+            end;
+        end
+        else if (commandName='dpay_ano') then
+        begin
+          //Водитель согласен на ежедневное отчисление
+            count:=0;
+            try
+
+              SetDrDailyPStatusADOSP.Parameters.Refresh;
+              SetDrDailyPStatusADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                InputJSONMessages.Items[i].DriverDBID;
+              SetDrDailyPStatusADOSP.Parameters.
+                ParamByName('@pstatus').Value:=
+                PAY_DECLINE;
+              SetDrDailyPStatusADOSP.Parameters.
+                ParamByName('@count').Value:=1;
+              SetDrDailyPStatusADOSP.ExecProc;
+
+              count:=SetDrDailyPStatusADOSP.Parameters.
+                ParamValues['@count'];
+
+              //SocketLogMemo.Lines.Add('Найдено ВОДИТЕЛЕЙ - '+IntToStr(count));
+              if (count>0) then
+              begin
+
+                SocketLogMemo.Lines.Add(
+                'Отказ оплаты'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' принят...');
+              end
+              else
+              begin
+                SocketLogMemo.Lines.Add(
+                'Отказ оплаты'+
+                ' клиентом '+IntToStr(
+                InputJSONMessages.Items[i].ClientId)+
+                ' , позывной '+IntToStr(
+                InputJSONMessages.Items[i].Pozyvnoi)+
+                ' НЕ ПРИНЯТ!!!');
+              end;
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка согласия '+
+                'на оплату! '+E.Message);
+            end;
+        end
+        else if (commandName='settar') then
+        begin
+          if (StrToIntDef(
+              InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('oid'), -1)>=0) and
+             (StrToIntDef(
+              InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('tarid'), -1)>=0) then
+          Self.setOrderTarif(StrToIntDef(
+              InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('oid'), 0),
+              StrToIntDef(
+              InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('tarid'), 0)        );
+        end
+        else if (commandName='setopts') then
+        begin
+          if (StrToIntDef(
+              InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('oid'), -1)>=0) and
+             (InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('oopts')<>'') then
+          Self.setOrderOptComb(StrToIntDef(
+              InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('oid'), 0),
+
+              InputJSONMessages.
+                      Items[i].MSGJSONObject.
+                      getString('oopts')        );
+        end
+        else
+          begin
+            SocketLogMemo.Lines.Add(
+                  'Неизвестная команда! "'+commandName+'".');
+          end;
+
+        end;
+
+    except on E:Exception do
+
+    end;
+    end
+    else
+    begin
+      //Не найдена нить для сообщения
+      //собственно и удалять нечего
+    end;
+
+
+
+  end;
+
+  finally
+    inputMessagesInProcess:=False;
+  end;
+  end;
+
+  Result:=res;
+
+end;
+
+function TRemoteControlForm.InsertEvent(ETYPE_ID, ORDER_ID,
+  DRIVER_ID, SECTOR_ID: Integer; EDATE: TDateTime;
+  DESCRIPTION: Widestring; ADRES, PHONE: String;
+  DR_NUM: Integer): Integer;
+var count: Integer;
+begin
+  count:=0;
+            try
+              InsertEventADOSP.Parameters.Refresh;
+              InsertEventADOSP.Parameters.
+                ParamByName('@etype_id').Value:=
+                ETYPE_ID;
+              InsertEventADOSP.Parameters.
+                ParamByName('@order_id').Value:=
+                ORDER_ID;
+              InsertEventADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                DRIVER_ID;
+              InsertEventADOSP.Parameters.
+                ParamByName('@sector_id').Value:=
+                SECTOR_ID;
+              InsertEventADOSP.Parameters.
+                ParamByName('@edate').Value:=
+                EDATE;
+              InsertEventADOSP.Parameters.
+                ParamByName('@description').Value:=
+                DESCRIPTION;
+              InsertEventADOSP.Parameters.
+                ParamByName('@adres').Value:=
+                ADRES;
+              InsertEventADOSP.Parameters.
+                ParamByName('@phone').Value:=
+                PHONE;
+              InsertEventADOSP.Parameters.
+                ParamByName('@dr_num').Value:=
+                DR_NUM;
+              InsertEventADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+              InsertEventADOSP.ExecProc;
+              count:=InsertEventADOSP.Parameters.
+                ParamValues['@count'];
+              SocketLogMemo.Lines.Add('Добавлено событий - '
+                +IntToStr(count));
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка '+
+                'добавления события! '+E.Message);
+            end;
+    Result:=count;
+end;
+
+function TRemoteControlForm.InsertEvent2(ETYPE_ID, ORDER_ID,
+  DRIVER_ID, SECTOR_ID: Integer; EDATE: TDateTime;
+  DESCRIPTION: Widestring; ADRES, PHONE: String;
+  DR_NUM: Integer; LATITUDE, LONGITUDE: String): Integer;
+var count: Integer;
+begin
+  count:=0;
+            try
+              InsertEvent2ADOSP.Parameters.Refresh;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@etype_id').Value:=
+                ETYPE_ID;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@order_id').Value:=
+                ORDER_ID;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@driver_id').Value:=
+                DRIVER_ID;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@sector_id').Value:=
+                SECTOR_ID;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@edate').Value:=
+                EDATE;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@description').Value:=
+                DESCRIPTION;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@adres').Value:=
+                ADRES;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@phone').Value:=
+                PHONE;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@dr_num').Value:=
+                DR_NUM;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@LATITUDE').Value:=
+                LATITUDE;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@LONGITUDE').Value:=
+                LONGITUDE;
+              InsertEvent2ADOSP.Parameters.
+                ParamByName('@count').Value:=0;
+              InsertEvent2ADOSP.ExecProc;
+              count:=InsertEvent2ADOSP.Parameters.
+                ParamValues['@count'];
+              SocketLogMemo.Lines.Add('Добавлено событий - '
+                +IntToStr(count));
+            except on E:Exception do
+              SocketLogMemo.Lines.Add(
+                'Неудачная обработка '+
+                'добавления события! '+E.Message);
+            end;
+    Result:=count;
+end;
+
+function TRemoteControlForm.GetJSONSectorList: Widestring;
+var res: Widestring;
+begin
+  res:='{"command":"sector_list","sector_count":"0","msg_end":"ok"}';
+  try
+      GetJSONSectorListADOQ.Active:=False;
+      GetJSONSectorListADOQ.Active:=True;
+      if GetJSONSectorListADOQ.RecordCount>0 then
+      begin
+        res:=GetJSONSectorListADOQ.
+          FieldByName('sector_list').AsString;
+      end;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачный запрос '+
+      'списка секторов! '+E.Message);
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.GetJSONTOList: Widestring;
+var res: Widestring;
+begin
+  res:='{"command":"to_lst","t_cnt":"0","op_cnt":"0","msg_end":"ok"}';
+  try
+      GetTOListADOQ.Active:=False;
+      GetTOListADOQ.Active:=True;
+      if GetTOListADOQ.RecordCount>0 then
+      begin
+        res:=GetTOListADOQ.
+          FieldByName('to_list').AsString;
+      end;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачный запрос '+
+      'списка тарифов и опций! '+E.Message);
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.GetJSONDriversList: Widestring;
+var res: Widestring;
+begin
+  res:='{"command":"sector_list","sector_count":"0","msg_end":"ok"}';
+  try
+      GetJSONDriversListADOQ.Active:=False;
+      GetJSONDriversListADOQ.Active:=True;
+      if GetJSONDriversListADOQ.RecordCount>0 then
+      begin
+        res:=GetJSONDriversListADOQ.
+          FieldByName('dr_list').AsString;
+      end;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачный запрос '+
+      'списка водителей! '+E.Message);
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.GetDrSectorName(driverId: Integer): String;
+var res: String;
+begin
+  res:='НЕ ОПРЕДЕЛЕН';
+  try
+      GetDrSectorNameADOQ.Active:=False;
+      GetDrSectorNameADOQ.Parameters.ParamByName(
+        'driver_id').Value:=driverId;
+      GetDrSectorNameADOQ.Active:=True;
+      if GetDrSectorNameADOQ.RecordCount>0 then
+      begin
+        res:=GetDrSectorNameADOQ.
+          FieldByName('sector_name').AsString;
+      end;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачный запрос имени '+
+      'сектора водителя! '+E.Message);
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.getDriverCalcBlocked(DrNum: Integer): Boolean;
+var res: Boolean;
+begin
+  res:=True;
+  try
+      GetDrLockOnCalcDebtADOSP.Parameters.Refresh;
+      GetDrLockOnCalcDebtADOSP.Parameters.
+          ParamByName('@dr_num').Value:=DrNum;
+      GetDrLockOnCalcDebtADOSP.Parameters.
+          ParamByName('@res').Value:=-1;
+      GetDrLockOnCalcDebtADOSP.ExecProc;
+      if GetDrLockOnCalcDebtADOSP.Parameters.
+                ParamValues['@res']<>1 then
+                res:=False;
+  except on E:Exception do
+    SocketLogMemo.Lines.Add(
+      'Неудачный запрос GetDrLockOnCalcDebtADOSP статуса '+
+      'блокировки по оплате водителя! '+E.Message);
+  end;
+  Result:=res;
+end;
+
+function TRemoteControlForm.verifyDriverClient(login, psw: String): Boolean;
+var res: Boolean;
+begin
+  res:=False;
+  AutorizedVerifyADODS.Active:=False;
+  AutorizedVerifyADODS.Parameters.
+    ParamByName('login').Value:=login;
+  AutorizedVerifyADODS.Parameters.
+    ParamByName('psw').Value:=psw;
+  try
+    AutorizedVerifyADODS.Active:=True;
+    if (AutorizedVerifyADODS.RecordCount=1) then
+    begin
+      if (IniFile.ReadString(
+                'BUSINESS_DATA',
+                'блокировать_по_выч_балансу',
+                'NO')='YES') then
+        begin
+          res:=not getDriverCalcBlocked(AutorizedVerifyADODS.FieldByName('Pozyvnoi').AsInteger);
+          if not res  then
+            SocketLogMemo.Lines.Add('Ошибка при верификации (водитель блокирован согласно политике допуска)'+
+            'login:'''+login+''', password:'''+psw+'''. '+
+        'Блокировка водителя '+ AutorizedVerifyADODS.FieldByName('Pozyvnoi').AsString);
+        end
+        else
+          res:=True;
+    end
+    else
+      begin
+        SocketLogMemo.Lines.Add('Ошибка при верификации '+
+        'login:'''+login+''', password:'''+psw+'''. '+
+        'Ни одного или более одного водителя с '+
+        'одинаковыми параметрами либо недостаточно средств.');
+      end;
+  except on E:Exception do
+    begin
+      SocketLogMemo.Lines.Add('Ошибка при верификации '+
+        'login:'''+login+''', password:'''+psw+'''. '+
+        E.Message);
+    end;
+  end;
+  Result:=res;
+end;
+
+procedure TRemoteControlForm.BitBtn1Click(Sender: TObject);
+begin
+  SocketCoord.TCPClientCollection.Items[0].
+  addTestInputCommand(
+    InputJSONTestEdit.Text);
+end;
+
+procedure TRemoteControlForm.BitBtn2Click(Sender: TObject);
+var NewMSWCollectItem: TMessageCollectionItem;
+begin
+  NewMSWCollectItem:=SendMsgCollection.Add;
+
+  NewMSWCollectItem.SetDirectJSONString(
+    OutputJSONTestEdit.Text);
+
+  NewMSWCollectItem.ClientID:=
+    StrToIntDef(ClientIdEdit.Text,-1);
+  NewMSWCollectItem.GetMessage().ClientID:=
+    StrToIntDef(ClientIdEdit.Text,-1);
+
+end;
+
+procedure TRemoteControlForm.TabSheet7Show(Sender: TObject);
+begin
+  try
+    if ServerMainForm.MainBASEADOC.Connected and False then
+    begin
+      self.SettingsADODS.Active:=False;
+      self.SettingsADODS.Active:=True;
+    end;
+  except
+  end;
+end;
+
+procedure TRemoteControlForm.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  if (IniFile.ReadString('BUSINESS_DATA',
+	'вести_лог','NO')='YES') then
+  begin
+  if logActive then
+    CloseFile(logFile);
+  end;
+end;
+
+procedure TRemoteControlForm.AutoArhivedTimerTimer(Sender: TObject);
+var arhCapacity: Integer;
+begin
+  if ServerMainForm.MainBASEADOC.Connected then
+  begin
+
+  if IniFile.ReadString('BUSINESS_DATA',
+  'автоархивирование_заявок','NO')='YES' then
+  begin
+
+    arhCapacity:=IniFile.
+      ReadInteger('BUSINESS_DATA',
+      'величина_порции_архивного_удаления',100);
+
+    if arhCapacity>100 then
+      arhCapacity:=100;
+
+    SocketLogMemo.Lines.Add(
+        DateTimeToStr(Today+Time)+
+        ' Вызов процедуры'+
+        ' автоархивирования...');
+    try
+      AutoArhADOSP.Parameters.Refresh;
+      AutoArhADOSP.Parameters.
+        ParamByName('@arh_limit').Value:=arhCapacity;
+      AutoArhADOSP.Parameters.
+        ParamByName('@del_limit').Value:=arhCapacity;
+      AutoArhADOSP.Parameters.
+        ParamByName('@last_arhived').Value:=IncDay(Today,-1);
+      AutoArhADOSP.Parameters.
+        ParamByName('@day_distance').Value:=42;      
+      AutoArhADOSP.Parameters.
+        ParamByName('@arh_count').Value:=0;
+      AutoArhADOSP.Parameters.
+        ParamByName('@del_count').Value:=0;
+      AutoArhADOSP.ExecProc;
+    except on E:Exception do
+      SocketLogMemo.Lines.Add(
+        'Неудачный вызов процедуры'+
+        ' автоархивирования! '+E.Message);
+    end;
+
+    SocketLogMemo.Lines.Add(
+        DateTimeToStr(Today+Time)+
+        ' Завершение процедуры'+
+        ' автоархивирования...');
+
+  end;
+
+  end;
+end;
+
+procedure TRemoteControlForm.FormDestroy(Sender: TObject);
+begin
+  if ServerActive then
+  begin
+    Self.SocketCoord.Destroy;
+  end;
+end;
+
+procedure TRemoteControlForm.Timer10SecTimer(Sender: TObject);
+var StateRequestResult: Integer;
+    success: Boolean;
+begin
+
+  if ServerMainForm.MainBASEADOC.Connected then
+  begin
+
+  if IniFile.ReadString('BUSINESS_DATA',
+  'tensec_процедура','NO')='YES' then
+  begin
+    success:=False;
+    //SocketLogMemo.Lines.Add(
+    //    'Вызов процедуры'+
+    //    ' 10 sec задачи...');
+    try
+      One10SecTaskADOSP.Parameters.Refresh;
+      One10SecTaskADOSP.Parameters.
+        ParamByName('@success').Value:=
+        0;
+      One10SecTaskADOSP.ExecProc;
+      if One10SecTaskADOSP.Parameters.
+        ParamValues['@success']=1 then
+                success:=True;
+    except on E:Exception do
+      SocketLogMemo.Lines.Add(
+        'Неудачный вызов процедуры'+
+        ' 10 sec задачи! '+E.Message);
+    end;
+  end;
+
+  end;
+
+end;
+
+end.
